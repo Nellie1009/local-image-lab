@@ -1,0 +1,3468 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>本地生图台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f3ea;
+      --ink: #1d2320;
+      --muted: #66706b;
+      --line: #d8d0c4;
+      --panel: #fffdf8;
+      --field: #ffffff;
+      --accent: #11695c;
+      --accent-strong: #0a4e46;
+      --warn: #9f3b24;
+      --shadow: 0 18px 50px rgba(33, 34, 29, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(120deg, rgba(17, 105, 92, 0.12), transparent 40%),
+        linear-gradient(300deg, rgba(183, 66, 38, 0.10), transparent 42%),
+        var(--bg);
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 60px);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .tagline {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .status-pill {
+      min-width: 132px;
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 14px;
+      color: var(--muted);
+      background: rgba(255, 253, 248, 0.72);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: end;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(320px, 430px) 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 253, 248, 0.88);
+      border: 1px solid rgba(216, 208, 196, 0.92);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    form {
+      padding: 18px;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--field);
+      color: var(--ink);
+      padding: 11px 12px;
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(17, 105, 92, 0.72);
+      box-shadow: 0 0 0 3px rgba(17, 105, 92, 0.14);
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .key-line {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .ghost-button,
+    .primary-button,
+    .download-button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 7px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform 150ms ease, opacity 150ms ease, background 150ms ease;
+      white-space: nowrap;
+    }
+
+    .ghost-button {
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      background: #fbf7ef;
+      color: var(--ink);
+    }
+
+    .primary-button {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      margin-top: 4px;
+    }
+
+    .download-button {
+      padding: 0 14px;
+      background: #e7f0ed;
+      color: var(--accent-strong);
+      border: 1px solid rgba(17, 105, 92, 0.18);
+    }
+
+    .ghost-button:hover,
+    .primary-button:hover,
+    .download-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-button:disabled {
+      cursor: wait;
+      opacity: 0.62;
+      transform: none;
+    }
+
+    .checkline {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 14px;
+    }
+
+    .checkline input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .upload-box {
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.54);
+      padding: 12px;
+    }
+
+    .upload-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .file-input-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .upload-actions .ghost-button,
+    .upload-actions .upload-button {
+      min-height: 36px;
+      font-size: 13px;
+    }
+
+    .upload-button {
+      cursor: pointer;
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      background: #fbf7ef;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .hint {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .model-picker {
+      position: relative;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      color: var(--ink);
+    }
+
+    .model-picker > summary {
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 10px 36px 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--field);
+      color: var(--ink);
+      font-weight: 700;
+      line-height: 1.35;
+      list-style: none;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+
+    .model-picker > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .model-picker > summary::after {
+      content: "";
+      position: absolute;
+      top: 16px;
+      right: 14px;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .model-picker[open] > summary {
+      border-color: rgba(17, 105, 92, 0.72);
+      box-shadow: 0 0 0 3px rgba(17, 105, 92, 0.14);
+    }
+
+    .model-picker[open] > summary::after {
+      top: 20px;
+      transform: rotate(225deg);
+    }
+
+    .model-options {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 6px);
+      left: 0;
+      width: min(360px, calc(100vw - 48px));
+      max-height: 330px;
+      overflow-y: auto;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf8;
+      box-shadow: 0 18px 42px rgba(33, 34, 29, 0.18);
+    }
+
+    .model-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin: 0;
+      padding: 9px 8px;
+      border-radius: 6px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.35;
+      text-transform: none;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+
+    .model-option:hover {
+      background: #eef7f3;
+    }
+
+    .model-option input {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+      margin: 1px 0 0;
+      accent-color: var(--accent);
+    }
+
+    .model-picker.is-busy > summary {
+      opacity: 0.62;
+      cursor: wait;
+    }
+
+    .skill-field-header {
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+
+    .skill-field-header label {
+      margin: 0;
+    }
+
+    .skill-header-actions {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      gap: 8px;
+    }
+
+    .skill-collapsed-selection {
+      display: none;
+      max-width: 240px;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .skill-collapsed-selection.show {
+      display: block;
+    }
+
+    .skill-panel-toggle {
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fbf7ef;
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 150ms ease, background 150ms ease;
+    }
+
+    .skill-panel-toggle:hover {
+      border-color: rgba(17, 105, 92, 0.5);
+      background: #eef7f3;
+    }
+
+    .skill-panel-toggle:focus-visible {
+      outline: 0;
+      border-color: rgba(17, 105, 92, 0.72);
+      box-shadow: 0 0 0 3px rgba(17, 105, 92, 0.14);
+    }
+
+    .skill-chevron {
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(225deg);
+      transition: transform 160ms ease;
+    }
+
+    .skill-panel-toggle[aria-expanded="false"] .skill-chevron {
+      transform: rotate(45deg);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skill-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      padding: 12px;
+    }
+
+    .skill-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .skill-actions .ghost-button {
+      min-height: 34px;
+      font-size: 13px;
+    }
+
+    .skill-add-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .skill-add-row input {
+      min-height: 38px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .skill-add-row .ghost-button {
+      min-height: 38px;
+      font-size: 13px;
+    }
+
+    .skill-summary {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .skill-add-status {
+      min-height: 18px;
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .skill-cards {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .saved-prompt-card {
+      position: relative;
+    }
+
+    .skill-preview {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(216, 208, 196, 0.86);
+      border-radius: 8px;
+      background: #fffdf8;
+      cursor: pointer;
+      color: var(--ink);
+      text-align: left;
+      transition: border-color 150ms ease, background 150ms ease;
+    }
+
+    .saved-prompt-card.custom .skill-preview {
+      padding-right: 48px;
+    }
+
+    .saved-prompt-delete {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fffdf8;
+      color: var(--warn);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .skill-preview.selected {
+      border-color: rgba(17, 105, 92, 0.5);
+      background: #eef7f3;
+    }
+
+    .skill-preview strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .skill-preview span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .skill-viewer {
+      display: none;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+
+    .skill-viewer.show {
+      display: block;
+    }
+
+    .skill-content {
+      max-height: 320px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      padding: 10px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+      color: var(--ink);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .thumb {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      cursor: grab;
+      transition: border-color 150ms ease, opacity 150ms ease, transform 150ms ease;
+    }
+
+    .thumb.dragging {
+      opacity: 0.48;
+      transform: scale(0.98);
+      cursor: grabbing;
+    }
+
+    .thumb.drop-target {
+      border-color: var(--accent);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      cursor: zoom-in;
+    }
+
+    .thumb span {
+      position: absolute;
+      left: 4px;
+      bottom: 4px;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(29, 35, 32, 0.78);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .thumb-tools {
+      position: absolute;
+      inset: 4px 4px auto auto;
+      display: flex;
+      gap: 3px;
+    }
+
+    .thumb-tools button {
+      width: 22px;
+      height: 22px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .preview {
+      min-height: 650px;
+      overflow: hidden;
+    }
+
+    .preview-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 16px 0;
+    }
+
+    .preview-title {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .canvas-wrap {
+      display: grid;
+      place-items: center;
+      min-height: 490px;
+      padding: 16px;
+    }
+
+    .canvas-wrap.comparison-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
+      place-items: stretch;
+      align-items: start;
+      gap: 14px;
+    }
+
+    .model-result {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    .model-result-head {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .model-result-name {
+      min-width: 0;
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .model-result-badge {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .model-result[data-tone="success"] .model-result-badge {
+      color: var(--accent);
+    }
+
+    .model-result[data-tone="error"] .model-result-badge {
+      color: var(--warn);
+    }
+
+    .model-result[data-tone="warning"] .model-result-badge {
+      color: #7a5a08;
+    }
+
+    .model-result-body {
+      min-height: 280px;
+      display: grid;
+      place-items: center;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .model-result-state {
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.45;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+
+    .model-result-state strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .model-image-grid {
+      width: 100%;
+      display: grid;
+      gap: 10px;
+    }
+
+    .model-image-grid .result-image {
+      max-height: 58vh;
+      box-shadow: none;
+    }
+
+    .model-result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 12px 12px;
+    }
+
+    .model-result-actions .download-button {
+      min-height: 36px;
+      font-size: 12px;
+    }
+
+    .export-selection-actions {
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .export-selection-actions .ghost-button {
+      min-height: 34px;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+    .export-selection-summary {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .export-selectable {
+      position: relative;
+    }
+
+    .export-select-toggle {
+      position: absolute;
+      z-index: 2;
+      top: 8px;
+      left: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 28px;
+      padding: 4px 7px;
+      border: 1px solid rgba(25, 33, 31, 0.18);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .export-select-toggle input {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+    }
+
+    .export-selectable.is-export-selected .result-image,
+    .history-card.is-export-selected {
+      outline: 3px solid rgba(17, 105, 92, 0.82);
+      outline-offset: -3px;
+    }
+
+    .empty {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-width: 560px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      padding: 20px;
+      background:
+        linear-gradient(45deg, rgba(17, 105, 92, 0.08) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(17, 105, 92, 0.08) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(17, 105, 92, 0.08) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(17, 105, 92, 0.08) 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+    }
+
+    .empty strong {
+      display: block;
+      color: var(--ink);
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .empty span {
+      display: block;
+      max-width: 360px;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .result-image {
+      width: 100%;
+      max-width: 720px;
+      max-height: 72vh;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: 0 16px 44px rgba(33, 34, 29, 0.14);
+      cursor: zoom-in;
+    }
+
+    .message {
+      margin: 0 16px 16px;
+      padding: 12px;
+      border-radius: 7px;
+      background: #f2e2dc;
+      color: var(--warn);
+      line-height: 1.45;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    details {
+      margin: 0 16px 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      color: var(--muted);
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    pre {
+      overflow: auto;
+      background: #1f2522;
+      color: #eef5f1;
+      padding: 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .history-panel {
+      margin: 0 16px 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .history-title {
+      font-weight: 900;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: end;
+    }
+
+    .history-actions .ghost-button {
+      min-height: 36px;
+      font-size: 13px;
+    }
+
+    .history-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+      gap: 10px;
+    }
+
+    .history-card {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .history-card img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      background: #f5f1e9;
+      cursor: zoom-in;
+    }
+
+    .history-meta {
+      padding: 8px;
+    }
+
+    .history-meta strong,
+    .history-meta span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .history-meta span {
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .history-meta .download-button {
+      min-height: 34px;
+      width: 100%;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .history-empty {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 10px 0;
+    }
+
+    .page {
+      display: block;
+    }
+
+    .page.hidden {
+      display: none;
+    }
+
+    .history-page {
+      padding: 18px;
+    }
+
+    .history-page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .history-page-head h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(29, 35, 32, 0.82);
+    }
+
+    .lightbox.show {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: min(100%, 1280px);
+      max-height: 88vh;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    @media (max-width: 860px) {
+      header {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      main,
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      .preview {
+        min-height: auto;
+      }
+
+      .canvas-wrap {
+        min-height: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div>
+        <h1>本地生图台</h1>
+        <p class="tagline">单文件页面，浏览器直连 OpenAI Images API。</p>
+      </div>
+      <div class="top-actions">
+        <a class="ghost-button" href="#home" id="home-link">生成</a>
+        <a class="ghost-button" href="#history" id="history-link">生图历史</a>
+        <div class="status-pill" id="status">待生成</div>
+      </div>
+    </header>
+
+    <main class="page" id="home-page">
+      <section class="panel">
+        <form id="image-form">
+          <div class="field">
+            <label for="api-key">API Key</label>
+            <div class="key-line">
+              <input id="api-key" name="apiKey" type="password" autocomplete="off" placeholder="sk-...">
+              <button class="ghost-button" type="button" id="toggle-key" aria-label="显示或隐藏 API Key">显示</button>
+            </div>
+          </div>
+
+          <label class="checkline">
+            <input id="remember-key" type="checkbox">
+            记住在这个浏览器
+          </label>
+
+          <div class="field">
+            <label for="base-url">API Base URL</label>
+            <input id="base-url" name="baseUrl" type="url" value="https://cdn.12ai.org">
+          </div>
+
+          <div class="field">
+            <label for="source-images">参考图</label>
+            <div class="upload-box">
+              <div class="upload-actions">
+                <label class="upload-button" for="source-images">选择图片</label>
+                <button class="ghost-button" type="button" id="clear-source-images">清空上传图</button>
+              </div>
+              <input class="file-input-hidden" id="source-images" name="sourceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple>
+              <p class="hint" id="upload-hint">不上传图就是文生图；上传图后自动走图生图。GPT Image 编辑接口一次最多 16 张参考图。</p>
+              <div class="thumb-grid" id="thumb-grid"></div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label id="model-label">模型</label>
+              <input id="model" name="model" type="hidden" value="gpt-image-2">
+              <details class="model-picker" id="model-picker">
+                <summary id="model-summary" aria-labelledby="model-label">gpt-image-2</summary>
+                <div class="model-options" id="model-options" role="group" aria-labelledby="model-label">
+                  <label class="model-option"><input type="checkbox" value="gpt-image-2" checked>gpt-image-2</label>
+                  <label class="model-option"><input type="checkbox" value="gpt-image-1.5">gpt-image-1.5</label>
+                  <label class="model-option"><input type="checkbox" value="chatgpt-image-latest">chatgpt-image-latest</label>
+                  <label class="model-option"><input type="checkbox" value="gpt-image-1">gpt-image-1</label>
+                  <label class="model-option"><input type="checkbox" value="gpt-image-1-mini">gpt-image-1-mini</label>
+                  <label class="model-option"><input type="checkbox" value="dall-e-3">dall-e-3</label>
+                  <label class="model-option"><input type="checkbox" value="dall-e-2">dall-e-2</label>
+                  <label class="model-option"><input type="checkbox" value="gemini-3.1-flash-image-preview">gemini-3.1-flash-image-preview</label>
+                  <label class="model-option"><input type="checkbox" value="gemini-3-pro-image-preview">gemini-3-pro-image-preview</label>
+                  <label class="model-option"><input type="checkbox" value="gemini-3.1-flash-image">gemini-3.1-flash-image</label>
+                  <label class="model-option"><input type="checkbox" value="gemini-3.1-flash-lite-image">gemini-3.1-flash-lite-image</label>
+                  <label class="model-option"><input type="checkbox" value="gemini-3-pro-image">gemini-3-pro-image</label>
+                  <label class="model-option"><input type="checkbox" value="gemini-2.5-flash-image">gemini-2.5-flash-image</label>
+                </div>
+              </details>
+            </div>
+            <div class="field">
+              <label for="size">尺寸</label>
+              <select id="size" name="size">
+                <option value="auto" selected>auto</option>
+                <option value="1024x1024">1024x1024</option>
+                <option value="1536x1024">1536x1024</option>
+                <option value="1024x1536">1024x1536</option>
+                <option value="1792x1024">1792x1024</option>
+                <option value="1024x1792">1024x1792</option>
+                <option value="512x512">512x512</option>
+                <option value="256x256">256x256</option>
+                <option value="1:1">1:1</option>
+                <option value="3:2">3:2</option>
+                <option value="2:3">2:3</option>
+                <option value="4:3">4:3</option>
+                <option value="3:4">3:4</option>
+                <option value="4:5">4:5</option>
+                <option value="5:4">5:4</option>
+                <option value="9:16">9:16</option>
+                <option value="16:9">16:9</option>
+                <option value="21:9">21:9</option>
+                <option value="1:4">1:4</option>
+                <option value="4:1">4:1</option>
+                <option value="1:8">1:8</option>
+                <option value="8:1">8:1</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="quality">质量</label>
+              <select id="quality" name="quality">
+                <option value="auto" selected>auto</option>
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+                <option value="standard">standard</option>
+                <option value="hd">hd</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="output-format">格式</label>
+              <select id="output-format" name="outputFormat">
+                <option value="png" selected>png</option>
+                <option value="jpeg">jpeg</option>
+                <option value="webp">webp</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="style">风格</label>
+              <select id="style" name="style">
+                <option value="auto" selected>auto</option>
+                <option value="vivid">vivid</option>
+                <option value="natural">natural</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="count">数量</label>
+              <select id="count" name="count">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="background">背景</label>
+              <select id="background" name="background">
+                <option value="auto" selected>auto</option>
+                <option value="opaque">opaque</option>
+                <option value="transparent">transparent</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="gemini-resolution">Gemini 分辨率</label>
+              <select id="gemini-resolution" name="geminiResolution">
+                <option value="auto" selected>auto</option>
+                <option value="512px">512px</option>
+                <option value="1K">1K</option>
+                <option value="2K">2K</option>
+                <option value="4K">4K</option>
+                <option value="1024px">1024px</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="prompt">Prompt</label>
+            <textarea id="prompt" name="prompt" placeholder="例：一张干净的产品海报，桌面上的透明玻璃香水瓶，柔和自然光，细腻真实摄影风格"></textarea>
+          </div>
+
+          <div class="field" id="skill-field">
+            <div class="skill-field-header">
+              <label for="prompt-skill">保存的 Prompt</label>
+              <div class="skill-header-actions">
+                <span class="skill-collapsed-selection" id="skill-collapsed-selection">未选择</span>
+                <button class="skill-panel-toggle" id="toggle-skill-panel" type="button" aria-expanded="true" aria-controls="skill-panel-body" title="收起保存的 Prompt">
+                  <span class="skill-chevron" aria-hidden="true"></span>
+                  <span class="sr-only" id="skill-panel-toggle-label">收起保存的 Prompt</span>
+                </button>
+              </div>
+            </div>
+            <div class="skill-panel" id="skill-panel-body">
+              <select id="prompt-skill" name="promptSkill">
+                <option value="" selected>不使用保存的 Prompt</option>
+                <option value="photo-abstract-editorial">photo-abstract-editorial · 抽象编辑画</option>
+                <option value="tait-crt-interface-skill">tait-crt-interface-skill · CRT像素界面</option>
+                <option value="travel-memory-sticker-card">travel-memory-sticker-card · 旅行贴纸卡</option>
+                <option value="y2k-poster-design">y2k-poster-design · Y2K海报</option>
+              </select>
+              <div class="skill-add-row">
+                <input id="skill-github-input" type="text" placeholder="给当前主 Prompt 起个名字">
+                <button class="ghost-button" id="add-skill-button" type="button">保存当前</button>
+              </div>
+              <p class="skill-add-status" id="skill-add-status"></p>
+              <div class="skill-cards" id="skill-cards"></div>
+              <p class="skill-summary" id="skill-summary">选择保存项后，生成时会把它放在主 Prompt 前面；主 Prompt 仍可单独输入。</p>
+              <div class="skill-actions">
+                <button class="ghost-button" type="button" id="toggle-skill-content">查看 Prompt 内容</button>
+                <a class="ghost-button" id="skill-source-link" href="#" target="_blank" rel="noreferrer" hidden>来源</a>
+              </div>
+              <div class="skill-viewer" id="skill-viewer">
+                <pre class="skill-content" id="skill-content">选择一个保存的 Prompt 后可以查看内容。</pre>
+              </div>
+            </div>
+          </div>
+
+          <button class="primary-button" id="submit" type="submit">生成图片</button>
+        </form>
+      </section>
+
+      <section class="panel preview">
+        <div class="preview-top">
+          <div class="preview-title">结果</div>
+          <div id="actions"></div>
+        </div>
+        <div class="canvas-wrap" id="canvas-wrap">
+          <div class="empty" id="preview-state">
+            <div>
+              <strong>准备生成</strong>
+              <span>填写 prompt，或先上传参考图开始图生图。</span>
+            </div>
+          </div>
+        </div>
+        <div class="message" id="message"></div>
+        <details>
+          <summary>请求 JSON</summary>
+          <pre id="request-json">{}</pre>
+        </details>
+        <div class="history-panel">
+          <div class="history-top">
+            <div class="history-title">最近 12 张</div>
+            <div class="history-actions">
+              <a class="ghost-button" href="#history">查看全部</a>
+            </div>
+          </div>
+          <div class="history-list" id="history-list">
+            <div class="history-empty">还没有历史图片。</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="panel page hidden history-page" id="history-page">
+      <div class="history-page-head">
+        <h2>生图历史</h2>
+        <div class="history-actions">
+          <a class="ghost-button" href="#home">返回生成</a>
+          <span class="export-selection-summary" id="history-export-selection-status">已选 0 张</span>
+          <button class="ghost-button" type="button" id="export-selection-history" disabled>导出 Excel</button>
+          <button class="ghost-button" type="button" id="clear-export-selection-history" disabled>清空选择</button>
+          <button class="ghost-button" type="button" id="download-history">下载全部</button>
+          <button class="ghost-button" type="button" id="clear-history">清空</button>
+        </div>
+      </div>
+      <div class="history-list" id="full-history-list">
+        <div class="history-empty">还没有历史图片。</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox-close" type="button" id="lightbox-close" aria-label="关闭大图">×</button>
+    <img id="lightbox-image" alt="大图预览">
+  </div>
+
+  <script src="prompt-library.js"></script>
+  <script src="multi-model.js"></script>
+  <script src="comparison-export.js"></script>
+  <script src="vendor/exceljs.min.js"></script>
+  <script>
+    const form = document.querySelector("#image-form");
+    const apiKeyInput = document.querySelector("#api-key");
+    const rememberKey = document.querySelector("#remember-key");
+    const toggleKey = document.querySelector("#toggle-key");
+    const statusEl = document.querySelector("#status");
+    const submitButton = document.querySelector("#submit");
+    const canvasWrap = document.querySelector("#canvas-wrap");
+    const previewState = document.querySelector("#preview-state");
+    const messageEl = document.querySelector("#message");
+    const requestJsonEl = document.querySelector("#request-json");
+    const actionsEl = document.querySelector("#actions");
+    const historyExportSelectionStatus = document.querySelector("#history-export-selection-status");
+    const exportSelectionHistoryButton = document.querySelector("#export-selection-history");
+    const clearExportSelectionHistoryButton = document.querySelector("#clear-export-selection-history");
+    const historyList = document.querySelector("#history-list");
+    const fullHistoryList = document.querySelector("#full-history-list");
+    const downloadHistoryButton = document.querySelector("#download-history");
+    const clearHistoryButton = document.querySelector("#clear-history");
+    const homePage = document.querySelector("#home-page");
+    const historyPage = document.querySelector("#history-page");
+    const lightbox = document.querySelector("#lightbox");
+    const lightboxImage = document.querySelector("#lightbox-image");
+    const lightboxClose = document.querySelector("#lightbox-close");
+    const modelSelect = document.querySelector("#model");
+    const modelPicker = document.querySelector("#model-picker");
+    const modelSummary = document.querySelector("#model-summary");
+    const modelOptions = document.querySelector("#model-options");
+    const modelCheckboxes = [...modelOptions.querySelectorAll('input[type="checkbox"]')];
+    const baseUrlInput = document.querySelector("#base-url");
+    const sourceImagesInput = document.querySelector("#source-images");
+    const clearSourceImagesButton = document.querySelector("#clear-source-images");
+    const uploadHint = document.querySelector("#upload-hint");
+    const thumbGrid = document.querySelector("#thumb-grid");
+    const sizeSelect = document.querySelector("#size");
+    const qualitySelect = document.querySelector("#quality");
+    const outputFormatSelect = document.querySelector("#output-format");
+    const styleSelect = document.querySelector("#style");
+    const countSelect = document.querySelector("#count");
+    const backgroundSelect = document.querySelector("#background");
+    const geminiResolutionSelect = document.querySelector("#gemini-resolution");
+    const promptInput = document.querySelector("#prompt");
+    const promptSkillSelect = document.querySelector("#prompt-skill");
+    const skillPanelBody = document.querySelector("#skill-panel-body");
+    const toggleSkillPanelButton = document.querySelector("#toggle-skill-panel");
+    const skillPanelToggleLabel = document.querySelector("#skill-panel-toggle-label");
+    const skillCollapsedSelection = document.querySelector("#skill-collapsed-selection");
+    const skillSummary = document.querySelector("#skill-summary");
+    const skillViewer = document.querySelector("#skill-viewer");
+    const skillContent = document.querySelector("#skill-content");
+    const toggleSkillContentButton = document.querySelector("#toggle-skill-content");
+    const skillSourceLink = document.querySelector("#skill-source-link");
+    const skillCards = document.querySelector("#skill-cards");
+    const skillGithubInput = document.querySelector("#skill-github-input");
+    const addSkillButton = document.querySelector("#add-skill-button");
+    const skillAddStatus = document.querySelector("#skill-add-status");
+
+    const DEFAULT_BASE_URLS = {
+      openai: "https://cdn.12ai.org",
+      gemini: "https://cdn.12ai.org"
+    };
+
+    const HISTORY_DB_NAME = "local-image-generator-history";
+    const HISTORY_STORE_NAME = "images";
+    const REMEMBER_SETTINGS_KEY = "image_generator_remember_settings_v2";
+    const SAVED_PROMPTS_KEY = "image_generator_saved_prompts_v1";
+    const LEGACY_CUSTOM_SKILLS_KEY = "image_generator_custom_skills_v1";
+    const SKILL_PANEL_COLLAPSED_KEY = "image_generator_skill_panel_collapsed_v1";
+    const LEGACY_API_KEY = "openai_image_api_key";
+    const REQUEST_MAX_ATTEMPTS = 3;
+    const REQUEST_TIMEOUT_MS = 180000;
+    const MODEL_REQUEST_CONCURRENCY = 2;
+    const GEMINI_INLINE_REQUEST_MAX_BYTES = 20 * 1024 * 1024;
+    const GEMINI_JSON_OVERHEAD_BYTES = 256 * 1024;
+    const PROMPT_MAX_LENGTH = 32000;
+    const RETRYABLE_STATUS_CODES = new Set([408, 409, 425, 429, 500, 502, 503, 504]);
+    let selectedSourceImages = [];
+    let modelResultPanels = new Map();
+    let modelRequestRecords = new Map();
+    let activeComparisonModels = [];
+    const exportSelection = new Map();
+
+    const OPTION_SETS = {
+      gptSizes: ["auto", "1024x1024", "1536x1024", "1024x1536"],
+      dalle3Sizes: ["1024x1024", "1792x1024", "1024x1792"],
+      dalle2Sizes: ["256x256", "512x512", "1024x1024"],
+      geminiRatios: ["auto", "1:1", "3:2", "2:3", "4:3", "3:4", "4:5", "5:4", "9:16", "16:9", "21:9"],
+      geminiProRatios: ["auto", "1:1", "3:2", "2:3", "4:3", "3:4", "4:5", "5:4", "9:16", "16:9", "21:9", "1:4", "4:1", "1:8", "8:1"],
+      gptQualities: ["auto", "low", "medium", "high"],
+      dalle3Qualities: ["standard", "hd"],
+      formats: ["png", "jpeg", "webp"],
+      geminiResolutions: ["auto", "512px", "1K", "2K", "4K"],
+      geminiLiteResolutions: ["auto", "1K"],
+      geminiProResolutions: ["auto", "1K", "2K", "4K"],
+      gemini25Resolutions: ["auto"],
+      gptBackgrounds: ["auto", "opaque", "transparent"],
+      image2Backgrounds: ["auto", "opaque"],
+      styles: ["auto", "vivid", "natural"],
+      counts1to8: ["1", "2", "3", "4", "5", "6", "7", "8"],
+      gptCounts: ["1", "2", "3", "4", "5", "6", "7", "8"],
+      dalle2Counts: ["1", "2", "3", "4", "5", "6", "7", "8"],
+      singleCount: ["1"]
+    };
+
+    const MODEL_CONFIGS = {
+      "gpt-image-2": {
+        provider: "openai",
+        sizes: OPTION_SETS.gptSizes,
+        qualities: OPTION_SETS.gptQualities,
+        formats: OPTION_SETS.formats,
+        backgrounds: OPTION_SETS.image2Backgrounds,
+        geminiResolutions: [],
+        styles: ["auto"],
+        counts: OPTION_SETS.gptCounts,
+        supportsEdit: true,
+        editMaxImages: 16,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 25
+      },
+      "gpt-image-1.5": {
+        provider: "openai",
+        sizes: OPTION_SETS.gptSizes,
+        qualities: OPTION_SETS.gptQualities,
+        formats: OPTION_SETS.formats,
+        backgrounds: OPTION_SETS.gptBackgrounds,
+        geminiResolutions: [],
+        styles: ["auto"],
+        counts: OPTION_SETS.gptCounts,
+        supportsEdit: true,
+        editMaxImages: 16,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 25
+      },
+      "chatgpt-image-latest": {
+        provider: "openai",
+        sizes: OPTION_SETS.gptSizes,
+        qualities: OPTION_SETS.gptQualities,
+        formats: OPTION_SETS.formats,
+        backgrounds: OPTION_SETS.gptBackgrounds,
+        geminiResolutions: [],
+        styles: ["auto"],
+        counts: OPTION_SETS.gptCounts,
+        supportsEdit: true,
+        editMaxImages: 16,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 25
+      },
+      "gpt-image-1": {
+        provider: "openai",
+        sizes: OPTION_SETS.gptSizes,
+        qualities: OPTION_SETS.gptQualities,
+        formats: OPTION_SETS.formats,
+        backgrounds: OPTION_SETS.gptBackgrounds,
+        geminiResolutions: [],
+        styles: ["auto"],
+        counts: OPTION_SETS.gptCounts,
+        supportsEdit: true,
+        editMaxImages: 16,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 25
+      },
+      "gpt-image-1-mini": {
+        provider: "openai",
+        sizes: OPTION_SETS.gptSizes,
+        qualities: OPTION_SETS.gptQualities,
+        formats: OPTION_SETS.formats,
+        backgrounds: OPTION_SETS.gptBackgrounds,
+        geminiResolutions: [],
+        styles: ["auto"],
+        counts: OPTION_SETS.gptCounts,
+        supportsEdit: true,
+        editMaxImages: 16,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 25
+      },
+      "dall-e-3": {
+        provider: "openai",
+        sizes: OPTION_SETS.dalle3Sizes,
+        qualities: OPTION_SETS.dalle3Qualities,
+        formats: [],
+        backgrounds: [],
+        geminiResolutions: [],
+        styles: OPTION_SETS.styles,
+        counts: OPTION_SETS.singleCount,
+        supportsEdit: false,
+        editMaxImages: 0,
+        editTypes: [],
+        editMaxSizeMb: 0
+      },
+      "dall-e-2": {
+        provider: "openai",
+        sizes: OPTION_SETS.dalle2Sizes,
+        qualities: [],
+        formats: [],
+        backgrounds: [],
+        geminiResolutions: [],
+        styles: ["auto"],
+        counts: OPTION_SETS.dalle2Counts,
+        supportsEdit: true,
+        editMaxImages: 1,
+        editTypes: ["image/png"],
+        editMaxSizeMb: 4
+      },
+      "gemini-3.1-flash-image-preview": {
+        provider: "gemini",
+        sizes: OPTION_SETS.geminiRatios,
+        qualities: [],
+        formats: [],
+        backgrounds: [],
+        geminiResolutions: OPTION_SETS.geminiResolutions,
+        styles: ["auto"],
+        counts: OPTION_SETS.counts1to8,
+        supportsEdit: true,
+        editMaxImages: 14,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 20
+      },
+      "gemini-3-pro-image-preview": {
+        provider: "gemini",
+        sizes: OPTION_SETS.geminiProRatios,
+        qualities: [],
+        formats: [],
+        backgrounds: [],
+        geminiResolutions: OPTION_SETS.geminiProResolutions,
+        styles: ["auto"],
+        counts: OPTION_SETS.counts1to8,
+        supportsEdit: true,
+        editMaxImages: 14,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 20
+      },
+      "gemini-3.1-flash-image": {
+        provider: "gemini",
+        sizes: OPTION_SETS.geminiRatios,
+        qualities: [],
+        formats: [],
+        backgrounds: [],
+        geminiResolutions: OPTION_SETS.geminiResolutions,
+        styles: ["auto"],
+        counts: OPTION_SETS.counts1to8,
+        supportsEdit: true,
+        editMaxImages: 14,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 20
+      },
+      "gemini-3.1-flash-lite-image": {
+        provider: "gemini",
+        sizes: OPTION_SETS.geminiRatios,
+        qualities: [],
+        formats: [],
+        backgrounds: [],
+        geminiResolutions: OPTION_SETS.geminiLiteResolutions,
+        styles: ["auto"],
+        counts: OPTION_SETS.counts1to8,
+        supportsEdit: true,
+        editMaxImages: 14,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 20
+      },
+      "gemini-3-pro-image": {
+        provider: "gemini",
+        sizes: OPTION_SETS.geminiProRatios,
+        qualities: [],
+        formats: [],
+        backgrounds: [],
+        geminiResolutions: OPTION_SETS.geminiProResolutions,
+        styles: ["auto"],
+        counts: OPTION_SETS.counts1to8,
+        supportsEdit: true,
+        editMaxImages: 14,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 20
+      },
+      "gemini-2.5-flash-image": {
+        provider: "gemini",
+        sizes: OPTION_SETS.geminiRatios,
+        qualities: [],
+        formats: [],
+        backgrounds: [],
+        geminiResolutions: OPTION_SETS.gemini25Resolutions,
+        styles: ["auto"],
+        counts: OPTION_SETS.counts1to8,
+        supportsEdit: true,
+        editMaxImages: 3,
+        editTypes: ["image/png", "image/jpeg", "image/webp"],
+        editMaxSizeMb: 20
+      }
+    };
+
+    const TWELVE_API_GEMINI_MODEL_ALIASES = {
+      "gemini-3.1-flash-image": "gemini-3.1-flash-image-preview",
+      "gemini-3-pro-image": "gemini-3-pro-image-preview"
+    };
+
+    const PROMPT_SKILLS = { ...PromptLibrary.BUILT_IN_SAVED_PROMPTS };
+
+    loadRememberedSettings();
+    loadCustomSavedPrompts();
+
+    toggleKey.addEventListener("click", () => {
+      const shouldShow = apiKeyInput.type === "password";
+      apiKeyInput.type = shouldShow ? "text" : "password";
+      toggleKey.textContent = shouldShow ? "隐藏" : "显示";
+    });
+
+    rememberKey.addEventListener("change", () => {
+      if (!rememberKey.checked) {
+        forgetRememberedSettings();
+      } else if (apiKeyInput.value.trim()) {
+        saveRememberedSettings();
+      }
+    });
+
+    apiKeyInput.addEventListener("input", () => {
+      if (rememberKey.checked) {
+        saveRememberedSettings();
+      }
+      updateReadyPreviewState();
+    });
+    promptInput.addEventListener("input", updateReadyPreviewState);
+
+    baseUrlInput.addEventListener("change", () => {
+      loadKeyForCurrentBaseUrl();
+      if (rememberKey.checked) saveRememberedSettings();
+    });
+    baseUrlInput.addEventListener("blur", () => {
+      loadKeyForCurrentBaseUrl();
+      if (rememberKey.checked) saveRememberedSettings();
+    });
+    modelOptions.addEventListener("change", handleModelSelectionChange);
+    document.addEventListener("click", (event) => {
+      if (!modelPicker.contains(event.target)) modelPicker.open = false;
+    });
+    promptSkillSelect.addEventListener("change", () => {
+      syncPromptSkillControls();
+      updateReadyPreviewState();
+    });
+    toggleSkillPanelButton.addEventListener("click", () => {
+      setSkillPanelCollapsed(toggleSkillPanelButton.getAttribute("aria-expanded") === "true");
+    });
+    toggleSkillContentButton.addEventListener("click", togglePromptSkillContent);
+    skillCards.addEventListener("click", handlePromptSkillCardClick);
+    addSkillButton.addEventListener("click", saveCurrentPrompt);
+    skillGithubInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        saveCurrentPrompt();
+      }
+    });
+    sourceImagesInput.addEventListener("change", appendReferenceFiles);
+    clearSourceImagesButton.addEventListener("click", clearReferenceImages);
+    thumbGrid.addEventListener("click", handleThumbAction);
+    thumbGrid.addEventListener("dragstart", handleThumbDragStart);
+    thumbGrid.addEventListener("dragover", handleThumbDragOver);
+    thumbGrid.addEventListener("dragleave", handleThumbDragLeave);
+    thumbGrid.addEventListener("drop", handleThumbDrop);
+    thumbGrid.addEventListener("dragend", handleThumbDragEnd);
+    downloadHistoryButton.addEventListener("click", downloadAllHistory);
+    clearHistoryButton.addEventListener("click", clearHistory);
+    [exportSelectionHistoryButton].forEach((button) => {
+      button.addEventListener("click", exportSelectedImagesToExcel);
+    });
+    [clearExportSelectionHistoryButton].forEach((button) => {
+      button.addEventListener("click", clearExportSelection);
+    });
+    lightboxClose.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeLightbox();
+    });
+    window.addEventListener("hashchange", syncRoute);
+    syncModelSelection();
+    renderPromptSkillOptions();
+    renderPromptSkillCards();
+    setSkillPanelCollapsed(localStorage.getItem(SKILL_PANEL_COLLAPSED_KEY) === "true", false);
+    syncPromptSkillControls();
+    syncRoute();
+    renderHistory();
+    refreshExportSelectionUi();
+    updateReadyPreviewState();
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      hideMessage();
+
+      const data = new FormData(form);
+      const apiKey = normalizeApiKey(data.get("apiKey"));
+      const rawBaseUrl = stripTrailingSlash(String(data.get("baseUrl") || DEFAULT_BASE_URLS.openai).trim());
+      const userPrompt = String(data.get("prompt") || "").trim();
+      const selectedSavedPromptId = String(data.get("promptSkill") || "");
+      const selectedModels = getSelectedModels();
+
+      if (!apiKey) {
+        setPreviewState("缺少 API Key", "先填 API Key，浏览器才知道该用哪个账号请求。");
+        return showMessage("先填 API Key。");
+      }
+      const keyError = validateHeaderValue(apiKey);
+      if (keyError) {
+        setPreviewState("API Key 需要整理", "输入框里有不能放进请求头的字符，请只保留 token 本体。");
+        return showMessage(`API Key 里有浏览器不能放进请求头的字符：${keyError}\n请只保留 token 本体，例如 sk-...，不要带中文说明、全角符号或多余文本。`);
+      }
+      if (!userPrompt && !selectedSavedPromptId) {
+        setPreviewState("缺少 Prompt", "写一句主 Prompt，或选择一个保存的 Prompt，再点击生成。");
+        return showMessage("先写主 Prompt，或选择一个保存的 Prompt。");
+      }
+      if (!selectedModels.length) {
+        setPreviewState("没有选择模型", "至少选择一个模型后再生成。");
+        return showMessage("至少选择一个模型。");
+      }
+
+      const savedPromptBundle = buildPromptWithSavedPrompt(selectedSavedPromptId, userPrompt);
+      const prompt = savedPromptBundle.prompt;
+      if (prompt.length > PROMPT_MAX_LENGTH) {
+        setPreviewState("Prompt 太长", `当前 ${prompt.length} 字符，接口最多 ${PROMPT_MAX_LENGTH} 字符。请缩短主 Prompt 或保存的 Prompt。`);
+        return showMessage(`Prompt 太长：当前 ${prompt.length} 字符，接口最多 ${PROMPT_MAX_LENGTH} 字符。`);
+      }
+
+      if (rememberKey.checked) {
+        saveRememberedSettings();
+      }
+      apiKeyInput.value = apiKey;
+
+      const sourceImages = getSelectedImages();
+      const sharedPayload = {
+        prompt,
+        size: data.get("size"),
+        quality: data.get("quality"),
+        output_format: data.get("outputFormat"),
+        style: data.get("style"),
+        background: data.get("background"),
+        gemini_resolution: data.get("geminiResolution"),
+        n: Number(data.get("count") || 1)
+      };
+      const comparisonId = createLocalRecordId("comparison");
+
+      createModelComparison(selectedModels);
+      resetModelRequestRecords(selectedModels);
+      setBusy(true);
+      let completedModels = 0;
+
+      try {
+        const outcomes = await MultiModel.runModelQueue(
+          selectedModels,
+          MODEL_REQUEST_CONCURRENCY,
+          async (model) => {
+            try {
+              const result = await generateForModel(model, {
+                apiKey,
+                rawBaseUrl,
+                userPrompt,
+                comparisonId,
+                sharedPayload,
+                sourceImages,
+                savedPromptMetadata: savedPromptBundle.metadata
+              });
+              updateModelRequestRecord(model, { status: result.warnings.length ? "部分完成" : "已完成" });
+              return result;
+            } catch (error) {
+              const message = formatModelGenerationError(model, error);
+              setModelResultState(model, "生成失败", message, "error");
+              updateModelRequestRecord(model, { status: "失败", error: message });
+              throw new Error(message);
+            } finally {
+              completedModels += 1;
+              statusEl.textContent = `生成中 ${completedModels}/${selectedModels.length}`;
+            }
+          }
+        );
+
+        await renderHistory();
+        const failures = outcomes
+          .map((outcome, index) => outcome.status === "rejected" ? `${selectedModels[index]}：${outcome.reason.message}` : "")
+          .filter(Boolean);
+        const warnings = outcomes
+          .flatMap((outcome, index) => outcome.status === "fulfilled"
+            ? (outcome.value.warnings || []).map((warning) => `${selectedModels[index]}：${warning}`)
+            : []);
+        const notices = [...failures, ...warnings];
+        if (notices.length) showMessage(notices.join("\n\n"));
+        const successCount = outcomes.length - failures.length;
+        statusEl.textContent = failures.length ? `完成 ${successCount}/${outcomes.length}` : "已完成";
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    async function generateForModel(model, context) {
+      const config = MODEL_CONFIGS[model] || MODEL_CONFIGS["gpt-image-2"];
+      const payload = cleanPayload(
+        MultiModel.resolveCompatiblePayload(context.sharedPayload, model, config)
+      );
+      const baseUrl = normalizeBaseUrlForProvider(context.rawBaseUrl, config.provider);
+      const directOpenAiError = getDirectOpenAiBrowserError(baseUrl);
+      if (directOpenAiError) throw new Error(directOpenAiError);
+
+      const isEdit = context.sourceImages.length > 0;
+      if (isEdit) {
+        const validationError = validateEditFiles(model, context.sourceImages);
+        if (validationError) throw new Error(validationError);
+      }
+
+      const metadata = {
+        model,
+        prompt: context.sharedPayload.prompt,
+        provider: config.provider,
+        saved_prompt: context.savedPromptMetadata,
+        comparisonId: context.comparisonId,
+        createdAt: Date.now()
+      };
+      const useNativeGemini = config.provider === "gemini" && isNativeGeminiBaseUrl(baseUrl);
+      const warnings = [];
+      setModelResultState(model, isEdit ? "正在编辑图片" : "正在生成图片", "请求已经发出，图片模型可能需要几十秒。", "active");
+
+      if (useNativeGemini) {
+        const geminiBody = await createGeminiBody(payload, context.sourceImages);
+        const geminiCount = Number(payload.n || 1);
+        const geminiRequestModel = getGeminiRequestModel(model, baseUrl);
+        const requestUrl = `${baseUrl}/v1beta/models/${encodeURIComponent(geminiRequestModel)}:generateContent?key=${encodeURIComponent(context.apiKey)}`;
+        const geminiBodyText = JSON.stringify(geminiBody);
+        recordModelRequest(model, {
+          url: requestUrl.replace(/key=[^&]+/, "key=[hidden]"),
+          selected_model: model,
+          request_model: geminiRequestModel,
+          saved_prompt: context.savedPromptMetadata,
+          user_prompt: context.userPrompt,
+          body: redactInlineImages(geminiBody),
+          diagnostics: createRequestDiagnostics(context.sourceImages, geminiBodyText),
+          repeat: geminiCount,
+          image_files: context.sourceImages.map((file) => file.name)
+        });
+
+        const images = [];
+        const requestErrors = [];
+        for (let index = 0; index < geminiCount; index += 1) {
+          try {
+            setModelResultState(model, "正在生成图片", `第 ${index + 1} / ${geminiCount} 次请求中。`, "active");
+            const response = await fetchWithRetry(requestUrl, () => ({
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: geminiBodyText
+            }), {
+              label: `${model} 第 ${index + 1} / ${geminiCount} 次请求`,
+              onRetry: (detail) => setModelResultState(model, "正在重试", detail, "warning")
+            });
+            const json = await parseImageResponse(response);
+            setModelResultState(model, "正在读取结果", `第 ${index + 1} / ${geminiCount} 次请求已响应。`, "active");
+            const responseImages = extractGeminiImages(json);
+            if (!responseImages.length) requestErrors.push(`第 ${index + 1} 次响应里没有图片。`);
+            images.push(...responseImages);
+          } catch (error) {
+            requestErrors.push(`第 ${index + 1} 次：${getErrorText(error)}`);
+            const action = MultiModel.getBatchErrorAction(
+              error?.status,
+              images.length,
+              geminiCount
+            );
+            if (action === "throw") throw error;
+            if (action === "stop") break;
+          }
+        }
+        if (!images.length) throw new Error(`没有成功生成图片。\n${requestErrors.join("\n")}`);
+        if (requestErrors.length) warnings.push(...requestErrors);
+        const generatedImages = prepareGeneratedImages(images, metadata);
+        renderModelImages(model, generatedImages, metadata);
+        setModelResultStatus(model, requestErrors.length ? "部分完成" : "已完成", requestErrors.length ? "warning" : "success");
+        await saveModelHistory(generatedImages, metadata, warnings);
+        return { images: generatedImages, warnings };
+      }
+
+      const compatiblePayload = createOpenAiCompatiblePayload(payload, baseUrl);
+      const requestUrl = `${baseUrl}/images/${isEdit ? "edits" : "generations"}`;
+      const compatiblePayloadText = isEdit ? "" : JSON.stringify(compatiblePayload);
+      recordModelRequest(model, {
+        url: requestUrl,
+        selected_model: model,
+        ...compatiblePayload,
+        saved_prompt: context.savedPromptMetadata,
+        user_prompt: context.userPrompt,
+        diagnostics: createRequestDiagnostics(context.sourceImages, compatiblePayloadText),
+        image_files: context.sourceImages.map((file) => file.name)
+      });
+
+      const response = await fetchWithRetry(requestUrl, () => isEdit ? {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${context.apiKey}` },
+        body: createEditBody(compatiblePayload, context.sourceImages, baseUrl)
+      } : {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${context.apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: compatiblePayloadText
+      }, {
+        label: `${model} 图片${isEdit ? "编辑" : "生成"}请求`,
+        onRetry: (detail) => setModelResultState(model, "正在重试", detail, "warning")
+      });
+      setModelResultState(model, "正在读取结果", "接口已响应，正在解析图片数据。", "active");
+      const json = await parseImageResponse(response);
+      const images = normalizeOpenAiImages(
+        json.data || [],
+        compatiblePayload.output_format || "png"
+      );
+      if (!images.length) throw new Error("接口成功响应了，但返回里没有可显示的图片数据。");
+      const generatedImages = prepareGeneratedImages(images, metadata);
+      renderModelImages(model, generatedImages, metadata);
+      setModelResultStatus(model, "已完成", "success");
+      await saveModelHistory(generatedImages, metadata, warnings);
+      return { images: generatedImages, warnings };
+    }
+
+    async function parseImageResponse(response) {
+      const rawText = await response.text();
+      let json;
+      try {
+        json = rawText ? JSON.parse(rawText) : {};
+      } catch {
+        throw new Error(rawText || "返回不是 JSON。");
+      }
+      if (!response.ok) {
+        const error = new Error(json.error?.message || `请求失败：HTTP ${response.status}`);
+        error.status = response.status;
+        throw error;
+      }
+      return json;
+    }
+
+    async function saveModelHistory(images, metadata, warnings) {
+      try {
+        await saveHistoryRecords(images, metadata);
+      } catch (error) {
+        warnings.push(`图片已生成，但历史保存失败：${getErrorText(error)}`);
+        setModelResultStatus(metadata.model, "图片完成，历史失败", "warning");
+      }
+    }
+
+    function cleanPayload(payload) {
+      const next = {};
+      const config = MODEL_CONFIGS[payload.model] || MODEL_CONFIGS["gpt-image-2"];
+      for (const [key, value] of Object.entries(payload)) {
+        if (value === "" || value === "auto" || value == null) continue;
+        next[key] = value;
+      }
+      if (!config.formats.includes(next.output_format)) {
+        delete next.output_format;
+      }
+      if (!config.backgrounds.includes(next.background)) {
+        delete next.background;
+      }
+      if (!config.styles.includes(next.style)) {
+        delete next.style;
+      }
+      if (!config.qualities.includes(next.quality)) {
+        delete next.quality;
+      }
+      if (!config.sizes.includes(next.size)) {
+        delete next.size;
+      }
+      if (!config.geminiResolutions.includes(next.gemini_resolution)) {
+        delete next.gemini_resolution;
+      }
+      if (!Number.isFinite(next.n) || next.n < 1) next.n = 1;
+      if (!config.counts.includes(String(next.n))) {
+        next.n = Number(config.counts[0] || 1);
+      }
+      return next;
+    }
+
+    function createEditBody(payload, files, baseUrl) {
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(payload)) {
+        if (key === "style" || key === "gemini_resolution") continue;
+        formData.append(key, String(value));
+      }
+
+      const fieldName = isTwelveApiBaseUrl(baseUrl) ? "image" : (files.length === 1 ? "image" : "image[]");
+      files.forEach((file) => formData.append(fieldName, file, file.name));
+      return formData;
+    }
+
+    function createOpenAiCompatiblePayload(payload, baseUrl) {
+      const next = { ...payload };
+      delete next.gemini_resolution;
+      if (String(next.size || "").includes(":")) {
+        delete next.size;
+      }
+      if (isTwelveApiBaseUrl(baseUrl)) {
+        next.response_format = "b64_json";
+        delete next.output_format;
+        delete next.background;
+        delete next.style;
+      }
+      return next;
+    }
+
+    function normalizeApiKey(value) {
+      return String(value || "")
+        .trim()
+        .replace(/^Bearer\s+/i, "")
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .replace(/\s+/g, "");
+    }
+
+    function loadRememberedSettings() {
+      const settings = readRememberedSettings();
+      const legacyKey = localStorage.getItem(LEGACY_API_KEY);
+      rememberKey.checked = Boolean(settings.enabled || legacyKey);
+      if (settings.lastBaseUrl) {
+        baseUrlInput.value = settings.lastBaseUrl;
+      }
+      const baseKey = getRememberedKeyForBaseUrl(baseUrlInput.value, settings);
+      const nextKey = baseKey || legacyKey || "";
+      if (nextKey) {
+        apiKeyInput.value = nextKey;
+      }
+    }
+
+    function readRememberedSettings() {
+      try {
+        return JSON.parse(localStorage.getItem(REMEMBER_SETTINGS_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveRememberedSettings() {
+      const apiKey = normalizeApiKey(apiKeyInput.value);
+      const baseUrl = stripTrailingSlash(baseUrlInput.value.trim());
+      const settings = readRememberedSettings();
+      const keysByBaseUrl = settings.keysByBaseUrl || {};
+      if (baseUrl && apiKey) {
+        keysByBaseUrl[baseUrl] = apiKey;
+      }
+      localStorage.setItem(REMEMBER_SETTINGS_KEY, JSON.stringify({
+        enabled: true,
+        lastBaseUrl: baseUrl,
+        keysByBaseUrl
+      }));
+      if (apiKey) {
+        localStorage.setItem(LEGACY_API_KEY, apiKey);
+      }
+    }
+
+    function forgetRememberedSettings() {
+      localStorage.removeItem(REMEMBER_SETTINGS_KEY);
+      localStorage.removeItem(LEGACY_API_KEY);
+    }
+
+    function loadKeyForCurrentBaseUrl() {
+      const settings = readRememberedSettings();
+      const key = getRememberedKeyForBaseUrl(baseUrlInput.value, settings);
+      if (key) {
+        apiKeyInput.value = key;
+      }
+    }
+
+    function getRememberedKeyForBaseUrl(baseUrl, settings = readRememberedSettings()) {
+      const clean = stripTrailingSlash(String(baseUrl || "").trim());
+      const keys = settings.keysByBaseUrl || {};
+      return keys[clean] || keys[normalizeBaseUrlForProvider(clean, modelSelect.value.startsWith("gemini-") ? "gemini" : "openai")] || "";
+    }
+
+    function readSavedPromptStorage(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveCustomSavedPrompts() {
+      const customPrompts = {};
+      Object.entries(PROMPT_SKILLS).forEach(([promptId, savedPrompt]) => {
+        if (savedPrompt.isCustom) customPrompts[promptId] = savedPrompt;
+      });
+      localStorage.setItem(SAVED_PROMPTS_KEY, JSON.stringify(customPrompts));
+    }
+
+    function loadCustomSavedPrompts() {
+      let customPrompts = readSavedPromptStorage(SAVED_PROMPTS_KEY);
+      if (!Object.keys(customPrompts).length) {
+        customPrompts = PromptLibrary.migrateLegacyPromptEntries(
+          readSavedPromptStorage(LEGACY_CUSTOM_SKILLS_KEY)
+        );
+        if (Object.keys(customPrompts).length) {
+          localStorage.setItem(SAVED_PROMPTS_KEY, JSON.stringify(customPrompts));
+        }
+      }
+      Object.entries(customPrompts).forEach(([promptId, savedPrompt]) => {
+        if (savedPrompt && savedPrompt.isCustom && savedPrompt.content) {
+          PROMPT_SKILLS[promptId] = savedPrompt;
+        }
+      });
+    }
+
+    function renderPromptSkillOptions(selectedSkillId = promptSkillSelect.value) {
+      promptSkillSelect.innerHTML = "";
+      const emptyOption = document.createElement("option");
+      emptyOption.value = "";
+      emptyOption.textContent = "不使用保存的 Prompt";
+      promptSkillSelect.appendChild(emptyOption);
+
+      Object.entries(PROMPT_SKILLS).forEach(([promptId, savedPrompt]) => {
+        const option = document.createElement("option");
+        option.value = promptId;
+        option.textContent = `${savedPrompt.name} · ${savedPrompt.label || "自定义"}`;
+        promptSkillSelect.appendChild(option);
+      });
+
+      promptSkillSelect.value = PROMPT_SKILLS[selectedSkillId] ? selectedSkillId : "";
+    }
+
+    function saveCurrentPrompt() {
+      const name = skillGithubInput.value.trim();
+      const content = promptInput.value.trim();
+      if (!name) {
+        skillAddStatus.textContent = "先给当前主 Prompt 起个名字。";
+        return;
+      }
+      if (!content) {
+        skillAddStatus.textContent = "主 Prompt 还是空的，先写好内容再保存。";
+        return;
+      }
+
+      const promptId = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      PROMPT_SKILLS[promptId] = PromptLibrary.createSavedPromptRecord(
+        name,
+        content,
+        promptId,
+        new Date().toISOString()
+      );
+      saveCustomSavedPrompts();
+      renderPromptSkillOptions();
+      renderPromptSkillCards();
+      skillGithubInput.value = "";
+      skillAddStatus.textContent = `已保存：${PROMPT_SKILLS[promptId].name}`;
+    }
+
+    function deleteSavedPrompt(promptId) {
+      const savedPrompt = PROMPT_SKILLS[promptId];
+      if (!savedPrompt?.isCustom) return;
+      if (!window.confirm(`删除保存的 Prompt“${savedPrompt.name}”？`)) return;
+      delete PROMPT_SKILLS[promptId];
+      if (promptSkillSelect.value === promptId) promptSkillSelect.value = "";
+      saveCustomSavedPrompts();
+      renderPromptSkillOptions();
+      renderPromptSkillCards();
+      syncPromptSkillControls();
+      updateReadyPreviewState();
+      skillAddStatus.textContent = `已删除：${savedPrompt.name}`;
+    }
+
+    function getPromptSkill(skillId = promptSkillSelect.value) {
+      return PROMPT_SKILLS[skillId] || null;
+    }
+
+    function buildPromptWithSavedPrompt(promptId, userPrompt) {
+      const savedPrompt = getPromptSkill(promptId);
+      const content = savedPrompt?.content || "";
+      return {
+        prompt: PromptLibrary.composeSavedPrompt(content, userPrompt),
+        metadata: savedPrompt ? {
+          id: promptId,
+          name: savedPrompt.name,
+          source: savedPrompt.sourceUrl || null,
+          content_length: content.length,
+          user_prompt_length: userPrompt.length
+        } : null
+      };
+    }
+
+    async function syncPromptSkillControls() {
+      const savedPrompt = getPromptSkill();
+      updateCollapsedSkillSelection(savedPrompt);
+      if (!savedPrompt) {
+        skillSummary.textContent = "选择保存项后，生成时会把它放在主 Prompt 前面；主 Prompt 仍可单独输入。";
+        skillSourceLink.hidden = true;
+        syncPromptSkillCardSelection();
+        skillContent.textContent = "选择一个保存的 Prompt 后可以查看内容。";
+        return;
+      }
+      skillSummary.textContent = savedPrompt.description;
+      skillSourceLink.hidden = !/^https?:\/\//.test(savedPrompt.sourceUrl || "");
+      skillSourceLink.href = savedPrompt.sourceUrl || "#";
+      skillSourceLink.textContent = "来源";
+      syncPromptSkillCardSelection();
+      if (skillViewer.classList.contains("show")) {
+        await renderPromptSkillContent();
+      } else {
+        skillContent.textContent = "点击“查看 Prompt 内容”后展开完整文字。";
+      }
+    }
+
+    function updateCollapsedSkillSelection(skill = getPromptSkill()) {
+      skillCollapsedSelection.textContent = skill
+        ? `${skill.name} · ${skill.label || "自定义"}`
+        : "未选择";
+    }
+
+    function setSkillPanelCollapsed(collapsed, persist = true) {
+      skillPanelBody.hidden = collapsed;
+      toggleSkillPanelButton.setAttribute("aria-expanded", String(!collapsed));
+      toggleSkillPanelButton.title = collapsed ? "展开保存的 Prompt" : "收起保存的 Prompt";
+      skillPanelToggleLabel.textContent = collapsed ? "展开保存的 Prompt" : "收起保存的 Prompt";
+      skillCollapsedSelection.classList.toggle("show", collapsed);
+      updateCollapsedSkillSelection();
+      if (persist) {
+        localStorage.setItem(SKILL_PANEL_COLLAPSED_KEY, String(collapsed));
+      }
+    }
+
+    function renderPromptSkillCards() {
+      skillCards.innerHTML = "";
+      Object.entries(PROMPT_SKILLS).forEach(([promptId, savedPrompt]) => {
+        const wrapper = document.createElement("div");
+        const card = document.createElement("button");
+        const text = document.createElement("div");
+        const title = document.createElement("strong");
+        const desc = document.createElement("span");
+        wrapper.className = `saved-prompt-card${savedPrompt.isCustom ? " custom" : ""}`;
+        card.className = "skill-preview";
+        card.type = "button";
+        card.dataset.skillId = promptId;
+        title.textContent = `${savedPrompt.name} · ${savedPrompt.label || ""}`.trim();
+        desc.textContent = savedPrompt.previewText || savedPrompt.description;
+        text.append(title, desc);
+        card.append(text);
+        wrapper.appendChild(card);
+        if (savedPrompt.isCustom) {
+          const deleteButton = document.createElement("button");
+          deleteButton.className = "saved-prompt-delete";
+          deleteButton.type = "button";
+          deleteButton.dataset.promptId = promptId;
+          deleteButton.title = `删除 ${savedPrompt.name}`;
+          deleteButton.setAttribute("aria-label", `删除保存的 Prompt ${savedPrompt.name}`);
+          deleteButton.textContent = "×";
+          wrapper.appendChild(deleteButton);
+        }
+        skillCards.appendChild(wrapper);
+      });
+      syncPromptSkillCardSelection();
+    }
+
+    function handlePromptSkillCardClick(event) {
+      const deleteButton = event.target.closest(".saved-prompt-delete");
+      if (deleteButton) {
+        deleteSavedPrompt(deleteButton.dataset.promptId);
+        return;
+      }
+      const card = event.target.closest(".skill-preview");
+      if (!card) return;
+      promptSkillSelect.value = card.dataset.skillId || "";
+      syncPromptSkillControls();
+      updateReadyPreviewState();
+    }
+
+    function syncPromptSkillCardSelection() {
+      skillCards.querySelectorAll(".skill-preview").forEach((card) => {
+        card.classList.toggle("selected", card.dataset.skillId === promptSkillSelect.value);
+      });
+    }
+
+    async function togglePromptSkillContent() {
+      skillViewer.classList.toggle("show");
+      toggleSkillContentButton.textContent = skillViewer.classList.contains("show") ? "收起 Prompt 内容" : "查看 Prompt 内容";
+      if (skillViewer.classList.contains("show")) {
+        await renderPromptSkillContent();
+      }
+    }
+
+    async function renderPromptSkillContent() {
+      const savedPrompt = getPromptSkill();
+      if (!savedPrompt) {
+        skillContent.textContent = "当前没有选择保存的 Prompt。";
+        return;
+      }
+      skillContent.textContent = savedPrompt.content;
+    }
+
+    async function fetchWithRetry(url, createOptions, context = {}) {
+      let lastError;
+      for (let attempt = 1; attempt <= REQUEST_MAX_ATTEMPTS; attempt += 1) {
+        try {
+          const response = await MultiModel.fetchWithTimeout(
+            url,
+            createOptions(),
+            REQUEST_TIMEOUT_MS
+          );
+          if (!RETRYABLE_STATUS_CODES.has(response.status) || attempt === REQUEST_MAX_ATTEMPTS) {
+            return response;
+          }
+          lastError = new Error(`HTTP ${response.status}`);
+          lastError.status = response.status;
+          await response.text().catch(() => "");
+        } catch (error) {
+          lastError = error;
+          if (attempt === REQUEST_MAX_ATTEMPTS) {
+            throw error;
+          }
+        }
+
+        const delayMs = 700 * attempt;
+        const retryDetail = `${context.label || "请求"} 第 ${attempt} 次没有成功，${Math.round(delayMs / 100) / 10} 秒后自动重试。`;
+        if (typeof context.onRetry === "function") {
+          context.onRetry(retryDetail, attempt);
+        } else {
+          setPreviewState("正在重试", retryDetail);
+        }
+        await wait(delayMs);
+      }
+      throw lastError || new Error("请求失败。");
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function getErrorText(error) {
+      return error?.message || String(error || "未知错误");
+    }
+
+    function validateHeaderValue(value) {
+      for (const char of value) {
+        const code = char.codePointAt(0);
+        if (code > 255) {
+          return `${char} (U+${code.toString(16).toUpperCase()})`;
+        }
+      }
+      return "";
+    }
+
+    async function createGeminiBody(payload, files) {
+      const parts = [];
+      for (const file of files) {
+        parts.push({
+          inlineData: {
+            mimeType: file.type,
+            data: await fileToBase64(file)
+          }
+        });
+      }
+      parts.push({ text: payload.prompt });
+
+      const body = {
+        contents: [{
+          parts
+        }],
+        generationConfig: {
+          responseModalities: ["IMAGE"]
+        }
+      };
+
+      const imageConfig = {};
+      if (payload.size && payload.size !== "auto") imageConfig.aspectRatio = payload.size;
+      if (payload.gemini_resolution && payload.gemini_resolution !== "auto") imageConfig.imageSize = payload.gemini_resolution;
+      if (Object.keys(imageConfig).length) {
+        body.generationConfig.imageConfig = imageConfig;
+      }
+
+      return body;
+    }
+
+    function redactInlineImages(body) {
+      return {
+        ...body,
+        contents: body.contents.map((content) => ({
+          ...content,
+          parts: content.parts.map((part) => {
+            if (!part.inlineData) return part;
+            return {
+              inlineData: {
+                mimeType: part.inlineData.mimeType,
+                data: `[base64 ${Math.round((part.inlineData.data || "").length / 1024)}KB]`
+              }
+            };
+          })
+        }))
+      };
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(",")[1] || "");
+        reader.onerror = () => reject(reader.error || new Error("读取图片失败。"));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function getSelectedImages() {
+      return selectedSourceImages.map((item) => item.file);
+    }
+
+    function createRequestDiagnostics(files, bodyText = "") {
+      const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+      const diagnostics = {
+        source_image_count: files.length,
+        source_image_total: formatBytes(totalBytes),
+        source_images: files.map((file, index) => ({
+          index: index + 1,
+          name: file.name,
+          type: file.type,
+          size: formatBytes(file.size)
+        }))
+      };
+      if (bodyText) {
+        diagnostics.json_body_size = formatBytes(new Blob([bodyText]).size);
+      }
+      return diagnostics;
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return "0 B";
+      const units = ["B", "KB", "MB", "GB"];
+      let value = bytes;
+      let unitIndex = 0;
+      while (value >= 1024 && unitIndex < units.length - 1) {
+        value /= 1024;
+        unitIndex += 1;
+      }
+      return `${value.toFixed(value >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+    }
+
+    function validateEditFiles(model, files) {
+      const config = MODEL_CONFIGS[model] || MODEL_CONFIGS["gpt-image-2"];
+      if (!config.supportsEdit) {
+        return `${model} 不支持图生图编辑。请换成 GPT Image 系列或 dall-e-2。`;
+      }
+      if (files.length > 20) {
+        return "页面最多先接 20 张参考图。";
+      }
+      if (files.length > config.editMaxImages) {
+        return `${model} 一次最多支持 ${config.editMaxImages} 张参考图，不能在一次请求里发送 ${files.length} 张。`;
+      }
+
+      const maxBytes = config.editMaxSizeMb * 1024 * 1024;
+      const badType = files.find((file) => !config.editTypes.includes(file.type));
+      if (badType) {
+        return `${model} 不支持 ${badType.name} 的文件类型。当前模型支持：${config.editTypes.join(", ")}。`;
+      }
+
+      const tooLarge = files.find((file) => file.size > maxBytes);
+      if (tooLarge) {
+        return `${tooLarge.name} 超过 ${config.editMaxSizeMb}MB。`;
+      }
+
+      if (config.provider === "gemini") {
+        const rawBytes = files.reduce((sum, file) => sum + file.size, 0);
+        const estimatedRequestBytes = MultiModel.estimateBase64Bytes(rawBytes)
+          + GEMINI_JSON_OVERHEAD_BYTES;
+        if (estimatedRequestBytes > GEMINI_INLINE_REQUEST_MAX_BYTES) {
+          return `${model} 的参考图转成 base64 后约 ${formatBytes(estimatedRequestBytes)}，超过 Gemini 约 20MB 的内联请求上限。请压缩图片或减少张数。`;
+        }
+      }
+
+      return "";
+    }
+
+    function normalizeOpenAiImages(items, format) {
+      return items
+        .map((item) => {
+          const raw = item.b64_json || item.url;
+          if (!raw) return null;
+          const imageType = MultiModel.detectBase64ImageType(raw, format);
+          const isRemoteUrl = /^https?:\/\//i.test(raw);
+          const isDataUrl = raw.startsWith("data:");
+          return {
+            src: isRemoteUrl || isDataUrl ? raw : `data:${imageType.mime};base64,${raw}`,
+            mime: imageType.mime,
+            extension: imageType.extension
+          };
+        })
+        .filter(Boolean);
+    }
+
+    function extractGeminiImages(json) {
+      const images = [];
+      const seen = new Set();
+
+      const addImage = (candidate) => {
+        if (!candidate || typeof candidate !== "object") return;
+        const inlineData = candidate.inlineData || candidate.inline_data;
+        const image = candidate.outputImage || candidate.output_image || inlineData || candidate;
+        const data = image.data;
+        const mime = image.mimeType || image.mime_type || image.mime || "image/png";
+        if (!data || seen.has(data)) return;
+        seen.add(data);
+        images.push({
+          src: data.startsWith("data:") ? data : `data:${mime};base64,${data}`,
+          mime,
+          extension: mime.includes("jpeg") ? "jpg" : mime.split("/")[1] || "png"
+        });
+      };
+
+      const walk = (value) => {
+        if (!value || typeof value !== "object") return;
+        if (Array.isArray(value)) {
+          value.forEach(walk);
+          return;
+        }
+        if (value.data && (value.type === "image" || value.mime_type || value.mimeType || value.mime)) {
+          addImage(value);
+        }
+        if (value.output_image || value.outputImage || value.inline_data || value.inlineData) {
+          addImage(value);
+        }
+        Object.values(value).forEach(walk);
+      };
+
+      walk(json);
+      return images;
+    }
+
+    function createModelComparison(models) {
+      activeComparisonModels = [...models];
+      modelResultPanels = new Map();
+      canvasWrap.innerHTML = "";
+      canvasWrap.classList.add("comparison-grid");
+
+      models.forEach((model) => {
+        const panel = document.createElement("article");
+        const header = document.createElement("header");
+        const name = document.createElement("h3");
+        const badge = document.createElement("span");
+        const body = document.createElement("div");
+        const actions = document.createElement("div");
+
+        panel.className = "model-result";
+        panel.dataset.tone = "queued";
+        header.className = "model-result-head";
+        name.className = "model-result-name";
+        name.textContent = model;
+        badge.className = "model-result-badge";
+        badge.textContent = "等待中";
+        body.className = "model-result-body";
+        actions.className = "model-result-actions";
+        header.append(name, badge);
+        panel.append(header, body, actions);
+        canvasWrap.appendChild(panel);
+        modelResultPanels.set(model, { panel, badge, body, actions });
+        setModelResultState(model, "等待生成", "任务正在排队。", "queued");
+      });
+    }
+
+    function setModelResultState(model, title, detail, tone = "active") {
+      const parts = modelResultPanels.get(model);
+      if (!parts) return;
+      const state = document.createElement("div");
+      const strong = document.createElement("strong");
+      const span = document.createElement("span");
+      state.className = "model-result-state";
+      strong.textContent = title;
+      span.textContent = detail || "";
+      state.append(strong, span);
+      parts.body.innerHTML = "";
+      parts.body.appendChild(state);
+      parts.actions.innerHTML = "";
+      setModelResultStatus(model, title, tone);
+    }
+
+    function setModelResultStatus(model, label, tone = "active") {
+      const parts = modelResultPanels.get(model);
+      if (!parts) return;
+      parts.panel.dataset.tone = tone;
+      parts.badge.textContent = label;
+    }
+
+    function createLocalRecordId(prefix) {
+      if (globalThis.crypto?.randomUUID) return `${prefix}-${globalThis.crypto.randomUUID()}`;
+      return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    }
+
+    function prepareGeneratedImages(images, metadata) {
+      return images.map((image, index) => ({
+        ...image,
+        resultId: image.resultId || createLocalRecordId("result"),
+        comparisonId: metadata.comparisonId || "",
+        model: metadata.model,
+        prompt: metadata.prompt,
+        provider: metadata.provider,
+        saved_prompt: metadata.saved_prompt || null,
+        batchIndex: index,
+        createdAt: metadata.createdAt || Date.now()
+      }));
+    }
+
+    function renderModelImages(model, images, metadata) {
+      const parts = modelResultPanels.get(model);
+      if (!parts) return;
+      const imageGrid = document.createElement("div");
+      imageGrid.className = "model-image-grid";
+      parts.body.innerHTML = "";
+      parts.actions.innerHTML = "";
+
+      images.forEach((item, index) => {
+        const imageWrap = document.createElement("div");
+        const image = document.createElement("img");
+        const link = document.createElement("a");
+        imageWrap.className = "export-selectable";
+        image.className = "result-image";
+        image.alt = `${model} 生成结果 ${index + 1}`;
+        image.src = item.src;
+        image.addEventListener("click", () => openLightbox(item.src, image.alt));
+        imageWrap.append(createExportSelectionToggle(item), image);
+        imageGrid.appendChild(imageWrap);
+
+        link.className = "download-button";
+        link.href = item.src;
+        link.download = createImageFilename(metadata, index, item.extension);
+        link.textContent = images.length === 1 ? "下载图片" : `下载 ${index + 1}`;
+        parts.actions.appendChild(link);
+      });
+      parts.body.appendChild(imageGrid);
+      refreshExportSelectionUi();
+    }
+
+    function resetModelRequestRecords(models) {
+      activeComparisonModels = [...models];
+      modelRequestRecords = new Map(models.map((model) => [model, {
+        selected_model: model,
+        status: "等待请求"
+      }]));
+      renderModelRequestRecords();
+    }
+
+    function recordModelRequest(model, record) {
+      modelRequestRecords.set(model, record);
+      renderModelRequestRecords();
+    }
+
+    function updateModelRequestRecord(model, updates) {
+      modelRequestRecords.set(model, {
+        selected_model: model,
+        ...(modelRequestRecords.get(model) || {}),
+        ...updates
+      });
+      renderModelRequestRecords();
+    }
+
+    function renderModelRequestRecords() {
+      requestJsonEl.textContent = JSON.stringify({
+        requests: activeComparisonModels.map((model) => modelRequestRecords.get(model) || {
+          selected_model: model,
+          status: "等待请求"
+        })
+      }, null, 2);
+    }
+
+    function formatModelGenerationError(model, error) {
+      if (!(error instanceof TypeError)) return getErrorText(error);
+      const requestUrl = modelRequestRecords.get(model)?.url || "未知";
+      return `浏览器请求失败：${error.message || "TypeError"}\n请求地址：${requestUrl}\n常见原因是网络、代理、CORS、网关超时，或上传图片导致请求体过大。\n\n排查建议：先把数量设为 1；如果用了参考图，先减少图片张数或压缩图片。`;
+    }
+
+    function stripTrailingSlash(value) {
+      return value.replace(/\/+$/, "");
+    }
+
+    function isNativeGeminiBaseUrl(baseUrl) {
+      try {
+        const hostname = new URL(baseUrl).hostname;
+        return hostname === "generativelanguage.googleapis.com" || hostname === "cdn.12ai.org";
+      } catch {
+        return false;
+      }
+    }
+
+    function isTwelveApiBaseUrl(baseUrl) {
+      try {
+        return new URL(baseUrl).hostname === "cdn.12ai.org";
+      } catch {
+        return false;
+      }
+    }
+
+    function getGeminiRequestModel(model, baseUrl) {
+      if (!isTwelveApiBaseUrl(baseUrl)) return model;
+      return TWELVE_API_GEMINI_MODEL_ALIASES[model] || model;
+    }
+
+    function getDirectOpenAiBrowserError(baseUrl) {
+      try {
+        const url = new URL(baseUrl);
+        if (url.hostname !== "api.openai.com") return "";
+      } catch {
+        return "";
+      }
+      return "当前 Base URL 是 OpenAI 官方 api.openai.com。这个纯前端页面从浏览器直连官方 Images API 时很容易被网络/CORS 拦截，所以这次请求还没进入模型阶段就 Failed to fetch。\n\n请把 Base URL 改成：https://cdn.12ai.org\n如果一定要用官方 OpenAI Key，需要加一个本地后端/代理来转发请求。";
+    }
+
+    function normalizeBaseUrlForProvider(baseUrl, provider) {
+      const clean = stripTrailingSlash(baseUrl || "");
+      if (!clean) return provider === "gemini" ? DEFAULT_BASE_URLS.gemini : DEFAULT_BASE_URLS.openai;
+      let parsed;
+      try {
+        parsed = new URL(clean);
+      } catch {
+        return clean;
+      }
+      if (provider === "gemini" && isNativeGeminiBaseUrl(clean)) return parsed.origin;
+      if (parsed.hostname === "generativelanguage.googleapis.com") return parsed.origin;
+      if (/\/v1(?:beta)?$/i.test(clean)) return clean;
+      if (/^https:\/\/cdn\.12ai\.org$/i.test(clean)) return `${clean}/v1`;
+      return clean;
+    }
+
+    function createImageFilename(metadata, index, extension) {
+      const timestamp = new Date(metadata?.createdAt || Date.now()).toISOString().replace(/[:.]/g, "-");
+      const provider = metadata?.provider || "image";
+      const model = String(metadata?.model || "model").replace(/[^a-z0-9._-]+/gi, "-");
+      return `${provider}-${model}-${timestamp}-${index + 1}.${extension || "png"}`;
+    }
+
+    function getSelectedModels() {
+      return MultiModel.normalizeSelectedModels(
+        modelCheckboxes.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value),
+        modelCheckboxes.map((checkbox) => checkbox.value),
+        modelSelect.value || "gpt-image-2"
+      );
+    }
+
+    function handleModelSelectionChange(event) {
+      if (!modelCheckboxes.some((checkbox) => checkbox.checked)) {
+        event.target.checked = true;
+      }
+      syncModelSelection(true);
+    }
+
+    function syncModelSelection(forceResultReset = false) {
+      const selectedModels = getSelectedModels();
+      modelCheckboxes.forEach((checkbox) => {
+        checkbox.checked = selectedModels.includes(checkbox.value);
+      });
+      modelSelect.value = selectedModels[0] || "gpt-image-2";
+      modelSummary.textContent = selectedModels.length === 1
+        ? selectedModels[0]
+        : `${selectedModels.length} 个模型`;
+      modelSummary.title = selectedModels.join("\n");
+      syncModelControls();
+      if (forceResultReset) {
+        resetModelRequestRecords(selectedModels);
+        updateReadyPreviewState(true);
+      } else if (!modelRequestRecords.size) {
+        resetModelRequestRecords(selectedModels);
+      }
+    }
+
+    function syncModelControls() {
+      const selectedModels = getSelectedModels();
+      const primaryModel = selectedModels[0] || "gpt-image-2";
+      const config = MODEL_CONFIGS[primaryModel] || MODEL_CONFIGS["gpt-image-2"];
+      syncSelect(sizeSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "sizes"), "auto");
+      syncSelect(qualitySelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "qualities"), "auto");
+      syncSelect(outputFormatSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "formats"), "png");
+      syncSelect(styleSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "styles"), "auto");
+      syncSelect(backgroundSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "backgrounds"), "auto");
+      syncSelect(geminiResolutionSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "geminiResolutions"), "1K");
+      syncSelect(countSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "counts"), "1");
+      syncBaseUrl(config.provider);
+      updateUploadHint();
+      updateReadyPreviewState();
+    }
+
+    function syncSelect(select, allowedValues, preferredValue) {
+      const allowed = new Set(allowedValues);
+      [...select.options].forEach((option) => {
+        option.hidden = !allowed.has(option.value);
+        option.disabled = !allowed.has(option.value);
+      });
+
+      select.disabled = allowedValues.length === 0 || (allowedValues.length === 1 && allowedValues[0] === "auto");
+      if (!allowed.has(select.value)) {
+        select.value = allowed.has(preferredValue) ? preferredValue : allowedValues[0] || "";
+      }
+    }
+
+    function syncBaseUrl(provider) {
+      const current = stripTrailingSlash(baseUrlInput.value.trim());
+      const defaultOpenAi = DEFAULT_BASE_URLS.openai;
+      const defaultGemini = DEFAULT_BASE_URLS.gemini;
+      if (provider === "gemini" && (!current || current === defaultOpenAi)) {
+        baseUrlInput.value = defaultGemini;
+      }
+      if (provider === "openai" && (!current || current === "https://generativelanguage.googleapis.com/v1beta" || current === "https://generativelanguage.googleapis.com" || current === "https://api.openai.com/v1")) {
+        baseUrlInput.value = defaultOpenAi;
+      }
+      if (rememberKey.checked) saveRememberedSettings();
+    }
+
+    function appendReferenceFiles() {
+      const currentKeys = new Set(selectedSourceImages.map((item) => item.key));
+      const incoming = [...sourceImagesInput.files];
+      incoming.forEach((file) => {
+        const key = createFileKey(file);
+        if (currentKeys.has(key)) return;
+        currentKeys.add(key);
+        selectedSourceImages.push({
+          key,
+          file
+        });
+      });
+      sourceImagesInput.value = "";
+      renderReferenceThumbs();
+      updateReadyPreviewState();
+    }
+
+    function renderReferenceThumbs() {
+      const files = getSelectedImages();
+      thumbGrid.innerHTML = "";
+      files.forEach((file, index) => {
+        const url = URL.createObjectURL(file);
+        const item = document.createElement("div");
+        const image = document.createElement("img");
+        const number = document.createElement("span");
+        const tools = document.createElement("div");
+        const deleteButton = document.createElement("button");
+        item.className = "thumb";
+        item.dataset.index = index;
+        item.draggable = true;
+        image.src = url;
+        image.alt = file.name;
+        image.addEventListener("click", () => openLightbox(url, file.name));
+        number.textContent = index + 1;
+        tools.className = "thumb-tools";
+        deleteButton.type = "button";
+        deleteButton.dataset.action = "delete";
+        deleteButton.dataset.index = index;
+        deleteButton.textContent = "×";
+        tools.append(deleteButton);
+        item.append(image, number, tools);
+        thumbGrid.appendChild(item);
+      });
+      updateUploadHint();
+    }
+
+    function handleThumbAction(event) {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const index = Number(button.dataset.index);
+      const action = button.dataset.action;
+      if (!Number.isInteger(index)) return;
+      if (action === "delete") {
+        selectedSourceImages.splice(index, 1);
+      }
+      renderReferenceThumbs();
+      updateReadyPreviewState();
+    }
+
+    function handleThumbDragStart(event) {
+      const item = event.target.closest(".thumb");
+      if (!item || event.target.closest("button")) return;
+      item.classList.add("dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", item.dataset.index);
+    }
+
+    function handleThumbDragOver(event) {
+      const item = event.target.closest(".thumb");
+      if (!item) return;
+      event.preventDefault();
+      clearDropTargets();
+      item.classList.add("drop-target");
+      event.dataTransfer.dropEffect = "move";
+    }
+
+    function handleThumbDragLeave(event) {
+      const item = event.target.closest(".thumb");
+      if (item && !item.contains(event.relatedTarget)) {
+        item.classList.remove("drop-target");
+      }
+    }
+
+    function handleThumbDrop(event) {
+      const item = event.target.closest(".thumb");
+      if (!item) return;
+      event.preventDefault();
+      const fromIndex = Number(event.dataTransfer.getData("text/plain"));
+      const targetIndex = Number(item.dataset.index);
+      if (!Number.isInteger(fromIndex) || !Number.isInteger(targetIndex) || fromIndex === targetIndex) {
+        clearDropTargets();
+        return;
+      }
+
+      const rect = item.getBoundingClientRect();
+      const insertAfter = event.clientX > rect.left + rect.width / 2;
+      moveReferenceImage(fromIndex, targetIndex + (insertAfter ? 1 : 0));
+      renderReferenceThumbs();
+      updateReadyPreviewState();
+    }
+
+    function handleThumbDragEnd() {
+      thumbGrid.querySelectorAll(".thumb").forEach((item) => {
+        item.classList.remove("dragging", "drop-target");
+      });
+    }
+
+    function moveReferenceImage(fromIndex, toIndex) {
+      const [moved] = selectedSourceImages.splice(fromIndex, 1);
+      const adjustedIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
+      selectedSourceImages.splice(Math.max(0, Math.min(adjustedIndex, selectedSourceImages.length)), 0, moved);
+    }
+
+    function clearDropTargets() {
+      thumbGrid.querySelectorAll(".thumb").forEach((item) => {
+        item.classList.remove("drop-target");
+      });
+    }
+
+    function clearReferenceImages() {
+      selectedSourceImages = [];
+      sourceImagesInput.value = "";
+      renderReferenceThumbs();
+      updateReadyPreviewState();
+    }
+
+    function createFileKey(file) {
+      return `${file.name}::${file.size}::${file.lastModified}`;
+    }
+
+    function updateUploadHint() {
+      const files = getSelectedImages();
+      const selectedModels = getSelectedModels();
+      const unsupportedModels = selectedModels.filter((model) => {
+        const config = MODEL_CONFIGS[model] || MODEL_CONFIGS["gpt-image-2"];
+        return !config.supportsEdit || files.length > config.editMaxImages;
+      });
+      const modeText = files.length ? `已选 ${files.length} 张，将走图生图。` : "不上传图就是文生图；上传图后自动走图生图。";
+      if (files.length && unsupportedModels.length) {
+        uploadHint.textContent = `${modeText} ${unsupportedModels.length} 个模型不支持当前参考图条件，会在各自结果框中提示。`;
+      } else {
+        uploadHint.textContent = `${modeText} 已选择 ${selectedModels.length} 个模型。`;
+      }
+    }
+
+    function openHistoryDb() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(HISTORY_DB_NAME, 1);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(HISTORY_STORE_NAME)) {
+            const store = db.createObjectStore(HISTORY_STORE_NAME, {
+              keyPath: "id",
+              autoIncrement: true
+            });
+            store.createIndex("createdAt", "createdAt");
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error || new Error("打开历史库失败。"));
+      });
+    }
+
+    async function saveHistoryRecords(images, metadata) {
+      if (!images.length) return;
+      const db = await openHistoryDb();
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction(HISTORY_STORE_NAME, "readwrite");
+        const store = transaction.objectStore(HISTORY_STORE_NAME);
+        images.forEach((image, index) => {
+          store.add({
+            src: image.src,
+            mime: image.mime,
+            extension: image.extension,
+            resultId: image.resultId || createLocalRecordId("result"),
+            comparisonId: image.comparisonId || metadata.comparisonId || "",
+            provider: image.provider || metadata.provider,
+            model: image.model || metadata.model,
+            prompt: image.prompt || metadata.prompt,
+            saved_prompt: image.saved_prompt || metadata.saved_prompt || metadata.skill || null,
+            batchIndex: Number.isInteger(image.batchIndex) ? image.batchIndex : index,
+            createdAt: image.createdAt || metadata.createdAt || Date.now()
+          });
+        });
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error || new Error("保存历史失败。"));
+      });
+      db.close();
+    }
+
+    async function getHistoryRecords() {
+      const db = await openHistoryDb();
+      const records = await new Promise((resolve, reject) => {
+        const request = db.transaction(HISTORY_STORE_NAME, "readonly")
+          .objectStore(HISTORY_STORE_NAME)
+          .getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error || new Error("读取历史失败。"));
+      });
+      db.close();
+      return records.sort((a, b) => b.createdAt - a.createdAt);
+    }
+
+    async function renderHistory() {
+      try {
+        const records = await getHistoryRecords();
+        renderHistoryInto(historyList, records.slice(0, 12));
+        renderHistoryInto(fullHistoryList, records);
+        if (!records.length) {
+          historyList.innerHTML = '<div class="history-empty">还没有历史图片。</div>';
+          fullHistoryList.innerHTML = '<div class="history-empty">还没有历史图片。</div>';
+        }
+      } catch (error) {
+        historyList.innerHTML = `<div class="history-empty">${error.message}</div>`;
+        fullHistoryList.innerHTML = `<div class="history-empty">${error.message}</div>`;
+      }
+      refreshExportSelectionUi();
+    }
+
+    function renderHistoryInto(container, records) {
+      container.innerHTML = "";
+      records.forEach((record) => {
+        const card = document.createElement("div");
+        const image = document.createElement("img");
+        const meta = document.createElement("div");
+        const model = document.createElement("strong");
+        const time = document.createElement("span");
+        const link = document.createElement("a");
+        card.className = "history-card";
+        meta.className = "history-meta";
+        image.src = record.src;
+        image.alt = record.prompt || record.model || "历史图片";
+        image.addEventListener("click", () => openLightbox(record.src, image.alt));
+        model.textContent = record.model || "image";
+        time.textContent = new Date(record.createdAt).toLocaleString();
+        link.className = "download-button";
+        link.href = record.src;
+        link.download = createImageFilename(record, record.batchIndex || 0, record.extension);
+        link.textContent = "下载";
+        card.append(createExportSelectionToggle(record), image);
+        meta.append(model, time, link);
+        card.append(meta);
+        container.appendChild(card);
+      });
+    }
+
+    function createExportSelectionToggle(record) {
+      const key = ComparisonExport.getExportRecordKey(record);
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+      const text = document.createElement("span");
+      label.className = "export-select-toggle";
+      input.type = "checkbox";
+      input.dataset.exportKey = key;
+      input.checked = exportSelection.has(key);
+      input.setAttribute("aria-label", "选择用于导出 Excel");
+      text.textContent = "选择";
+      label.append(input, text);
+      input.addEventListener("change", () => {
+        setExportSelection(record, input.checked);
+      });
+      return label;
+    }
+
+    function setExportSelection(record, selected) {
+      const key = ComparisonExport.getExportRecordKey(record);
+      if (!key) return;
+      if (selected) {
+        exportSelection.set(key, {
+          ...record,
+          resultId: record.resultId || key
+        });
+      } else {
+        exportSelection.delete(key);
+      }
+      refreshExportSelectionUi();
+    }
+
+    function clearExportSelection() {
+      exportSelection.clear();
+      refreshExportSelectionUi();
+    }
+
+    function refreshExportSelectionUi() {
+      const count = exportSelection.size;
+      const label = `已选 ${count} 张`;
+      historyExportSelectionStatus.textContent = label;
+      [exportSelectionHistoryButton, clearExportSelectionHistoryButton]
+        .forEach((button) => {
+          button.disabled = count === 0;
+        });
+
+      document.querySelectorAll("input[data-export-key]").forEach((input) => {
+        const selected = exportSelection.has(input.dataset.exportKey);
+        input.checked = selected;
+        input.closest(".export-selectable, .history-card")?.classList.toggle("is-export-selected", selected);
+      });
+    }
+
+    async function exportSelectedImagesToExcel() {
+      const records = [...exportSelection.values()];
+      if (!records.length) return showMessage("先勾选要导出的生成结果。");
+      if (!globalThis.ExcelJS) {
+        return showMessage("Excel 导出组件没有加载成功，请刷新页面后重试。");
+      }
+
+      setExportButtonsBusy(true);
+      try {
+        const table = ComparisonExport.buildComparisonExportTable(records);
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = "本地生图台";
+        workbook.created = new Date();
+        const sheet = workbook.addWorksheet("模型对比", {
+          views: [{ state: "frozen", ySplit: 1 }]
+        });
+        const headers = ["Prompt", ...table.models];
+        sheet.addRow(headers);
+        sheet.getRow(1).height = 28;
+        sheet.getRow(1).eachCell((cell) => {
+          cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF11695C" } };
+          cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        });
+        sheet.getColumn(1).width = 46;
+        table.models.forEach((_model, index) => {
+          sheet.getColumn(index + 2).width = 30;
+        });
+
+        for (const row of table.rows) {
+          const excelRow = sheet.addRow([
+            row.index === 1 ? row.prompt : `${row.prompt}\n结果 ${row.index}`,
+            ...table.models.map(() => "")
+          ]);
+          excelRow.height = 156;
+          excelRow.eachCell((cell) => {
+            cell.alignment = { vertical: "top", wrapText: true };
+            cell.border = {
+              top: { style: "thin", color: { argb: "FFD9D2C6" } },
+              left: { style: "thin", color: { argb: "FFD9D2C6" } },
+              bottom: { style: "thin", color: { argb: "FFD9D2C6" } },
+              right: { style: "thin", color: { argb: "FFD9D2C6" } }
+            };
+          });
+
+          for (const [index, model] of table.models.entries()) {
+            const record = row.images[model];
+            if (!record) continue;
+            const cell = sheet.getCell(excelRow.number, index + 2);
+            try {
+              const image = await getExcelImageData(record.src);
+              const imageId = workbook.addImage({ base64: image.dataUrl, extension: image.extension });
+              sheet.addImage(imageId, {
+                tl: { col: index + 1, row: excelRow.number - 1 },
+                ext: image.size
+              });
+            } catch (error) {
+              cell.value = /^https?:\/\//i.test(record.src || "")
+                ? { text: "图片链接", hyperlink: record.src }
+                : `图片无法嵌入：${getErrorText(error)}`;
+              cell.font = { color: { argb: "FFB94135" }, underline: /^https?:\/\//i.test(record.src || "") };
+            }
+          }
+        }
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `模型对比-${new Date().toISOString().replace(/[:.]/g, "-")}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showMessage(`已导出 ${records.length} 张图片的模型对比 Excel。`);
+      } catch (error) {
+        showMessage(`Excel 导出失败：${getErrorText(error)}`);
+      } finally {
+        setExportButtonsBusy(false);
+      }
+    }
+
+    function setExportButtonsBusy(isBusy) {
+      const hasSelection = exportSelection.size > 0;
+      [exportSelectionHistoryButton].forEach((button) => {
+        button.disabled = isBusy || !hasSelection;
+        button.textContent = isBusy ? "正在导出..." : "导出 Excel";
+      });
+      [clearExportSelectionHistoryButton].forEach((button) => {
+        button.disabled = isBusy || !hasSelection;
+      });
+    }
+
+    async function getExcelImageData(source) {
+      let dataUrl = String(source || "");
+      if (/^https?:\/\//i.test(dataUrl)) {
+        const response = await MultiModel.fetchWithTimeout(dataUrl, {}, 60000);
+        if (!response.ok) throw new Error(`下载图片失败：HTTP ${response.status}`);
+        dataUrl = await blobToDataUrl(await response.blob());
+      }
+      const type = MultiModel.detectBase64ImageType(dataUrl, "png");
+      if (!["png", "jpeg"].includes(type.format)) {
+        dataUrl = await convertImageToPng(dataUrl);
+      }
+      const normalizedType = MultiModel.detectBase64ImageType(dataUrl, "png");
+      return {
+        dataUrl,
+        extension: normalizedType.format,
+        size: await getExcelImageSize(dataUrl)
+      };
+    }
+
+    function blobToDataUrl(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(reader.error || new Error("读取图片失败。"));
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    function loadHtmlImage(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("图片无法读取。"));
+        image.src = src;
+      });
+    }
+
+    async function convertImageToPng(source) {
+      const image = await loadHtmlImage(source);
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth || image.width;
+      canvas.height = image.naturalHeight || image.height;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("浏览器不支持图片转换。");
+      context.drawImage(image, 0, 0);
+      return canvas.toDataURL("image/png");
+    }
+
+    async function getExcelImageSize(source) {
+      const image = await loadHtmlImage(source);
+      const width = image.naturalWidth || image.width || 1;
+      const height = image.naturalHeight || image.height || 1;
+      const scale = Math.min(184 / width, 142 / height, 1);
+      return {
+        width: Math.max(1, Math.round(width * scale)),
+        height: Math.max(1, Math.round(height * scale))
+      };
+    }
+
+    async function downloadAllHistory() {
+      const records = await getHistoryRecords();
+      if (!records.length) {
+        showMessage("还没有历史图片可以下载。");
+        return;
+      }
+
+      records.slice().reverse().forEach((record, index) => {
+        window.setTimeout(() => {
+          const link = document.createElement("a");
+          link.href = record.src;
+          link.download = createImageFilename(record, record.batchIndex || index, record.extension);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        }, index * 180);
+      });
+    }
+
+    async function clearHistory() {
+      if (!confirm("确定清空所有本地生图历史吗？")) return;
+      const db = await openHistoryDb();
+      await new Promise((resolve, reject) => {
+        const request = db.transaction(HISTORY_STORE_NAME, "readwrite")
+          .objectStore(HISTORY_STORE_NAME)
+          .clear();
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error || new Error("清空历史失败。"));
+      });
+      db.close();
+      clearExportSelection();
+      await renderHistory();
+    }
+
+    function setBusy(isBusy) {
+      submitButton.disabled = isBusy;
+      submitButton.textContent = isBusy ? "生成中..." : "生成图片";
+      statusEl.textContent = isBusy ? "生成中" : statusEl.textContent;
+      modelPicker.classList.toggle("is-busy", isBusy);
+      modelCheckboxes.forEach((checkbox) => {
+        checkbox.disabled = isBusy;
+      });
+      if (isBusy) modelPicker.open = false;
+    }
+
+    function showMessage(message) {
+      messageEl.textContent = message;
+      messageEl.classList.add("show");
+    }
+
+    function hideMessage() {
+      messageEl.textContent = "";
+      messageEl.classList.remove("show");
+    }
+
+    function setPreviewState(title, detail) {
+      if (!previewState) return;
+      previewState.innerHTML = `<div><strong>${escapeHtml(title)}</strong><span>${escapeHtml(detail || "")}</span></div>`;
+      if (!canvasWrap.contains(previewState)) {
+        canvasWrap.innerHTML = "";
+        canvasWrap.classList.remove("comparison-grid");
+        canvasWrap.appendChild(previewState);
+      }
+    }
+
+    function updateReadyPreviewState(forceReset = false) {
+      if (submitButton.disabled) return;
+      if (!forceReset && canvasWrap.querySelector(".result-image")) return;
+      const hasKey = Boolean(normalizeApiKey(apiKeyInput.value));
+      const hasPrompt = Boolean(promptInput.value.trim());
+      const hasSavedPrompt = Boolean(promptSkillSelect.value);
+      const imageCount = selectedSourceImages.length;
+      const selectedModels = getSelectedModels();
+      const modelCount = selectedModels.length;
+      const sameModels = activeComparisonModels.length === selectedModels.length
+        && activeComparisonModels.every((model, index) => model === selectedModels[index]);
+      if (forceReset || !sameModels || modelResultPanels.size !== selectedModels.length || !canvasWrap.classList.contains("comparison-grid")) {
+        createModelComparison(selectedModels);
+      }
+
+      const setAllReadyStates = (title, detail) => {
+        selectedModels.forEach((model) => setModelResultState(model, title, detail, "queued"));
+      };
+      if (!hasKey) {
+        setAllReadyStates("等待 API Key", "填入 API Key 后就可以请求图片模型。");
+        return;
+      }
+      if (hasSavedPrompt && !hasPrompt && imageCount) {
+        setAllReadyStates("准备保存 Prompt 图生图", `已选 ${imageCount} 张参考图、${modelCount} 个模型和一个保存的 Prompt。`);
+        return;
+      }
+      if (hasSavedPrompt && !hasPrompt) {
+        setAllReadyStates("准备保存 Prompt 生图", `已选择保存的 Prompt，将由 ${modelCount} 个模型生成。`);
+        return;
+      }
+      if (!hasPrompt && imageCount) {
+        setAllReadyStates("参考图已就绪", `已选 ${imageCount} 张参考图。补一句主 Prompt，或选择一个保存的 Prompt。`);
+        return;
+      }
+      if (!hasPrompt) {
+        setAllReadyStates("等待 Prompt", "写下你想生成的画面，或选择一个保存的 Prompt。");
+        return;
+      }
+      if (imageCount) {
+        setAllReadyStates(hasSavedPrompt ? "准备组合 Prompt 图生图" : "准备图生图", `已选 ${imageCount} 张参考图和 ${modelCount} 个模型。参考图会按当前顺序发送。`);
+        return;
+      }
+      setAllReadyStates(hasSavedPrompt ? "准备组合 Prompt 生图" : "准备文生图", `点击生成后将对比 ${modelCount} 个模型。`);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function syncRoute() {
+      const showHistory = location.hash === "#history";
+      homePage.classList.toggle("hidden", showHistory);
+      historyPage.classList.toggle("hidden", !showHistory);
+      statusEl.textContent = showHistory ? "历史" : statusEl.textContent === "历史" ? "待生成" : statusEl.textContent;
+      if (showHistory) renderHistory();
+    }
+
+    function openLightbox(src, alt) {
+      lightboxImage.src = src;
+      lightboxImage.alt = alt || "大图预览";
+      lightbox.classList.add("show");
+      lightbox.setAttribute("aria-hidden", "false");
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("show");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxImage.removeAttribute("src");
+    }
+  </script>
+</body>
+</html>
