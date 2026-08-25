@@ -2,6 +2,8 @@
 
 本地浏览器直连的多模型生图、历史管理与 Excel 对比导出工具。
 
+在线体验：[local-image-lab-dpbpftgxl8na.edgeone.cool](https://local-image-lab-dpbpftgxl8na.edgeone.cool)
+
 ## 功能
 
 - 同时调用多个图片模型，并在同一轮中对比结果。
