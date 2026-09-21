@@ -213,9 +213,9 @@ test("runs at most two model tasks concurrently and returns outcomes in model or
 
 test("the page wires multi-select models to independent queued result panels", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
-  const modelCheckboxes = html.match(/class="model-option"/g) || [];
 
-  assert.equal(modelCheckboxes.length, 13);
+  assert.match(html, /let modelCheckboxes = \[\]/);
+  assert.match(html, /providerCatalog\.modelsById\.forEach/);
   assert.match(html, /MODEL_REQUEST_CONCURRENCY = 2/);
   assert.match(html, /MultiModel\.runModelQueue/);
   assert.match(html, /MultiModel\.mergeSupportedOptions/);

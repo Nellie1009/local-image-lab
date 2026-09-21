@@ -156,6 +156,248 @@
       gap: 8px;
     }
 
+    .provider-source-panel {
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .provider-source-panel > summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 44px;
+      padding: 9px 12px;
+      list-style: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .provider-source-panel > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .provider-summary-count {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .provider-source-body {
+      padding: 0 12px 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .provider-add-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+      gap: 8px;
+      padding-top: 12px;
+    }
+
+    .provider-add-grid .key-line {
+      grid-column: 1 / -1;
+    }
+
+    .provider-toolbar,
+    .credential-actions,
+    .price-viewer-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .provider-toolbar {
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .provider-toolbar .ghost-button,
+    .credential-actions .ghost-button,
+    .price-viewer-actions .ghost-button {
+      min-height: 34px;
+      font-size: 12px;
+    }
+
+    .credential-rows {
+      display: grid;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .credential-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .credential-row.exhausted,
+    .credential-row.disabled {
+      background: #ececea;
+      color: #777b78;
+    }
+
+    .credential-main {
+      min-width: 0;
+    }
+
+    .credential-name,
+    .credential-meta {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .credential-name {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .credential-meta {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .credential-empty,
+    .provider-status {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .provider-status.error {
+      color: var(--warn);
+    }
+
+    .price-viewer {
+      width: min(940px, calc(100% - 28px));
+      max-height: min(86vh, 820px);
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+    }
+
+    .price-viewer::backdrop {
+      background: rgba(29, 35, 32, 0.72);
+    }
+
+    .price-viewer-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .price-viewer-head h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .price-viewer-body {
+      padding: 14px 16px 18px;
+      overflow: auto;
+      max-height: calc(86vh - 62px);
+    }
+
+    .price-filter-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .price-filter-tabs button {
+      min-height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .price-filter-tabs button.active {
+      border-color: var(--accent);
+      background: #e7f0ed;
+      color: var(--accent-strong);
+    }
+
+    .price-table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+    }
+
+    .price-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .price-table th,
+    .price-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    .price-table th {
+      position: sticky;
+      top: 0;
+      background: #f4f0e8;
+      z-index: 1;
+    }
+
+    .price-default-badge {
+      display: inline-block;
+      margin-left: 5px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: #e7f0ed;
+      color: var(--accent-strong);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .price-json {
+      display: none;
+      max-height: 320px;
+      overflow: auto;
+      margin: 10px 0 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #1f2422;
+      color: #edf3ef;
+      font-size: 11px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .price-json.show {
+      display: block;
+    }
+
     .ghost-button,
     .primary-button,
     .download-button {
@@ -1104,6 +1346,11 @@
       .canvas-wrap {
         min-height: 360px;
       }
+
+      .provider-add-grid,
+      .credential-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -1112,7 +1359,7 @@
     <header>
       <div>
         <h1>本地生图台</h1>
-        <p class="tagline">单文件页面，浏览器直连 OpenAI Images API。</p>
+        <p class="tagline">浏览器本地保存 API 来源，直接对比多个图片模型。</p>
       </div>
       <div class="top-actions">
         <a class="ghost-button" href="#home" id="home-link">生成</a>
@@ -1124,23 +1371,29 @@
     <main class="page" id="home-page">
       <section class="panel">
         <form id="image-form">
-          <div class="field">
-            <label for="api-key">API Key</label>
-            <div class="key-line">
-              <input id="api-key" name="apiKey" type="password" autocomplete="off" placeholder="sk-...">
-              <button class="ghost-button" type="button" id="toggle-key" aria-label="显示或隐藏 API Key">显示</button>
+          <details class="provider-source-panel" id="provider-source-panel" open>
+            <summary>
+              <span>API 来源</span>
+              <span class="provider-summary-count" id="provider-summary-count">正在加载目录</span>
+            </summary>
+            <div class="provider-source-body">
+              <div class="provider-add-grid">
+                <select id="provider-select" aria-label="API 平台"></select>
+                <input id="provider-key-label" type="text" maxlength="40" placeholder="备注，例如：12API 主 Key">
+                <div class="key-line">
+                  <input id="provider-key-secret" type="password" autocomplete="off" placeholder="输入 API Key">
+                  <button class="ghost-button" type="button" id="add-provider-key">添加 Key</button>
+                </div>
+              </div>
+              <div class="provider-toolbar">
+                <p class="provider-status" id="provider-status">Key 只保存在这个浏览器。</p>
+                <button class="ghost-button" type="button" id="view-pricing">查看价格</button>
+              </div>
+              <div class="credential-rows" id="credential-rows">
+                <p class="credential-empty">还没有保存 API Key。</p>
+              </div>
             </div>
-          </div>
-
-          <label class="checkline">
-            <input id="remember-key" type="checkbox">
-            记住在这个浏览器
-          </label>
-
-          <div class="field">
-            <label for="base-url">API Base URL</label>
-            <input id="base-url" name="baseUrl" type="url" value="https://cdn.12ai.org">
-          </div>
+          </details>
 
           <div class="field">
             <label for="source-images">参考图</label>
@@ -1158,24 +1411,10 @@
           <div class="field-row">
             <div class="field">
               <label id="model-label">模型</label>
-              <input id="model" name="model" type="hidden" value="gpt-image-2">
+              <input id="model" name="model" type="hidden" value="">
               <details class="model-picker" id="model-picker">
-                <summary id="model-summary" aria-labelledby="model-label">gpt-image-2</summary>
-                <div class="model-options" id="model-options" role="group" aria-labelledby="model-label">
-                  <label class="model-option"><input type="checkbox" value="gpt-image-2" checked>gpt-image-2</label>
-                  <label class="model-option"><input type="checkbox" value="gpt-image-1.5">gpt-image-1.5</label>
-                  <label class="model-option"><input type="checkbox" value="chatgpt-image-latest">chatgpt-image-latest</label>
-                  <label class="model-option"><input type="checkbox" value="gpt-image-1">gpt-image-1</label>
-                  <label class="model-option"><input type="checkbox" value="gpt-image-1-mini">gpt-image-1-mini</label>
-                  <label class="model-option"><input type="checkbox" value="dall-e-3">dall-e-3</label>
-                  <label class="model-option"><input type="checkbox" value="dall-e-2">dall-e-2</label>
-                  <label class="model-option"><input type="checkbox" value="gemini-3.1-flash-image-preview">gemini-3.1-flash-image-preview</label>
-                  <label class="model-option"><input type="checkbox" value="gemini-3-pro-image-preview">gemini-3-pro-image-preview</label>
-                  <label class="model-option"><input type="checkbox" value="gemini-3.1-flash-image">gemini-3.1-flash-image</label>
-                  <label class="model-option"><input type="checkbox" value="gemini-3.1-flash-lite-image">gemini-3.1-flash-lite-image</label>
-                  <label class="model-option"><input type="checkbox" value="gemini-3-pro-image">gemini-3-pro-image</label>
-                  <label class="model-option"><input type="checkbox" value="gemini-2.5-flash-image">gemini-2.5-flash-image</label>
-                </div>
+                <summary id="model-summary" aria-labelledby="model-label">正在加载模型</summary>
+                <div class="model-options" id="model-options" role="group" aria-labelledby="model-label"></div>
               </details>
             </div>
             <div class="field">
@@ -1370,6 +1609,31 @@
     </section>
   </div>
 
+  <dialog class="price-viewer" id="price-viewer" aria-labelledby="price-viewer-title">
+    <div class="price-viewer-head">
+      <div>
+        <h2 id="price-viewer-title">模型价格</h2>
+        <div class="credential-meta" id="price-updated-at"></div>
+      </div>
+      <button class="ghost-button" type="button" id="close-price-viewer" aria-label="关闭价格">关闭</button>
+    </div>
+    <div class="price-viewer-body">
+      <div class="price-filter-tabs" id="price-filter-tabs"></div>
+      <div class="price-table-wrap">
+        <table class="price-table">
+          <thead>
+            <tr><th>模型</th><th>平台</th><th>分组</th><th>计费</th><th>价格</th><th>可用度</th></tr>
+          </thead>
+          <tbody id="price-table-body"></tbody>
+        </table>
+      </div>
+      <div class="price-viewer-actions">
+        <button class="ghost-button" type="button" id="toggle-price-json">查看原始 pricing.json</button>
+      </div>
+      <pre class="price-json" id="price-json"></pre>
+    </div>
+  </dialog>
+
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <button class="lightbox-close" type="button" id="lightbox-close" aria-label="关闭大图">×</button>
     <img id="lightbox-image" alt="大图预览">
@@ -1378,12 +1642,29 @@
   <script src="prompt-library.js"></script>
   <script src="multi-model.js"></script>
   <script src="comparison-export.js"></script>
+  <script src="provider-catalog.js"></script>
+  <script src="credential-store.js"></script>
+  <script src="provider-router.js"></script>
+  <script src="provider-adapters.js"></script>
   <script src="vendor/exceljs.min.js"></script>
   <script>
     const form = document.querySelector("#image-form");
-    const apiKeyInput = document.querySelector("#api-key");
-    const rememberKey = document.querySelector("#remember-key");
-    const toggleKey = document.querySelector("#toggle-key");
+    const providerSourcePanel = document.querySelector("#provider-source-panel");
+    const providerSummaryCount = document.querySelector("#provider-summary-count");
+    const providerSelect = document.querySelector("#provider-select");
+    const providerKeyLabel = document.querySelector("#provider-key-label");
+    const providerKeySecret = document.querySelector("#provider-key-secret");
+    const addProviderKeyButton = document.querySelector("#add-provider-key");
+    const providerStatus = document.querySelector("#provider-status");
+    const credentialRows = document.querySelector("#credential-rows");
+    const viewPricingButton = document.querySelector("#view-pricing");
+    const priceViewer = document.querySelector("#price-viewer");
+    const closePriceViewerButton = document.querySelector("#close-price-viewer");
+    const priceUpdatedAt = document.querySelector("#price-updated-at");
+    const priceFilterTabs = document.querySelector("#price-filter-tabs");
+    const priceTableBody = document.querySelector("#price-table-body");
+    const togglePriceJsonButton = document.querySelector("#toggle-price-json");
+    const priceJson = document.querySelector("#price-json");
     const statusEl = document.querySelector("#status");
     const submitButton = document.querySelector("#submit");
     const canvasWrap = document.querySelector("#canvas-wrap");
@@ -1407,8 +1688,7 @@
     const modelPicker = document.querySelector("#model-picker");
     const modelSummary = document.querySelector("#model-summary");
     const modelOptions = document.querySelector("#model-options");
-    const modelCheckboxes = [...modelOptions.querySelectorAll('input[type="checkbox"]')];
-    const baseUrlInput = document.querySelector("#base-url");
+    let modelCheckboxes = [];
     const sourceImagesInput = document.querySelector("#source-images");
     const clearSourceImagesButton = document.querySelector("#clear-source-images");
     const uploadHint = document.querySelector("#upload-hint");
@@ -1436,11 +1716,6 @@
     const addSkillButton = document.querySelector("#add-skill-button");
     const skillAddStatus = document.querySelector("#skill-add-status");
 
-    const DEFAULT_BASE_URLS = {
-      openai: "https://cdn.12ai.org",
-      gemini: "https://cdn.12ai.org"
-    };
-
     const HISTORY_DB_NAME = "local-image-generator-history";
     const HISTORY_STORE_NAME = "images";
     const REMEMBER_SETTINGS_KEY = "image_generator_remember_settings_v2";
@@ -1459,6 +1734,12 @@
     let modelResultPanels = new Map();
     let modelRequestRecords = new Map();
     let activeComparisonModels = [];
+    let providerCatalog = null;
+    let modelConfigs = {};
+    let credentialStore = null;
+    let generationBusy = false;
+    let catalogReady = false;
+    let activePriceFilter = "all";
     const exportSelection = new Map();
 
     const OPTION_SETS = {
@@ -1675,39 +1956,23 @@
 
     const PROMPT_SKILLS = { ...PromptLibrary.BUILT_IN_SAVED_PROMPTS };
 
-    loadRememberedSettings();
     loadCustomSavedPrompts();
-
-    toggleKey.addEventListener("click", () => {
-      const shouldShow = apiKeyInput.type === "password";
-      apiKeyInput.type = shouldShow ? "text" : "password";
-      toggleKey.textContent = shouldShow ? "隐藏" : "显示";
-    });
-
-    rememberKey.addEventListener("change", () => {
-      if (!rememberKey.checked) {
-        forgetRememberedSettings();
-      } else if (apiKeyInput.value.trim()) {
-        saveRememberedSettings();
-      }
-    });
-
-    apiKeyInput.addEventListener("input", () => {
-      if (rememberKey.checked) {
-        saveRememberedSettings();
-      }
-      updateReadyPreviewState();
-    });
     promptInput.addEventListener("input", updateReadyPreviewState);
-
-    baseUrlInput.addEventListener("change", () => {
-      loadKeyForCurrentBaseUrl();
-      if (rememberKey.checked) saveRememberedSettings();
+    addProviderKeyButton.addEventListener("click", addProviderCredential);
+    providerKeySecret.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addProviderCredential();
+      }
     });
-    baseUrlInput.addEventListener("blur", () => {
-      loadKeyForCurrentBaseUrl();
-      if (rememberKey.checked) saveRememberedSettings();
+    credentialRows.addEventListener("click", handleCredentialAction);
+    viewPricingButton.addEventListener("click", openPriceViewer);
+    closePriceViewerButton.addEventListener("click", closePriceViewer);
+    priceViewer.addEventListener("click", (event) => {
+      if (event.target === priceViewer) closePriceViewer();
     });
+    priceFilterTabs.addEventListener("click", handlePriceFilter);
+    togglePriceJsonButton.addEventListener("click", togglePriceJson);
     modelOptions.addEventListener("change", handleModelSelectionChange);
     document.addEventListener("click", (event) => {
       if (!modelPicker.contains(event.target)) modelPicker.open = false;
@@ -1752,7 +2017,6 @@
       if (event.key === "Escape") closeLightbox();
     });
     window.addEventListener("hashchange", syncRoute);
-    syncModelSelection();
     renderPromptSkillOptions();
     renderPromptSkillCards();
     setSkillPanelCollapsed(localStorage.getItem(SKILL_PANEL_COLLAPSED_KEY) === "true", false);
@@ -1760,15 +2024,287 @@
     syncRoute();
     renderHistory();
     refreshExportSelectionUi();
-    updateReadyPreviewState();
+    submitButton.disabled = true;
+    initializeProviderUi().catch(setCatalogFailure);
+
+    async function initializeProviderUi() {
+      submitButton.disabled = true;
+      providerCatalog = await ProviderCatalog.loadCatalogs(fetch, "data");
+      modelConfigs = ProviderCatalog.createModelConfigMap(providerCatalog);
+      providerCatalog.mappingsByModelId.forEach((mappings, modelId) => {
+        if (!modelConfigs[modelId]) return;
+        modelConfigs[modelId].provider = mappings[0]?.adapter === "gemini-native" ? "gemini" : "openai";
+      });
+      credentialStore = CredentialStore.createCredentialStore(localStorage);
+      credentialStore.migrateLegacy({
+        ...readRememberedSettings(),
+        legacyKey: localStorage.getItem(LEGACY_API_KEY)
+      });
+      renderProviderOptions();
+      renderCredentialRows();
+      renderModelOptions();
+      catalogReady = true;
+      providerStatus.textContent = "Key 只保存在这个浏览器，不会写入项目文件。";
+      providerStatus.classList.remove("error");
+      refreshGenerationAvailability();
+      updateReadyPreviewState(true);
+    }
+
+    function renderProviderOptions() {
+      providerSelect.innerHTML = "";
+      providerCatalog.providersById.forEach((provider) => {
+        const option = document.createElement("option");
+        option.value = provider.id;
+        option.textContent = provider.name;
+        providerSelect.appendChild(option);
+      });
+    }
+
+    function addProviderCredential() {
+      try {
+        const provider = providerCatalog?.providersById.get(providerSelect.value);
+        if (!provider) throw new Error("请选择 API 平台。");
+        credentialStore.add({
+          providerId: provider.id,
+          label: providerKeyLabel.value.trim() || `${provider.name} Key`,
+          secret: providerKeySecret.value,
+          priceGroupId: provider.defaultPriceGroupId,
+          endpointId: provider.defaultEndpointId
+        });
+        providerKeySecret.value = "";
+        providerKeyLabel.value = "";
+        providerStatus.textContent = `已添加 ${provider.name} Key。`;
+        providerStatus.classList.remove("error");
+        renderCredentialRows();
+      } catch (error) {
+        providerStatus.textContent = getErrorText(error);
+        providerStatus.classList.add("error");
+      }
+    }
+
+    function renderCredentialRows() {
+      const credentials = credentialStore?.list() || [];
+      credentialRows.innerHTML = "";
+      providerSummaryCount.textContent = credentials.length
+        ? `${credentials.filter((item) => item.status === "active").length} 个可用 / ${credentials.length} 个已保存`
+        : "未添加 Key";
+      if (!credentials.length) {
+        credentialRows.innerHTML = '<p class="credential-empty">还没有保存 API Key。</p>';
+        refreshGenerationAvailability();
+        return;
+      }
+
+      credentials.forEach((credential) => {
+        const provider = providerCatalog?.providersById.get(credential.providerId);
+        const row = document.createElement("div");
+        row.className = credential.status === "exhausted"
+          ? "credential-row exhausted"
+          : credential.status === "disabled"
+            ? "credential-row disabled"
+            : "credential-row active";
+        row.dataset.credentialId = credential.id;
+
+        const main = document.createElement("div");
+        main.className = "credential-main";
+        const name = document.createElement("div");
+        name.className = "credential-name";
+        name.textContent = credential.label;
+        const secret = document.createElement("input");
+        secret.className = "credential-secret-display";
+        secret.type = "password";
+        secret.readOnly = true;
+        secret.tabIndex = -1;
+        secret.value = credential.secret;
+        secret.setAttribute("aria-label", `${credential.label} API Key`);
+        const failure = credential.lastFailure?.message ? ` · ${credential.lastFailure.message}` : "";
+        const meta = document.createElement("div");
+        meta.className = "credential-meta";
+        meta.textContent = `${provider?.name || credential.providerId} · ${CredentialStore.maskSecret(credential.secret)} · ${credential.status}${failure}`;
+        main.append(name, secret, meta);
+
+        const actions = document.createElement("div");
+        actions.className = "credential-actions";
+        const reveal = createCredentialButton("显示", "reveal", credential.id);
+        actions.appendChild(reveal);
+        if (credential.status === "exhausted") {
+          actions.appendChild(createCredentialButton("恢复", "restore", credential.id));
+        } else {
+          actions.appendChild(createCredentialButton(credential.status === "disabled" ? "启用" : "停用", "toggle", credential.id));
+        }
+        actions.appendChild(createCredentialButton("删除", "remove", credential.id));
+        row.append(main, actions);
+        credentialRows.appendChild(row);
+      });
+      refreshGenerationAvailability();
+    }
+
+    function createCredentialButton(label, action, id) {
+      const button = document.createElement("button");
+      button.className = "ghost-button";
+      button.type = "button";
+      button.textContent = label;
+      button.dataset.action = action;
+      button.dataset.credentialId = id;
+      return button;
+    }
+
+    function handleCredentialAction(event) {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const id = button.dataset.credentialId;
+      const row = button.closest(".credential-row");
+      if (button.dataset.action === "reveal") {
+        const input = row.querySelector(".credential-secret-display");
+        const reveal = input.type === "password";
+        input.type = reveal ? "text" : "password";
+        button.textContent = reveal ? "隐藏" : "显示";
+        return;
+      }
+      if (button.dataset.action === "restore") credentialStore.restore(id);
+      if (button.dataset.action === "toggle") {
+        const credential = credentialStore.list().find((item) => item.id === id);
+        credentialStore.setDisabled(id, credential?.status !== "disabled");
+      }
+      if (button.dataset.action === "remove") {
+        const credential = credentialStore.list().find((item) => item.id === id);
+        if (!confirm(`删除“${credential?.label || "这个 Key"}”？`)) return;
+        credentialStore.remove(id);
+      }
+      renderCredentialRows();
+      updateReadyPreviewState(true);
+    }
+
+    function renderModelOptions() {
+      const selected = new Set(getSelectedModels());
+      modelOptions.innerHTML = "";
+      providerCatalog.modelsById.forEach((model) => {
+        const label = document.createElement("label");
+        label.className = "model-option";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = model.id;
+        checkbox.checked = selected.has(model.id) || (!selected.size && model.id === "gpt-image-2");
+        const text = document.createElement("span");
+        text.textContent = model.displayName || model.id;
+        label.append(checkbox, text);
+        modelOptions.appendChild(label);
+      });
+      modelCheckboxes = [...modelOptions.querySelectorAll('input[type="checkbox"]')];
+      if (!modelCheckboxes.some((checkbox) => checkbox.checked) && modelCheckboxes[0]) {
+        modelCheckboxes[0].checked = true;
+      }
+      syncModelSelection(true);
+    }
+
+    function openPriceViewer() {
+      if (!providerCatalog) return;
+      activePriceFilter = "all";
+      priceUpdatedAt.textContent = `币种：${providerCatalog.currency} · 数据更新：${providerCatalog.updatedAt}`;
+      priceJson.textContent = JSON.stringify(providerCatalog.raw.pricing, null, 2);
+      priceJson.classList.remove("show");
+      togglePriceJsonButton.textContent = "查看原始 pricing.json";
+      renderPriceTabs();
+      renderPriceRows();
+      if (typeof priceViewer.showModal === "function") priceViewer.showModal();
+      else priceViewer.setAttribute("open", "");
+    }
+
+    function closePriceViewer() {
+      if (typeof priceViewer.close === "function" && priceViewer.open) priceViewer.close();
+      else priceViewer.removeAttribute("open");
+    }
+
+    function renderPriceTabs() {
+      priceFilterTabs.innerHTML = "";
+      const filters = [{ id: "all", name: "全部" }];
+      providerCatalog.providersById.forEach((provider) => filters.push({ id: provider.id, name: provider.name }));
+      filters.forEach((filter) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.providerId = filter.id;
+        button.classList.toggle("active", filter.id === activePriceFilter);
+        button.textContent = filter.name;
+        priceFilterTabs.appendChild(button);
+      });
+    }
+
+    function handlePriceFilter(event) {
+      const button = event.target.closest("button[data-provider-id]");
+      if (!button) return;
+      activePriceFilter = button.dataset.providerId;
+      renderPriceTabs();
+      renderPriceRows();
+    }
+
+    function renderPriceRows() {
+      const rows = ProviderCatalog.getPriceRows(providerCatalog)
+        .filter((row) => activePriceFilter === "all" || row.providerId === activePriceFilter);
+      priceTableBody.innerHTML = rows.map((row) => {
+        const defaultBadge = row.groupId === "default" ? '<span class="price-default-badge">当前默认</span>' : "";
+        return `<tr><td>${escapeHtml(row.modelId)}</td><td>${escapeHtml(row.providerName)}</td><td>${escapeHtml(row.groupName)}${defaultBadge}</td><td>${escapeHtml(formatBillingType(row.billingType))}</td><td>${escapeHtml(formatPriceRow(row))}</td><td>${row.availabilityPercent == null ? "未提供" : `${row.availabilityPercent}%`}</td></tr>`;
+      }).join("");
+    }
+
+    function formatBillingType(type) {
+      return type === "per_request" ? "按次" : type === "per_image" ? "按图片" : type === "per_token" ? "按量" : type;
+    }
+
+    function formatPriceRow(row) {
+      const price = row.raw;
+      if (row.billingType === "per_request") {
+        const multipliers = Object.entries(price.qualityMultipliers || {})
+          .map(([quality, multiplier]) => `${quality} ¥${(price.basePrice * multiplier).toFixed(3)}`)
+          .join(" / ");
+        return multipliers || `¥${Number(price.basePrice).toFixed(3)} / 次`;
+      }
+      if (row.billingType === "per_image") {
+        const reference = Number(price.referenceImagePrice) > 0
+          ? `；参考图首 ${price.freeReferenceImages || 0} 张免费，之后 ¥${Number(price.referenceImagePrice).toFixed(3)} / 张`
+          : "";
+        return `输出 ¥${Number(price.outputImagePrice).toFixed(3)} / 张${reference}`;
+      }
+      if (row.billingType === "per_token") {
+        return `输入 ¥${price.inputPerMillion} / M；输出 ¥${price.outputPerMillion} / M；缓存 ¥${price.cachedInputPerMillion} / M`;
+      }
+      return "未提供";
+    }
+
+    function togglePriceJson() {
+      const show = !priceJson.classList.contains("show");
+      priceJson.classList.toggle("show", show);
+      togglePriceJsonButton.textContent = show ? "收起原始 pricing.json" : "查看原始 pricing.json";
+    }
+
+    function setCatalogFailure(error) {
+      catalogReady = false;
+      submitButton.disabled = true;
+      const message = `模型目录加载失败：${getErrorText(error)}`;
+      statusEl.textContent = "目录加载失败";
+      providerSummaryCount.textContent = "加载失败";
+      providerStatus.textContent = message;
+      providerStatus.classList.add("error");
+      setPreviewState("无法加载模型目录", `${message} 请通过本地 HTTP 服务打开页面，不要直接使用 file://。`);
+      showMessage(message);
+    }
+
+    function refreshGenerationAvailability() {
+      const hasActiveCredential = Boolean(credentialStore?.list().some((credential) => credential.status === "active"));
+      submitButton.disabled = generationBusy || !catalogReady || !hasActiveCredential;
+    }
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       hideMessage();
 
       const data = new FormData(form);
-      const apiKey = normalizeApiKey(data.get("apiKey"));
-      const rawBaseUrl = stripTrailingSlash(String(data.get("baseUrl") || DEFAULT_BASE_URLS.openai).trim());
+      const activeCredential = credentialStore?.list().find((credential) => credential.status === "active");
+      const apiKey = activeCredential?.secret || "";
+      const activeProvider = activeCredential
+        ? providerCatalog?.providersById.get(activeCredential.providerId)
+        : null;
+      const rawBaseUrl = activeProvider
+        ? ProviderAdapters.resolveEndpoint(activeProvider, activeCredential.endpointId).origin
+        : "";
       const userPrompt = String(data.get("prompt") || "").trim();
       const selectedSavedPromptId = String(data.get("promptSkill") || "");
       const selectedModels = getSelectedModels();
@@ -1797,11 +2333,6 @@
         setPreviewState("Prompt 太长", `当前 ${prompt.length} 字符，接口最多 ${PROMPT_MAX_LENGTH} 字符。请缩短主 Prompt 或保存的 Prompt。`);
         return showMessage(`Prompt 太长：当前 ${prompt.length} 字符，接口最多 ${PROMPT_MAX_LENGTH} 字符。`);
       }
-
-      if (rememberKey.checked) {
-        saveRememberedSettings();
-      }
-      apiKeyInput.value = apiKey;
 
       const sourceImages = getSelectedImages();
       const sharedPayload = {
@@ -1868,7 +2399,7 @@
     });
 
     async function generateForModel(model, context) {
-      const config = MODEL_CONFIGS[model] || MODEL_CONFIGS["gpt-image-2"];
+      const config = modelConfigs[model] || modelConfigs["gpt-image-2"];
       const payload = cleanPayload(
         MultiModel.resolveCompatiblePayload(context.sharedPayload, model, config)
       );
@@ -2019,7 +2550,7 @@
 
     function cleanPayload(payload) {
       const next = {};
-      const config = MODEL_CONFIGS[payload.model] || MODEL_CONFIGS["gpt-image-2"];
+      const config = modelConfigs[payload.model] || modelConfigs["gpt-image-2"];
       for (const [key, value] of Object.entries(payload)) {
         if (value === "" || value === "auto" || value == null) continue;
         next[key] = value;
@@ -2505,7 +3036,7 @@
     }
 
     function validateEditFiles(model, files) {
-      const config = MODEL_CONFIGS[model] || MODEL_CONFIGS["gpt-image-2"];
+      const config = modelConfigs[model] || modelConfigs["gpt-image-2"];
       if (!config.supportsEdit) {
         return `${model} 不支持图生图编辑。请换成 GPT Image 系列或 dall-e-2。`;
       }
@@ -2831,30 +3362,35 @@
     function syncModelControls() {
       const selectedModels = getSelectedModels();
       const primaryModel = selectedModels[0] || "gpt-image-2";
-      const config = MODEL_CONFIGS[primaryModel] || MODEL_CONFIGS["gpt-image-2"];
-      syncSelect(sizeSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "sizes"), "auto");
-      syncSelect(qualitySelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "qualities"), "auto");
-      syncSelect(outputFormatSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "formats"), "png");
-      syncSelect(styleSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "styles"), "auto");
-      syncSelect(backgroundSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "backgrounds"), "auto");
-      syncSelect(geminiResolutionSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "geminiResolutions"), "1K");
-      syncSelect(countSelect, MultiModel.mergeSupportedOptions(selectedModels, MODEL_CONFIGS, "counts"), "1");
-      syncBaseUrl(config.provider);
+      const config = modelConfigs[primaryModel] || modelConfigs["gpt-image-2"];
+      syncSelect(sizeSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "sizes"), "auto");
+      syncSelect(qualitySelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "qualities"), "auto");
+      syncSelect(outputFormatSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "formats"), "png");
+      syncSelect(styleSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "styles"), "auto");
+      syncSelect(backgroundSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "backgrounds"), "auto");
+      syncSelect(geminiResolutionSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "geminiResolutions"), "1K");
+      syncSelect(countSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "counts"), "1");
       updateUploadHint();
       updateReadyPreviewState();
     }
 
     function syncSelect(select, allowedValues, preferredValue) {
       const allowed = new Set(allowedValues);
-      [...select.options].forEach((option) => {
-        option.hidden = !allowed.has(option.value);
-        option.disabled = !allowed.has(option.value);
+      const currentValue = select.value;
+      select.innerHTML = "";
+      allowedValues.forEach((value) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
       });
 
       select.disabled = allowedValues.length === 0 || (allowedValues.length === 1 && allowedValues[0] === "auto");
-      if (!allowed.has(select.value)) {
-        select.value = allowed.has(preferredValue) ? preferredValue : allowedValues[0] || "";
-      }
+      select.value = allowed.has(currentValue)
+        ? currentValue
+        : allowed.has(preferredValue)
+          ? preferredValue
+          : allowedValues[0] || "";
     }
 
     function syncBaseUrl(provider) {
@@ -3004,7 +3540,7 @@
       const files = getSelectedImages();
       const selectedModels = getSelectedModels();
       const unsupportedModels = selectedModels.filter((model) => {
-        const config = MODEL_CONFIGS[model] || MODEL_CONFIGS["gpt-image-2"];
+        const config = modelConfigs[model] || modelConfigs["gpt-image-2"];
         return !config.supportsEdit || files.length > config.editMaxImages;
       });
       const modeText = files.length ? `已选 ${files.length} 张，将走图生图。` : "不上传图就是文生图；上传图后自动走图生图。";
@@ -3359,7 +3895,8 @@
     }
 
     function setBusy(isBusy) {
-      submitButton.disabled = isBusy;
+      generationBusy = isBusy;
+      refreshGenerationAvailability();
       submitButton.textContent = isBusy ? "生成中..." : "生成图片";
       statusEl.textContent = isBusy ? "生成中" : statusEl.textContent;
       modelPicker.classList.toggle("is-busy", isBusy);
@@ -3392,7 +3929,7 @@
     function updateReadyPreviewState(forceReset = false) {
       if (submitButton.disabled) return;
       if (!forceReset && canvasWrap.querySelector(".result-image")) return;
-      const hasKey = Boolean(normalizeApiKey(apiKeyInput.value));
+      const hasKey = Boolean(credentialStore?.list().some((credential) => credential.status === "active"));
       const hasPrompt = Boolean(promptInput.value.trim());
       const hasSavedPrompt = Boolean(promptSkillSelect.value);
       const imageCount = selectedSourceImages.length;
@@ -3408,7 +3945,7 @@
         selectedModels.forEach((model) => setModelResultState(model, title, detail, "queued"));
       };
       if (!hasKey) {
-        setAllReadyStates("等待 API Key", "填入 API Key 后就可以请求图片模型。");
+        setAllReadyStates("等待 API Key", "在 API 来源中添加至少一个可用 Key。");
         return;
       }
       if (hasSavedPrompt && !hasPrompt && imageCount) {
