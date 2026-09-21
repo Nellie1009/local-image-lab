@@ -152,8 +152,14 @@
 
     .key-line {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
+    }
+
+    .key-line > input,
+    .provider-add-grid > input,
+    .provider-add-grid > select {
+      min-width: 0;
     }
 
     .provider-source-panel {
@@ -1350,6 +1356,15 @@
       .provider-add-grid,
       .credential-row {
         grid-template-columns: 1fr;
+      }
+
+      .provider-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .provider-toolbar .ghost-button {
+        width: 100%;
       }
     }
   </style>
@@ -3118,7 +3133,7 @@
     function validateEditFiles(model, files) {
       const config = modelConfigs[model] || modelConfigs["gpt-image-2"];
       if (!config.supportsEdit) {
-        return `${model} 不支持图生图编辑。请换成 GPT Image 系列或 dall-e-2。`;
+        return `${model} 不支持图生图编辑。请换成目录中支持参考图的模型。`;
       }
       if (files.length > 20) {
         return "页面最多先接 20 张参考图。";
@@ -3356,7 +3371,7 @@
 
     function formatModelGenerationError(model, error) {
       if (!(error instanceof TypeError)) return getErrorText(error);
-      const requestUrl = modelRequestRecords.get(model)?.url || "未知";
+      const requestUrl = modelRequestRecords.get(model)?.request?.url || "未知";
       return `浏览器请求失败：${error.message || "TypeError"}\n请求地址：${requestUrl}\n常见原因是网络、代理、CORS、网关超时，或上传图片导致请求体过大。\n\n排查建议：先把数量设为 1；如果用了参考图，先减少图片张数或压缩图片。`;
     }
 
@@ -4056,7 +4071,7 @@
     }
 
     function updateReadyPreviewState(forceReset = false) {
-      if (submitButton.disabled) return;
+      if (!catalogReady || generationBusy) return;
       if (!forceReset && canvasWrap.querySelector(".result-image")) return;
       const hasKey = Boolean(credentialStore?.list().some((credential) => credential.status === "active"));
       const hasPrompt = Boolean(promptInput.value.trim());
