@@ -2297,26 +2297,14 @@
       hideMessage();
 
       const data = new FormData(form);
-      const activeCredential = credentialStore?.list().find((credential) => credential.status === "active");
-      const apiKey = activeCredential?.secret || "";
-      const activeProvider = activeCredential
-        ? providerCatalog?.providersById.get(activeCredential.providerId)
-        : null;
-      const rawBaseUrl = activeProvider
-        ? ProviderAdapters.resolveEndpoint(activeProvider, activeCredential.endpointId).origin
-        : "";
+      const activeCredentials = credentialStore?.list().filter((credential) => credential.status === "active") || [];
       const userPrompt = String(data.get("prompt") || "").trim();
       const selectedSavedPromptId = String(data.get("promptSkill") || "");
       const selectedModels = getSelectedModels();
 
-      if (!apiKey) {
-        setPreviewState("缺少 API Key", "先填 API Key，浏览器才知道该用哪个账号请求。");
-        return showMessage("先填 API Key。");
-      }
-      const keyError = validateHeaderValue(apiKey);
-      if (keyError) {
-        setPreviewState("API Key 需要整理", "输入框里有不能放进请求头的字符，请只保留 token 本体。");
-        return showMessage(`API Key 里有浏览器不能放进请求头的字符：${keyError}\n请只保留 token 本体，例如 sk-...，不要带中文说明、全角符号或多余文本。`);
+      if (!activeCredentials.length) {
+        setPreviewState("缺少 API Key", "在 API 来源中添加至少一个可用 Key。");
+        return showMessage("没有可用的 API Key。");
       }
       if (!userPrompt && !selectedSavedPromptId) {
         setPreviewState("缺少 Prompt", "写一句主 Prompt，或选择一个保存的 Prompt，再点击生成。");
@@ -2359,8 +2347,6 @@
           async (model) => {
             try {
               const result = await generateForModel(model, {
-                apiKey,
-                rawBaseUrl,
                 userPrompt,
                 comparisonId,
                 sharedPayload,
@@ -2399,128 +2385,222 @@
     });
 
     async function generateForModel(model, context) {
-      const config = modelConfigs[model] || modelConfigs["gpt-image-2"];
+      const config = modelConfigs[model];
+      if (!config) throw new Error(`模型目录里找不到 ${model}。`);
       const payload = cleanPayload(
         MultiModel.resolveCompatiblePayload(context.sharedPayload, model, config)
       );
-      const baseUrl = normalizeBaseUrlForProvider(context.rawBaseUrl, config.provider);
-      const directOpenAiError = getDirectOpenAiBrowserError(baseUrl);
-      if (directOpenAiError) throw new Error(directOpenAiError);
-
       const isEdit = context.sourceImages.length > 0;
       if (isEdit) {
         const validationError = validateEditFiles(model, context.sourceImages);
         if (validationError) throw new Error(validationError);
       }
 
-      const metadata = {
-        model,
-        prompt: context.sharedPayload.prompt,
-        provider: config.provider,
-        saved_prompt: context.savedPromptMetadata,
-        comparisonId: context.comparisonId,
-        createdAt: Date.now()
-      };
-      const useNativeGemini = config.provider === "gemini" && isNativeGeminiBaseUrl(baseUrl);
+      const candidates = ProviderRouter.buildCandidates({
+        modelId: model,
+        isEdit,
+        quality: payload.quality || context.sharedPayload.quality,
+        count: payload.n,
+        referenceImageCount: context.sourceImages.length,
+        catalog: providerCatalog,
+        credentials: credentialStore.list()
+      });
+      if (!candidates.length) {
+        throw new Error(`没有支持 ${model} 的可用 API Key。请在 API 来源中添加对应平台的 Key，或恢复已停用的 Key。`);
+      }
+
       const warnings = [];
-      setModelResultState(model, isEdit ? "正在编辑图片" : "正在生成图片", "请求已经发出，图片模型可能需要几十秒。", "active");
-
-      if (useNativeGemini) {
-        const geminiBody = await createGeminiBody(payload, context.sourceImages);
-        const geminiCount = Number(payload.n || 1);
-        const geminiRequestModel = getGeminiRequestModel(model, baseUrl);
-        const requestUrl = `${baseUrl}/v1beta/models/${encodeURIComponent(geminiRequestModel)}:generateContent?key=${encodeURIComponent(context.apiKey)}`;
-        const geminiBodyText = JSON.stringify(geminiBody);
-        recordModelRequest(model, {
-          url: requestUrl.replace(/key=[^&]+/, "key=[hidden]"),
-          selected_model: model,
-          request_model: geminiRequestModel,
-          saved_prompt: context.savedPromptMetadata,
-          user_prompt: context.userPrompt,
-          body: redactInlineImages(geminiBody),
-          diagnostics: createRequestDiagnostics(context.sourceImages, geminiBodyText),
-          repeat: geminiCount,
-          image_files: context.sourceImages.map((file) => file.name)
+      const routingAttempts = [];
+      const geminiBody = candidates.some((candidate) => candidate.mapping.adapter === "gemini-native")
+        ? await createGeminiBody(payload, context.sourceImages)
+        : null;
+      const arkImageDataUrls = candidates.some((candidate) => candidate.mapping.adapter === "ark-images")
+        ? await Promise.all(context.sourceImages.map(blobToDataUrl))
+        : [];
+      const onExhausted = (credential, error, candidate) => {
+        credentialStore.markExhausted(credential.id, {
+          status: error.status,
+          message: getErrorText(error),
+          at: Date.now()
         });
+        routingAttempts.push({ candidate, error });
+        warnings.push(`${credential.label} 额度不足，已尝试下一个 API 来源。`);
+        renderCredentialRows();
+        setModelResultState(model, "正在切换 API Key", `${credential.label} 额度不足，尝试下一个来源。`, "warning");
+      };
 
-        const images = [];
+      setModelResultState(model, "正在选择 API 来源", `已找到 ${candidates.length} 个支持 ${model} 的可用 Key。`, "active");
+      const usesGeminiBatch = candidates.every((candidate) => candidate.mapping.adapter === "gemini-native");
+      let images = [];
+      let successfulCandidate;
+
+      if (usesGeminiBatch) {
+        const geminiCount = Number(payload.n || 1);
         const requestErrors = [];
+        let orderedCandidates = [...candidates];
         for (let index = 0; index < geminiCount; index += 1) {
           try {
             setModelResultState(model, "正在生成图片", `第 ${index + 1} / ${geminiCount} 次请求中。`, "active");
-            const response = await fetchWithRetry(requestUrl, () => ({
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: geminiBodyText
-            }), {
-              label: `${model} 第 ${index + 1} / ${geminiCount} 次请求`,
-              onRetry: (detail) => setModelResultState(model, "正在重试", detail, "warning")
-            });
-            const json = await parseImageResponse(response);
-            setModelResultState(model, "正在读取结果", `第 ${index + 1} / ${geminiCount} 次请求已响应。`, "active");
-            const responseImages = extractGeminiImages(json);
-            if (!responseImages.length) requestErrors.push(`第 ${index + 1} 次响应里没有图片。`);
-            images.push(...responseImages);
+            const outcome = await ProviderRouter.runWithCredentialFallback(
+              orderedCandidates,
+              (candidate) => executeCandidateRequest(candidate, payload, context, {
+                geminiBody,
+                arkImageDataUrls,
+                batchIndex: index,
+                repeat: geminiCount,
+                routingAttempts
+              }),
+              onExhausted
+            );
+            successfulCandidate = outcome.candidate;
+            orderedCandidates = [
+              successfulCandidate,
+              ...orderedCandidates.filter((candidate) => candidate.credential.id !== successfulCandidate.credential.id)
+            ];
+            images.push(...outcome.value.images);
           } catch (error) {
             requestErrors.push(`第 ${index + 1} 次：${getErrorText(error)}`);
-            const action = MultiModel.getBatchErrorAction(
-              error?.status,
-              images.length,
-              geminiCount
-            );
+            const action = MultiModel.getBatchErrorAction(error?.status, images.length, geminiCount);
             if (action === "throw") throw error;
             if (action === "stop") break;
           }
         }
         if (!images.length) throw new Error(`没有成功生成图片。\n${requestErrors.join("\n")}`);
         if (requestErrors.length) warnings.push(...requestErrors);
-        const generatedImages = prepareGeneratedImages(images, metadata);
-        renderModelImages(model, generatedImages, metadata);
-        setModelResultStatus(model, requestErrors.length ? "部分完成" : "已完成", requestErrors.length ? "warning" : "success");
-        await saveModelHistory(generatedImages, metadata, warnings);
-        return { images: generatedImages, warnings };
+      } else {
+        const outcome = await ProviderRouter.runWithCredentialFallback(
+          candidates,
+          (candidate) => executeCandidateRequest(candidate, payload, context, {
+            geminiBody,
+            arkImageDataUrls,
+            routingAttempts
+          }),
+          onExhausted
+        );
+        successfulCandidate = outcome.candidate;
+        images = outcome.value.images;
       }
 
-      const compatiblePayload = createOpenAiCompatiblePayload(payload, baseUrl);
-      const requestUrl = `${baseUrl}/images/${isEdit ? "edits" : "generations"}`;
-      const compatiblePayloadText = isEdit ? "" : JSON.stringify(compatiblePayload);
-      recordModelRequest(model, {
-        url: requestUrl,
-        selected_model: model,
-        ...compatiblePayload,
+      if (!images.length || !successfulCandidate) {
+        throw new Error("接口成功响应了，但返回里没有可显示的图片数据。");
+      }
+      const route = createRouteMetadata(successfulCandidate, routingAttempts);
+      const metadata = {
+        model,
+        prompt: context.sharedPayload.prompt,
+        provider: route.providerName,
+        providerId: route.providerId,
+        route,
         saved_prompt: context.savedPromptMetadata,
-        user_prompt: context.userPrompt,
-        diagnostics: createRequestDiagnostics(context.sourceImages, compatiblePayloadText),
-        image_files: context.sourceImages.map((file) => file.name)
-      });
-
-      const response = await fetchWithRetry(requestUrl, () => isEdit ? {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${context.apiKey}` },
-        body: createEditBody(compatiblePayload, context.sourceImages, baseUrl)
-      } : {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${context.apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: compatiblePayloadText
-      }, {
-        label: `${model} 图片${isEdit ? "编辑" : "生成"}请求`,
-        onRetry: (detail) => setModelResultState(model, "正在重试", detail, "warning")
-      });
-      setModelResultState(model, "正在读取结果", "接口已响应，正在解析图片数据。", "active");
-      const json = await parseImageResponse(response);
-      const images = normalizeOpenAiImages(
-        json.data || [],
-        compatiblePayload.output_format || "png"
-      );
-      if (!images.length) throw new Error("接口成功响应了，但返回里没有可显示的图片数据。");
+        comparisonId: context.comparisonId,
+        createdAt: Date.now()
+      };
       const generatedImages = prepareGeneratedImages(images, metadata);
       renderModelImages(model, generatedImages, metadata);
-      setModelResultStatus(model, "已完成", "success");
+      setModelResultStatus(model, `${route.providerName} · ${warnings.length ? "部分完成" : "已完成"}`, warnings.length ? "warning" : "success");
       await saveModelHistory(generatedImages, metadata, warnings);
-      return { images: generatedImages, warnings };
+      return { images: generatedImages, warnings, route };
+    }
+
+    async function executeCandidateRequest(candidate, payload, context, requestContext) {
+      const createDescriptor = () => {
+        if (candidate.mapping.adapter === "openai-images") {
+          return ProviderAdapters.buildOpenAiRequest({
+            origin: candidate.endpoint.origin,
+            apiKey: candidate.credential.secret,
+            modelId: candidate.mapping.requestModel,
+            payload,
+            files: context.sourceImages
+          });
+        }
+        if (candidate.mapping.adapter === "gemini-native") {
+          return ProviderAdapters.buildGeminiRequest({
+            origin: candidate.endpoint.origin,
+            apiKey: candidate.credential.secret,
+            modelId: candidate.mapping.requestModel,
+            body: requestContext.geminiBody
+          });
+        }
+        if (candidate.mapping.adapter === "ark-images") {
+          return ProviderAdapters.buildArkRequest({
+            origin: candidate.endpoint.origin,
+            apiKey: candidate.credential.secret,
+            modelId: candidate.mapping.requestModel,
+            payload,
+            imageDataUrls: requestContext.arkImageDataUrls
+          });
+        }
+        throw new Error(`不支持请求适配器：${candidate.mapping.adapter}`);
+      };
+
+      const descriptor = createDescriptor();
+      recordRoutedRequest(candidate.model.id, candidate, descriptor, payload, context, requestContext);
+      setModelResultState(
+        candidate.model.id,
+        context.sourceImages.length ? "正在编辑图片" : "正在生成图片",
+        `${candidate.provider.name} · ${candidate.credential.label}`,
+        "active"
+      );
+      const response = await fetchWithRetry(descriptor.url, () => createDescriptor().options, {
+        label: `${candidate.provider.name} ${candidate.model.id}`,
+        onRetry: (detail) => setModelResultState(candidate.model.id, "正在重试", detail, "warning")
+      });
+      const json = await parseImageResponse(response);
+      setModelResultState(candidate.model.id, "正在读取结果", `${candidate.provider.name} 已响应，正在解析图片。`, "active");
+      const images = candidate.mapping.adapter === "gemini-native"
+        ? extractGeminiImages(json)
+        : normalizeOpenAiImages(json.data || [], payload.output_format || "png");
+      if (!images.length) throw new Error("接口成功响应了，但返回里没有可显示的图片数据。");
+      return { images };
+    }
+
+    function recordRoutedRequest(model, candidate, descriptor, payload, context, requestContext) {
+      const redactedDescriptor = ProviderAdapters.redactRequestDescriptor(descriptor);
+      recordModelRequest(model, {
+        selected_model: model,
+        request_model: candidate.mapping.requestModel,
+        providerId: candidate.provider.id,
+        providerName: candidate.provider.name,
+        endpointId: candidate.endpoint.id,
+        endpointName: candidate.endpoint.name,
+        credentialLabel: candidate.credential.label,
+        priceGroupId: candidate.credential.priceGroupId,
+        billingType: candidate.billingType,
+        estimatedPrice: candidate.estimatedPrice,
+        routingAttempts: (requestContext.routingAttempts || []).map(({ candidate: failed, error }) => ({
+          providerId: failed.provider.id,
+          credentialLabel: failed.credential.label,
+          status: error.status || null,
+          reason: ProviderRouter.classifyProviderError(error, failed.provider)
+        })),
+        request: redactedDescriptor,
+        payload: { ...payload, prompt: context.sharedPayload.prompt },
+        saved_prompt: context.savedPromptMetadata,
+        user_prompt: context.userPrompt,
+        diagnostics: createRequestDiagnostics(context.sourceImages, typeof descriptor.options.body === "string" ? descriptor.options.body : ""),
+        repeat: requestContext.repeat || 1,
+        batch_index: requestContext.batchIndex == null ? null : requestContext.batchIndex + 1,
+        image_files: context.sourceImages.map((file) => file.name)
+      });
+    }
+
+    function createRouteMetadata(candidate, attempts) {
+      return {
+        providerId: candidate.provider.id,
+        providerName: candidate.provider.name,
+        endpointId: candidate.endpoint.id,
+        endpointName: candidate.endpoint.name,
+        credentialLabel: candidate.credential.label,
+        priceGroupId: candidate.credential.priceGroupId,
+        billingType: candidate.billingType,
+        estimatedPrice: candidate.estimatedPrice,
+        routingAttempts: attempts.map(({ candidate: failed, error }) => ({
+          providerId: failed.provider.id,
+          credentialLabel: failed.credential.label,
+          status: error.status || null,
+          reason: ProviderRouter.classifyProviderError(error, failed.provider)
+        }))
+      };
     }
 
     async function parseImageResponse(response) {
