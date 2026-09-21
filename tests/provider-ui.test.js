@@ -48,6 +48,11 @@ test("price viewer distinguishes request, image, and token billing", () => {
 
 test("the page wires additive image input, queued submissions, and history details", () => {
   assert.match(html, /id="reference-dropzone"/);
+  assert.match(html, /id="reference-drop-target"/);
+  assert.match(html, /class="upload-symbol"/);
+  assert.match(html, /<kbd>⌘V<\/kbd>/);
+  assert.match(html, /referenceDropTarget\.addEventListener\("click"/);
+  assert.match(html, /referenceDropTarget\.addEventListener\("keydown"/);
   assert.match(html, /id="generation-queue-status"/);
   assert.match(html, /id="lightbox-details"/);
   assert.match(html, /reference-images\.js/);

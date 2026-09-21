@@ -484,24 +484,59 @@
     }
 
     .upload-drop-copy {
-      display: grid;
-      gap: 3px;
-      padding: 2px 0 8px;
+      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 14px 10px;
+      color: var(--muted);
+      text-align: center;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .upload-drop-copy:focus-visible {
+      border-radius: 6px;
+      box-shadow: inset 0 0 0 2px var(--accent);
+    }
+
+    .upload-symbol {
+      color: var(--accent);
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 1;
     }
 
     .upload-drop-copy strong {
-      font-size: 14px;
+      font-size: 16px;
       color: var(--ink);
     }
 
-    .upload-drop-copy span {
+    .upload-instruction {
       color: var(--muted);
       font-size: 12px;
       line-height: 1.45;
     }
 
+    .upload-instruction kbd {
+      display: inline-block;
+      min-width: 32px;
+      margin: 0 2px;
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-weight: 800;
+    }
+
     .upload-actions {
       display: flex;
+      justify-content: center;
       gap: 8px;
       flex-wrap: wrap;
       margin-top: 4px;
@@ -1537,9 +1572,10 @@
           <div class="field">
             <label for="source-images">参考图</label>
             <div class="upload-box" id="reference-dropzone">
-              <div class="upload-drop-copy">
+              <div class="upload-drop-copy" id="reference-drop-target" role="button" tabindex="0" aria-label="选择、拖入或粘贴参考图片">
+                <span class="upload-symbol" aria-hidden="true">↑</span>
                 <strong>拖入或粘贴图片</strong>
-                <span>也可以点击选择；支持 PNG、JPEG、WebP，新图片会追加到现有图片之后。</span>
+                <span class="upload-instruction">拖到这里、点击选择，或按 <kbd>⌘V</kbd> / <kbd>Ctrl+V</kbd></span>
               </div>
               <div class="upload-actions">
                 <label class="upload-button" for="source-images">选择图片</label>
@@ -1850,6 +1886,7 @@
     let modelCheckboxes = [];
     const sourceImagesInput = document.querySelector("#source-images");
     const referenceDropzone = document.querySelector("#reference-dropzone");
+    const referenceDropTarget = document.querySelector("#reference-drop-target");
     const clearSourceImagesButton = document.querySelector("#clear-source-images");
     const uploadHint = document.querySelector("#upload-hint");
     const thumbGrid = document.querySelector("#thumb-grid");
@@ -2160,6 +2197,12 @@
     });
     sourceImagesInput.addEventListener("change", () => appendReferenceFiles(sourceImagesInput.files));
     clearSourceImagesButton.addEventListener("click", clearReferenceImages);
+    referenceDropTarget.addEventListener("click", () => sourceImagesInput.click());
+    referenceDropTarget.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      sourceImagesInput.click();
+    });
     referenceDropzone.addEventListener("dragenter", handleReferenceDragOver);
     referenceDropzone.addEventListener("dragover", handleReferenceDragOver);
     referenceDropzone.addEventListener("dragleave", handleReferenceDragLeave);
