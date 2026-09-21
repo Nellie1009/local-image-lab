@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "providers": [
+    {
+      "id": "12api",
+      "name": "12API",
+      "defaultEndpointId": "cdn",
+      "defaultPriceGroupId": "default",
+      "endpoints": [
+        {
+          "id": "cdn",
+          "name": "CDN 线路",
+          "origin": "https://cdn.12ai.org",
+          "recommended": true,
+          "note": "文本及生图任务优先推荐"
+        },
+        {
+          "id": "main",
+          "name": "主线路",
+          "origin": "https://new.12ai.org",
+          "recommended": false,
+          "note": "默认主站地址，可能遇到 Cloudflare 超时"
+        },
+        {
+          "id": "direct",
+          "name": "直连线路",
+          "origin": "https://api.12ai.org",
+          "recommended": false,
+          "note": "直连无超时优化线路"
+        }
+      ],
+      "modelMappings": [
+        { "modelId": "gpt-image-2.5-flare", "requestModel": "gpt-image-2.5-flare", "adapter": "openai-images" },
+        { "modelId": "gpt-image-2.5-sunburst", "requestModel": "gpt-image-2.5-sunburst", "adapter": "openai-images" },
+        { "modelId": "gpt-image-2", "requestModel": "gpt-image-2", "adapter": "openai-images" },
+        { "modelId": "gemini-3.1-flash-lite-image", "requestModel": "gemini-3.1-flash-lite-image", "adapter": "gemini-native" },
+        { "modelId": "gemini-2.5-flash-image", "requestModel": "gemini-2.5-flash-image", "adapter": "gemini-native" },
+        { "modelId": "gemini-3-pro-image", "requestModel": "gemini-3-pro-image", "adapter": "gemini-native" },
+        { "modelId": "gemini-3-pro-image-preview", "requestModel": "gemini-3-pro-image-preview", "adapter": "gemini-native" },
+        { "modelId": "gemini-3.1-flash-image", "requestModel": "gemini-3.1-flash-image", "adapter": "gemini-native" },
+        { "modelId": "gemini-3.1-flash-image-preview", "requestModel": "gemini-3.1-flash-image-preview", "adapter": "gemini-native" }
+      ],
+      "quotaErrors": {
+        "statusCodes": [402],
+        "messagePatterns": ["余额不足", "额度不足", "insufficient quota", "insufficient balance"]
+      }
+    },
+    {
+      "id": "volcengine-ark",
+      "name": "火山方舟 Ark",
+      "defaultEndpointId": "beijing",
+      "defaultPriceGroupId": "default",
+      "endpoints": [
+        {
+          "id": "beijing",
+          "name": "北京线路",
+          "origin": "https://ark.cn-beijing.volces.com",
+          "recommended": true,
+          "note": "火山方舟北京地域推理入口"
+        }
+      ],
+      "modelMappings": [
+        { "modelId": "doubao-seedream-4-5-251128", "requestModel": "doubao-seedream-4-5-251128", "adapter": "ark-images" },
+        { "modelId": "doubao-seedream-5-0-260128", "requestModel": "doubao-seedream-5-0-260128", "adapter": "ark-images" },
+        { "modelId": "doubao-seedream-5-0-pro-260628", "requestModel": "doubao-seedream-5-0-pro-260628", "adapter": "ark-images" }
+      ],
+      "quotaErrors": {
+        "statusCodes": [402],
+        "messagePatterns": ["余额不足", "账户欠费", "account overdue", "insufficient balance"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "models": [
+    {
+      "id": "gpt-image-2.5-flare",
+      "displayName": "GPT Image 2.5 Flare",
+      "vendor": "OpenAI",
+      "releaseDate": "2026-09-08",
+      "description": "速度优先的小模型，适合日常高频出图和精确编辑。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": true },
+      "options": {
+        "sizes": ["auto", "1024x1024", "1536x1024", "1024x1536"],
+        "qualities": ["auto", "low", "medium", "high", "xhigh", "max"],
+        "formats": ["png", "jpeg", "webp"],
+        "backgrounds": ["auto", "opaque", "transparent"],
+        "styles": ["auto"],
+        "geminiResolutions": [],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 16, "editTypes": ["image/png", "image/jpeg", "image/webp"], "editMaxSizeMb": 25 }
+    },
+    {
+      "id": "gpt-image-2.5-sunburst",
+      "displayName": "GPT Image 2.5 Sunburst",
+      "vendor": "OpenAI",
+      "releaseDate": "2026-09-08",
+      "description": "质量优先的基础模型，适合商业海报与精细产品图。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": true },
+      "options": {
+        "sizes": ["auto", "1024x1024", "1536x1024", "1024x1536"],
+        "qualities": ["auto", "low", "medium", "high", "xhigh", "max"],
+        "formats": ["png", "jpeg", "webp"],
+        "backgrounds": ["auto", "opaque", "transparent"],
+        "styles": ["auto"],
+        "geminiResolutions": [],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 16, "editTypes": ["image/png", "image/jpeg", "image/webp"], "editMaxSizeMb": 25 }
+    },
+    {
+      "id": "gpt-image-2",
+      "displayName": "GPT Image 2",
+      "vendor": "OpenAI",
+      "releaseDate": null,
+      "description": "高质量图片生成与编辑模型，支持自定义尺寸和多图输出。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "1024x1024", "1536x1024", "1024x1536"],
+        "qualities": ["auto", "low", "medium", "high"],
+        "formats": ["png", "jpeg", "webp"],
+        "backgrounds": ["auto", "opaque"],
+        "styles": ["auto"],
+        "geminiResolutions": [],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 16, "editTypes": ["image/png", "image/jpeg", "image/webp"], "editMaxSizeMb": 25 }
+    },
+    {
+      "id": "gemini-3.1-flash-lite-image",
+      "displayName": "Gemini 3.1 Flash Lite Image",
+      "vendor": "Google",
+      "releaseDate": "2026-06-30",
+      "description": "低延迟、低成本的图片生成与编辑模型。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "1:1", "3:2", "2:3", "4:3", "3:4", "4:5", "5:4", "9:16", "16:9", "21:9"],
+        "qualities": [], "formats": [], "backgrounds": [], "styles": ["auto"],
+        "geminiResolutions": ["auto", "1K"],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 14, "editTypes": ["image/png", "image/jpeg", "image/webp"], "editMaxSizeMb": 20 }
+    },
+    {
+      "id": "gemini-2.5-flash-image",
+      "displayName": "Gemini 2.5 Flash Image",
+      "vendor": "Google",
+      "releaseDate": null,
+      "description": "Nano Banana 图片生成与多轮编辑模型。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "1:1", "3:2", "2:3", "4:3", "3:4", "4:5", "5:4", "9:16", "16:9", "21:9"],
+        "qualities": [], "formats": [], "backgrounds": [], "styles": ["auto"],
+        "geminiResolutions": ["auto"],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 3, "editTypes": ["image/png", "image/jpeg", "image/webp"], "editMaxSizeMb": 20 }
+    },
+    {
+      "id": "gemini-3-pro-image",
+      "displayName": "Gemini 3 Pro Image",
+      "vendor": "Google",
+      "releaseDate": null,
+      "description": "复杂指令、文字渲染和专业素材生成模型。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "1:1", "3:2", "2:3", "4:3", "3:4", "4:5", "5:4", "9:16", "16:9", "21:9", "1:4", "4:1", "1:8", "8:1"],
+        "qualities": [], "formats": [], "backgrounds": [], "styles": ["auto"],
+        "geminiResolutions": ["auto", "1K", "2K", "4K"],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 14, "editTypes": ["image/png", "image/jpeg", "image/webp"], "editMaxSizeMb": 20 }
+    },
+    {
+      "id": "gemini-3-pro-image-preview",
+      "displayName": "Gemini 3 Pro Image Preview",
+      "vendor": "Google",
+      "releaseDate": null,
+      "description": "Gemini 3 Pro Image 预览模型。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "1:1", "3:2", "2:3", "4:3", "3:4", "4:5", "5:4", "9:16", "16:9", "21:9", "1:4", "4:1", "1:8", "8:1"],
+        "qualities": [], "formats": [], "backgrounds": [], "styles": ["auto"],
+        "geminiResolutions": ["auto", "1K", "2K", "4K"],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 14, "editTypes": ["image/png", "image/jpeg", "image/webp"], "editMaxSizeMb": 20 }
+    },
+    {
+      "id": "gemini-3.1-flash-image",
+      "displayName": "Gemini 3.1 Flash Image",
+      "vendor": "Google",
+      "releaseDate": null,
+      "description": "速度和效率优先的 Nano Banana 2 稳定模型。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "1:1", "3:2", "2:3", "4:3", "3:4", "4:5", "5:4", "9:16", "16:9", "21:9"],
+        "qualities": [], "formats": [], "backgrounds": [], "styles": ["auto"],
+        "geminiResolutions": ["auto", "512px", "1K", "2K", "4K"],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 14, "editTypes": ["image/png", "image/jpeg", "image/webp"], "editMaxSizeMb": 20 }
+    },
+    {
+      "id": "gemini-3.1-flash-image-preview",
+      "displayName": "Gemini 3.1 Flash Image Preview",
+      "vendor": "Google",
+      "releaseDate": null,
+      "description": "速度和效率优先的 Nano Banana 2 预览模型。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "1:1", "3:2", "2:3", "4:3", "3:4", "4:5", "5:4", "9:16", "16:9", "21:9"],
+        "qualities": [], "formats": [], "backgrounds": [], "styles": ["auto"],
+        "geminiResolutions": ["auto", "512px", "1K", "2K", "4K"],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 14, "editTypes": ["image/png", "image/jpeg", "image/webp"], "editMaxSizeMb": 20 }
+    },
+    {
+      "id": "doubao-seedream-4-5-251128",
+      "displayName": "Doubao Seedream 4.5",
+      "vendor": "ByteDance",
+      "releaseDate": "2025-11-28",
+      "description": "多图稳定融合、编辑一致性和 4K 输出。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "2K", "4K"], "qualities": ["auto"], "formats": ["png", "jpeg"],
+        "backgrounds": ["auto"], "styles": ["auto"], "geminiResolutions": [],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 10, "editTypes": ["image/png", "image/jpeg"], "editMaxSizeMb": 10 }
+    },
+    {
+      "id": "doubao-seedream-5-0-260128",
+      "displayName": "Doubao Seedream 5.0 Lite",
+      "vendor": "ByteDance",
+      "releaseDate": "2026-01-28",
+      "description": "可控创作、实时检索和一致性保持。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "2K", "4K"], "qualities": ["auto"], "formats": ["png", "jpeg"],
+        "backgrounds": ["auto"], "styles": ["auto"], "geminiResolutions": [],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 10, "editTypes": ["image/png", "image/jpeg"], "editMaxSizeMb": 10 }
+    },
+    {
+      "id": "doubao-seedream-5-0-pro-260628",
+      "displayName": "Doubao Seedream 5.0 Pro",
+      "vendor": "ByteDance",
+      "releaseDate": "2026-06-28",
+      "description": "精准图片编辑和图层级控制。",
+      "capabilities": { "generate": true, "edit": true, "multiReference": true, "transparentBackground": false },
+      "options": {
+        "sizes": ["auto", "2K", "4K"], "qualities": ["auto"], "formats": ["png", "jpeg"],
+        "backgrounds": ["auto"], "styles": ["auto"], "geminiResolutions": [],
+        "counts": ["1", "2", "3", "4", "5", "6", "7", "8"]
+      },
+      "limits": { "editMaxImages": 10, "editTypes": ["image/png", "image/jpeg"], "editMaxSizeMb": 10 }
+    }
+  ]
+}

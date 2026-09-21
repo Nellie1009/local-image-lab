@@ -15,7 +15,7 @@
 - Keep exactly two application pages: generation configuration and image history.
 - Store API secrets only in browser localStorage; never write them to JSON, history, diagnostics, Excel, Git, or rendered price data.
 - Load catalogs from `data/providers.json`, `data/models.json`, and `data/pricing.json` over HTTP(S).
-- Include only the nine 12API image-generation models listed in the spec.
+- Include the nine 12API image-generation models and three Volcengine Ark Seedream models listed in the spec.
 - Use `default` as the current 12API credential price group and `cdn` as its default endpoint.
 - Only a confirmed quota error exhausts a credential and triggers fallback; 400, 401, 403, timeout, and unknown network failures do not.
 - Never substitute one model ID for another model ID.
@@ -60,7 +60,7 @@ const readJson = (name) => JSON.parse(
   fs.readFileSync(path.join(__dirname, "..", "data", name), "utf8")
 );
 
-test("the 12API catalogs contain exactly the approved nine image models", () => {
+test("the catalogs contain exactly the approved twelve image models", () => {
   const raw = {
     providers: readJson("providers.json"),
     models: readJson("models.json"),
@@ -78,7 +78,10 @@ test("the 12API catalogs contain exactly the approved nine image models", () => 
       "gemini-3-pro-image",
       "gemini-3-pro-image-preview",
       "gemini-3.1-flash-image",
-      "gemini-3.1-flash-image-preview"
+      "gemini-3.1-flash-image-preview",
+      "doubao-seedream-4-5-251128",
+      "doubao-seedream-5-0-260128",
+      "doubao-seedream-5-0-pro-260628"
     ]
   );
 });
@@ -115,7 +118,7 @@ Expected: FAIL because `provider-catalog.js` and the three JSON files do not exi
 
 - [ ] **Step 3: Create the three JSON files from the approved data**
 
-Use these top-level shapes and transcribe all nine model entries and all 36 price-group records exactly from the spec:
+Use these top-level shapes and transcribe all twelve model entries and all 39 price-group records exactly from the spec:
 
 ```json
 {
@@ -382,7 +385,7 @@ git commit -m "Add local provider credential storage"
 
 **Interfaces:**
 - Consumes: catalog indexes from Task 1 and credential records from Task 2.
-- Produces: `ProviderRouter.buildCandidates(input)`, `ProviderRouter.classifyProviderError(error, provider)`, `ProviderRouter.runWithCredentialFallback(candidates, requestCandidate, onExhausted)`, `ProviderAdapters.resolveEndpoint(provider, endpointId)`, `ProviderAdapters.buildOpenAiRequest(input)`, `ProviderAdapters.buildGeminiRequest(input)`, and `ProviderAdapters.redactRequestDescriptor(descriptor)`.
+- Produces: `ProviderRouter.buildCandidates(input)`, `ProviderRouter.classifyProviderError(error, provider)`, `ProviderRouter.runWithCredentialFallback(candidates, requestCandidate, onExhausted)`, `ProviderAdapters.resolveEndpoint(provider, endpointId)`, `ProviderAdapters.buildOpenAiRequest(input)`, `ProviderAdapters.buildGeminiRequest(input)`, `ProviderAdapters.buildArkRequest(input)`, and `ProviderAdapters.redactRequestDescriptor(descriptor)`.
 
 - [ ] **Step 1: Write failing routing tests**
 
@@ -537,6 +540,8 @@ test("redacts secrets from request diagnostics", () => {
 
 OpenAI requests use `/v1/images/generations` for JSON and `/v1/images/edits` for `multipart/form-data`, repeating the `image[]` field for each reference. Gemini requests use `/v1beta/models/{requestModel}:generateContent?key=...`. Both builders receive `candidate.mapping.requestModel`, never infer or alias a model name. Return descriptors shaped as `{ url, options, adapterId }`. `redactRequestDescriptor` must replace Bearer values and `key` query values with `[hidden]`, and replace inline image base64 with size labels.
 
+Ark requests use `/api/v3/images/generations`, Bearer authentication, and JSON. Send local references as data URLs in `image`; use `sequential_image_generation: "disabled"` for one output or `"auto"` plus `sequential_image_generation_options.max_images` for multiple outputs; request `b64_json` and `watermark: false`.
+
 - [ ] **Step 6: Run router and adapter tests and commit**
 
 Run: `node --test tests/provider-router.test.js tests/provider-adapters.test.js`
@@ -634,7 +639,7 @@ The price dialog uses `ProviderCatalog.getPriceRows`; display per-request values
 
 Run: `node --test tests/provider-ui.test.js tests/multi-model.test.js`
 
-Expected: UI wiring tests PASS and multi-model tests use the nine catalog models.
+Expected: UI wiring tests PASS and multi-model tests use the twelve catalog models.
 
 ```bash
 git add index.html tests/provider-ui.test.js tests/multi-model.test.js
@@ -866,7 +871,7 @@ Run: `python3 -m http.server 8765 --bind 127.0.0.1`
 If 8765 is occupied, use 8766 and report the actual URL. Verify without a real generation request:
 
 - all three JSON requests return HTTP 200;
-- the page shows nine model checkboxes;
+- the page shows twelve model checkboxes from two providers;
 - legacy or newly added 12API Key appears masked;
 - the price dialog shows all four groups and the 2026-09-22 update date;
 - an exhausted test credential row is gray and “恢复” reactivates it;

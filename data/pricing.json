@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "currency": "CNY",
+  "updatedAt": "2026-09-22",
+  "sources": [
+    {
+      "providerId": "12api",
+      "source": "12API pricing data supplied by the user",
+      "models": [
+        {
+          "modelId": "gpt-image-2.5-flare",
+          "groups": [
+            { "id": "official", "name": "纯 Azure 来源分组，官 Key 兜底", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.3, "qualityMultipliers": { "low": 1, "medium": 1, "high": 1, "xhigh": 1.5, "max": 2 } },
+            { "id": "discount", "name": "特惠-混合分组", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.15, "qualityMultipliers": { "low": 1, "medium": 1, "high": 1, "xhigh": 1.5, "max": 2 } },
+            { "id": "stable", "name": "标准-稳定分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.225, "qualityMultipliers": { "low": 1, "medium": 1, "high": 1, "xhigh": 1.5, "max": 2 }, "sourceDisplayPrices": { "xhigh": 0.337 } },
+            { "id": "default", "name": "默认（含全模型推荐）", "billingType": "per_request", "availabilityPercent": 99, "basePrice": 0.15, "qualityMultipliers": { "low": 1, "medium": 1, "high": 1, "xhigh": 1.5, "max": 2 } }
+          ]
+        },
+        {
+          "modelId": "gpt-image-2.5-sunburst",
+          "groups": [
+            { "id": "official", "name": "纯 Azure 来源分组，官 Key 兜底", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.3, "qualityMultipliers": { "low": 1, "medium": 1, "high": 1, "xhigh": 1.5, "max": 2 } },
+            { "id": "discount", "name": "特惠-混合分组", "billingType": "per_request", "availabilityPercent": 99.9, "basePrice": 0.15, "qualityMultipliers": { "low": 1, "medium": 1, "high": 1, "xhigh": 1.5, "max": 2 } },
+            { "id": "stable", "name": "标准-稳定分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.225, "qualityMultipliers": { "low": 1, "medium": 1, "high": 1, "xhigh": 1.5, "max": 2 }, "sourceDisplayPrices": { "xhigh": 0.337 } },
+            { "id": "default", "name": "默认（含全模型推荐）", "billingType": "per_request", "availabilityPercent": 99.7, "basePrice": 0.15, "qualityMultipliers": { "low": 1, "medium": 1, "high": 1, "xhigh": 1.5, "max": 2 } }
+          ]
+        },
+        {
+          "modelId": "gpt-image-2",
+          "groups": [
+            { "id": "official", "name": "纯 Azure 来源分组，官 Key 兜底", "billingType": "per_token", "availabilityPercent": null, "inputPerMillion": 25, "outputPerMillion": 150, "cachedInputPerMillion": 10 },
+            { "id": "discount", "name": "特惠-混合分组", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.15 },
+            { "id": "stable", "name": "标准-稳定分组", "billingType": "per_token", "availabilityPercent": null, "inputPerMillion": 18.75, "outputPerMillion": 112.5, "cachedInputPerMillion": 7.5 },
+            { "id": "default", "name": "默认（含全模型推荐）", "billingType": "per_token", "availabilityPercent": 99.9, "inputPerMillion": 12.5, "outputPerMillion": 75, "cachedInputPerMillion": 5 }
+          ]
+        },
+        {
+          "modelId": "gemini-3.1-flash-lite-image",
+          "groups": [
+            { "id": "official", "name": "纯 GCP 来源分组", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.05 },
+            { "id": "discount", "name": "特惠-混合分组", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.03 },
+            { "id": "stable", "name": "标准-稳定分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.075 },
+            { "id": "default", "name": "默认（含全模型推荐）", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.05 }
+          ]
+        },
+        {
+          "modelId": "gemini-2.5-flash-image",
+          "groups": [
+            { "id": "official", "name": "纯 GCP 来源分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.06 },
+            { "id": "discount", "name": "特惠-混合分组", "billingType": "per_request", "availabilityPercent": 0, "basePrice": 0.054 },
+            { "id": "stable", "name": "标准-稳定分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.09 },
+            { "id": "default", "name": "默认（含全模型推荐）", "billingType": "per_request", "availabilityPercent": 0, "basePrice": 0.06 }
+          ]
+        },
+        {
+          "modelId": "gemini-3-pro-image",
+          "groups": [
+            { "id": "official", "name": "纯 GCP 来源分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.35 },
+            { "id": "discount", "name": "特惠-混合分组", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.18 },
+            { "id": "stable", "name": "标准-稳定分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.75 },
+            { "id": "default", "name": "默认（含全模型推荐）", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.25 }
+          ]
+        },
+        {
+          "modelId": "gemini-3-pro-image-preview",
+          "groups": [
+            { "id": "official", "name": "纯 GCP 来源分组", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.35 },
+            { "id": "discount", "name": "特惠-混合分组", "billingType": "per_request", "availabilityPercent": 99.7, "basePrice": 0.18 },
+            { "id": "stable", "name": "标准-稳定分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.75 },
+            { "id": "default", "name": "默认（含全模型推荐）", "billingType": "per_request", "availabilityPercent": 99.9, "basePrice": 0.25 }
+          ]
+        },
+        {
+          "modelId": "gemini-3.1-flash-image",
+          "groups": [
+            { "id": "official", "name": "纯 GCP 来源分组", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.2 },
+            { "id": "discount", "name": "特惠-混合分组", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.13 },
+            { "id": "stable", "name": "标准-稳定分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.39 },
+            { "id": "default", "name": "默认（含全模型推荐）", "billingType": "per_request", "availabilityPercent": 99.8, "basePrice": 0.13 }
+          ]
+        },
+        {
+          "modelId": "gemini-3.1-flash-image-preview",
+          "groups": [
+            { "id": "official", "name": "纯 GCP 来源分组", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.2 },
+            { "id": "discount", "name": "特惠-混合分组", "billingType": "per_request", "availabilityPercent": 99.9, "basePrice": 0.13 },
+            { "id": "stable", "name": "标准-稳定分组", "billingType": "per_request", "availabilityPercent": null, "basePrice": 0.39 },
+            { "id": "default", "name": "默认（含全模型推荐）", "billingType": "per_request", "availabilityPercent": 100, "basePrice": 0.13 }
+          ]
+        }
+      ]
+    },
+    {
+      "providerId": "volcengine-ark",
+      "source": "Volcengine Ark pricing data supplied by the user",
+      "models": [
+        {
+          "modelId": "doubao-seedream-4-5-251128",
+          "groups": [
+            { "id": "default", "name": "默认", "billingType": "per_image", "availabilityPercent": null, "outputImagePrice": 0.25, "referenceImagePrice": 0, "freeReferenceImages": 0 }
+          ]
+        },
+        {
+          "modelId": "doubao-seedream-5-0-260128",
+          "groups": [
+            { "id": "default", "name": "默认", "billingType": "per_image", "availabilityPercent": null, "outputImagePrice": 0.22, "referenceImagePrice": 0, "freeReferenceImages": 0 }
+          ]
+        },
+        {
+          "modelId": "doubao-seedream-5-0-pro-260628",
+          "groups": [
+            { "id": "default", "name": "默认", "billingType": "per_image", "availabilityPercent": null, "outputImagePrice": 0.3, "referenceImagePrice": 0.02, "freeReferenceImages": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}
