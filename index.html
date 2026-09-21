@@ -474,13 +474,37 @@
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.54);
       padding: 12px;
+      transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+    }
+
+    .upload-box.is-dragover {
+      border-color: var(--accent);
+      background: #eef7f3;
+      box-shadow: 0 0 0 3px rgba(17, 105, 92, 0.12);
+    }
+
+    .upload-drop-copy {
+      display: grid;
+      gap: 3px;
+      padding: 2px 0 8px;
+    }
+
+    .upload-drop-copy strong {
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .upload-drop-copy span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
     }
 
     .upload-actions {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-top: 10px;
+      margin-top: 4px;
     }
 
     .file-input-hidden {
@@ -517,6 +541,19 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.45;
+    }
+
+    .generation-queue-status {
+      min-height: 20px;
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .generation-queue-status.active {
+      color: var(--accent-strong);
+      font-weight: 800;
     }
 
     .model-picker {
@@ -1309,13 +1346,82 @@
       display: flex;
     }
 
+    .lightbox-dialog {
+      width: min(1440px, 100%);
+      max-height: calc(100vh - 48px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+      overflow: hidden;
+      border-radius: 8px;
+      background: #171b19;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    }
+
+    .lightbox-dialog:not(.has-details) {
+      width: auto;
+      display: block;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .lightbox-media {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      overflow: auto;
+    }
+
     .lightbox img {
-      max-width: min(100%, 1280px);
-      max-height: 88vh;
+      max-width: 100%;
+      max-height: calc(100vh - 84px);
       object-fit: contain;
       border-radius: 8px;
       background: #fff;
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    }
+
+    .lightbox-details {
+      overflow: auto;
+      padding: 20px;
+      background: var(--panel);
+      color: var(--ink);
+    }
+
+    .lightbox-details[hidden] {
+      display: none;
+    }
+
+    .lightbox-details h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .lightbox-parameters {
+      display: grid;
+      grid-template-columns: minmax(92px, auto) minmax(0, 1fr);
+      gap: 10px 12px;
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .lightbox-parameters dt {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .lightbox-parameters dd {
+      min-width: 0;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .lightbox-parameters dd.multiline {
+      white-space: pre-wrap;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
     }
 
     .lightbox-close {
@@ -1343,6 +1449,24 @@
       main,
       .field-row {
         grid-template-columns: 1fr;
+      }
+
+      .lightbox {
+        padding: 12px;
+      }
+
+      .lightbox-dialog {
+        max-height: calc(100vh - 24px);
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(220px, 56vh) minmax(0, 1fr);
+      }
+
+      .lightbox-media {
+        padding: 10px;
+      }
+
+      .lightbox img {
+        max-height: 52vh;
       }
 
       .preview {
@@ -1412,7 +1536,11 @@
 
           <div class="field">
             <label for="source-images">参考图</label>
-            <div class="upload-box">
+            <div class="upload-box" id="reference-dropzone">
+              <div class="upload-drop-copy">
+                <strong>拖入或粘贴图片</strong>
+                <span>也可以点击选择；支持 PNG、JPEG、WebP，新图片会追加到现有图片之后。</span>
+              </div>
               <div class="upload-actions">
                 <label class="upload-button" for="source-images">选择图片</label>
                 <button class="ghost-button" type="button" id="clear-source-images">清空上传图</button>
@@ -1571,6 +1699,7 @@
           </div>
 
           <button class="primary-button" id="submit" type="submit">生成图片</button>
+          <p class="generation-queue-status" id="generation-queue-status" aria-live="polite">当前没有生成任务</p>
         </form>
       </section>
 
@@ -1649,13 +1778,24 @@
     </div>
   </dialog>
 
-  <div class="lightbox" id="lightbox" aria-hidden="true">
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true">
     <button class="lightbox-close" type="button" id="lightbox-close" aria-label="关闭大图">×</button>
-    <img id="lightbox-image" alt="大图预览">
+    <div class="lightbox-dialog" id="lightbox-dialog">
+      <div class="lightbox-media">
+        <img id="lightbox-image" alt="大图预览">
+      </div>
+      <aside class="lightbox-details" id="lightbox-details" hidden>
+        <h2>图片参数</h2>
+        <dl class="lightbox-parameters" id="lightbox-parameters"></dl>
+      </aside>
+    </div>
   </div>
 
   <script src="prompt-library.js"></script>
   <script src="multi-model.js"></script>
+  <script src="reference-images.js"></script>
+  <script src="generation-queue.js"></script>
+  <script src="history-details.js"></script>
   <script src="comparison-export.js"></script>
   <script src="provider-catalog.js"></script>
   <script src="credential-store.js"></script>
@@ -1682,6 +1822,7 @@
     const priceJson = document.querySelector("#price-json");
     const statusEl = document.querySelector("#status");
     const submitButton = document.querySelector("#submit");
+    const generationQueueStatus = document.querySelector("#generation-queue-status");
     const canvasWrap = document.querySelector("#canvas-wrap");
     const previewState = document.querySelector("#preview-state");
     const messageEl = document.querySelector("#message");
@@ -1697,7 +1838,10 @@
     const homePage = document.querySelector("#home-page");
     const historyPage = document.querySelector("#history-page");
     const lightbox = document.querySelector("#lightbox");
+    const lightboxDialog = document.querySelector("#lightbox-dialog");
     const lightboxImage = document.querySelector("#lightbox-image");
+    const lightboxDetails = document.querySelector("#lightbox-details");
+    const lightboxParameters = document.querySelector("#lightbox-parameters");
     const lightboxClose = document.querySelector("#lightbox-close");
     const modelSelect = document.querySelector("#model");
     const modelPicker = document.querySelector("#model-picker");
@@ -1705,6 +1849,7 @@
     const modelOptions = document.querySelector("#model-options");
     let modelCheckboxes = [];
     const sourceImagesInput = document.querySelector("#source-images");
+    const referenceDropzone = document.querySelector("#reference-dropzone");
     const clearSourceImagesButton = document.querySelector("#clear-source-images");
     const uploadHint = document.querySelector("#upload-hint");
     const thumbGrid = document.querySelector("#thumb-grid");
@@ -1756,6 +1901,11 @@
     let catalogReady = false;
     let activePriceFilter = "all";
     const exportSelection = new Map();
+    const generationQueue = GenerationQueue.createGenerationQueue({
+      worker: runGenerationBatch,
+      onStateChange: updateGenerationQueueState,
+      onTaskError: (error) => showMessage(`生成队列出错：${getErrorText(error)}`)
+    });
 
     const OPTION_SETS = {
       gptSizes: ["auto", "1024x1024", "1536x1024", "1024x1536"],
@@ -2008,8 +2158,13 @@
         saveCurrentPrompt();
       }
     });
-    sourceImagesInput.addEventListener("change", appendReferenceFiles);
+    sourceImagesInput.addEventListener("change", () => appendReferenceFiles(sourceImagesInput.files));
     clearSourceImagesButton.addEventListener("click", clearReferenceImages);
+    referenceDropzone.addEventListener("dragenter", handleReferenceDragOver);
+    referenceDropzone.addEventListener("dragover", handleReferenceDragOver);
+    referenceDropzone.addEventListener("dragleave", handleReferenceDragLeave);
+    referenceDropzone.addEventListener("drop", handleReferenceFileDrop);
+    document.addEventListener("paste", handleReferencePaste);
     thumbGrid.addEventListener("click", handleThumbAction);
     thumbGrid.addEventListener("dragstart", handleThumbDragStart);
     thumbGrid.addEventListener("dragover", handleThumbDragOver);
@@ -2304,10 +2459,25 @@
 
     function refreshGenerationAvailability() {
       const hasActiveCredential = Boolean(credentialStore?.list().some((credential) => credential.status === "active"));
-      submitButton.disabled = generationBusy || !catalogReady || !hasActiveCredential;
+      submitButton.disabled = !catalogReady || !hasActiveCredential;
     }
 
-    form.addEventListener("submit", async (event) => {
+    function updateGenerationQueueState(state) {
+      generationBusy = state.running > 0;
+      refreshGenerationAvailability();
+      generationQueueStatus.classList.toggle("active", Boolean(state.running || state.pending));
+      if (state.running && state.pending) {
+        generationQueueStatus.textContent = `正在生成 1 轮 · 另有 ${state.pending} 轮排队`;
+      } else if (state.running) {
+        generationQueueStatus.textContent = "正在生成 1 轮 · 可以继续提交下一轮";
+      } else if (state.pending) {
+        generationQueueStatus.textContent = `已有 ${state.pending} 轮等待生成`;
+      } else {
+        generationQueueStatus.textContent = "当前没有生成任务";
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
       hideMessage();
 
@@ -2350,54 +2520,69 @@
       };
       const comparisonId = createLocalRecordId("comparison");
 
+      generationQueue.enqueue({
+        userPrompt,
+        comparisonId,
+        selectedModels,
+        sharedPayload,
+        sourceImages,
+        savedPromptMetadata: savedPromptBundle.metadata
+      });
+    });
+
+    async function runGenerationBatch(task) {
+      const {
+        userPrompt,
+        comparisonId,
+        selectedModels,
+        sharedPayload,
+        sourceImages,
+        savedPromptMetadata
+      } = task;
+
       createModelComparison(selectedModels);
       resetModelRequestRecords(selectedModels);
-      setBusy(true);
       let completedModels = 0;
 
-      try {
-        const outcomes = await MultiModel.runModelQueue(
-          selectedModels,
-          MODEL_REQUEST_CONCURRENCY,
-          async (model) => {
-            try {
-              const result = await generateForModel(model, {
-                userPrompt,
-                comparisonId,
-                sharedPayload,
-                sourceImages,
-                savedPromptMetadata: savedPromptBundle.metadata
-              });
-              updateModelRequestRecord(model, { status: result.warnings.length ? "部分完成" : "已完成" });
-              return result;
-            } catch (error) {
-              const message = formatModelGenerationError(model, error);
-              setModelResultState(model, "生成失败", message, "error");
-              updateModelRequestRecord(model, { status: "失败", error: message });
-              throw new Error(message);
-            } finally {
-              completedModels += 1;
-              statusEl.textContent = `生成中 ${completedModels}/${selectedModels.length}`;
-            }
+      const outcomes = await MultiModel.runModelQueue(
+        selectedModels,
+        MODEL_REQUEST_CONCURRENCY,
+        async (model) => {
+          try {
+            const result = await generateForModel(model, {
+              userPrompt,
+              comparisonId,
+              sharedPayload,
+              sourceImages,
+              savedPromptMetadata
+            });
+            updateModelRequestRecord(model, { status: result.warnings.length ? "部分完成" : "已完成" });
+            return result;
+          } catch (error) {
+            const message = formatModelGenerationError(model, error);
+            setModelResultState(model, "生成失败", message, "error");
+            updateModelRequestRecord(model, { status: "失败", error: message });
+            throw new Error(message);
+          } finally {
+            completedModels += 1;
+            statusEl.textContent = `生成中 ${completedModels}/${selectedModels.length}`;
           }
-        );
+        }
+      );
 
-        await renderHistory();
-        const failures = outcomes
-          .map((outcome, index) => outcome.status === "rejected" ? `${selectedModels[index]}：${outcome.reason.message}` : "")
-          .filter(Boolean);
-        const warnings = outcomes
-          .flatMap((outcome, index) => outcome.status === "fulfilled"
-            ? (outcome.value.warnings || []).map((warning) => `${selectedModels[index]}：${warning}`)
-            : []);
-        const notices = [...failures, ...warnings];
-        if (notices.length) showMessage(notices.join("\n\n"));
-        const successCount = outcomes.length - failures.length;
-        statusEl.textContent = failures.length ? `完成 ${successCount}/${outcomes.length}` : "已完成";
-      } finally {
-        setBusy(false);
-      }
-    });
+      await renderHistory();
+      const failures = outcomes
+        .map((outcome, index) => outcome.status === "rejected" ? `${selectedModels[index]}：${outcome.reason.message}` : "")
+        .filter(Boolean);
+      const warnings = outcomes
+        .flatMap((outcome, index) => outcome.status === "fulfilled"
+          ? (outcome.value.warnings || []).map((warning) => `${selectedModels[index]}：${warning}`)
+          : []);
+      const notices = [...failures, ...warnings];
+      if (notices.length) showMessage(notices.join("\n\n"));
+      const successCount = outcomes.length - failures.length;
+      statusEl.textContent = failures.length ? `完成 ${successCount}/${outcomes.length}` : "已完成";
+    }
 
     async function generateForModel(model, context) {
       const config = modelConfigs[model];
@@ -2510,6 +2695,18 @@
         providerId: route.providerId,
         route,
         saved_prompt: context.savedPromptMetadata,
+        user_prompt: context.userPrompt,
+        generation_parameters: {
+          request_model: successfulCandidate.mapping.requestModel,
+          size: payload.size || "接口默认",
+          quality: payload.quality || "接口默认",
+          output_format: payload.output_format || "接口默认",
+          style: payload.style || "接口默认",
+          background: payload.background || "接口默认",
+          gemini_resolution: payload.gemini_resolution || "接口默认",
+          n: Number(payload.n || 1),
+          reference_images: context.sourceImages.map((file) => file.name || "粘贴的图片")
+        },
         comparisonId: context.comparisonId,
         createdAt: Date.now()
       };
@@ -2875,6 +3072,7 @@
           id: promptId,
           name: savedPrompt.name,
           source: savedPrompt.sourceUrl || null,
+          content,
           content_length: content.length,
           user_prompt_length: userPrompt.length
         } : null
@@ -3308,6 +3506,8 @@
             reason: attempt.reason
           })),
           saved_prompt: metadata.saved_prompt || null,
+          user_prompt: metadata.user_prompt || "",
+          generation_parameters: { ...(metadata.generation_parameters || {}) },
           batchIndex: index,
           createdAt: metadata.createdAt || Date.now()
         };
@@ -3330,7 +3530,7 @@
         image.className = "result-image";
         image.alt = `${model} 生成结果 ${index + 1}`;
         image.src = item.src;
-        image.addEventListener("click", () => openLightbox(item.src, image.alt));
+        image.addEventListener("click", () => openLightbox(item.src, image.alt, item));
         imageWrap.append(createExportSelectionToggle(item), image);
         imageGrid.appendChild(imageWrap);
 
@@ -3522,21 +3722,41 @@
       if (rememberKey.checked) saveRememberedSettings();
     }
 
-    function appendReferenceFiles() {
-      const currentKeys = new Set(selectedSourceImages.map((item) => item.key));
-      const incoming = [...sourceImagesInput.files];
-      incoming.forEach((file) => {
-        const key = createFileKey(file);
-        if (currentKeys.has(key)) return;
-        currentKeys.add(key);
-        selectedSourceImages.push({
-          key,
-          file
-        });
-      });
+    function appendReferenceFiles(files) {
+      selectedSourceImages = ReferenceImages.appendUniqueImages(selectedSourceImages, [...(files || [])]);
       sourceImagesInput.value = "";
       renderReferenceThumbs();
       updateReadyPreviewState();
+    }
+
+    function hasDraggedFiles(event) {
+      return [...(event.dataTransfer?.types || [])].includes("Files");
+    }
+
+    function handleReferenceDragOver(event) {
+      if (!hasDraggedFiles(event)) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "copy";
+      referenceDropzone.classList.add("is-dragover");
+    }
+
+    function handleReferenceDragLeave(event) {
+      if (event.relatedTarget && referenceDropzone.contains(event.relatedTarget)) return;
+      referenceDropzone.classList.remove("is-dragover");
+    }
+
+    function handleReferenceFileDrop(event) {
+      if (!hasDraggedFiles(event)) return;
+      event.preventDefault();
+      referenceDropzone.classList.remove("is-dragover");
+      appendReferenceFiles(ReferenceImages.extractImageFiles(event.dataTransfer));
+    }
+
+    function handleReferencePaste(event) {
+      const files = ReferenceImages.extractImageFiles(event.clipboardData);
+      if (!files.length) return;
+      event.preventDefault();
+      appendReferenceFiles(files);
     }
 
     function renderReferenceThumbs() {
@@ -3648,10 +3868,6 @@
       updateReadyPreviewState();
     }
 
-    function createFileKey(file) {
-      return `${file.name}::${file.size}::${file.lastModified}`;
-    }
-
     function updateUploadHint() {
       const files = getSelectedImages();
       const selectedModels = getSelectedModels();
@@ -3720,6 +3936,11 @@
             model: image.model || metadata.model,
             prompt: image.prompt || metadata.prompt,
             saved_prompt: image.saved_prompt || metadata.saved_prompt || metadata.skill || null,
+            user_prompt: image.user_prompt || metadata.user_prompt || "",
+            generation_parameters: {
+              ...(metadata.generation_parameters || {}),
+              ...(image.generation_parameters || {})
+            },
             batchIndex: Number.isInteger(image.batchIndex) ? image.batchIndex : index,
             createdAt: image.createdAt || metadata.createdAt || Date.now()
           });
@@ -3773,7 +3994,7 @@
         meta.className = "history-meta";
         image.src = record.src;
         image.alt = record.prompt || record.model || "历史图片";
-        image.addEventListener("click", () => openLightbox(record.src, image.alt));
+        image.addEventListener("click", () => openLightbox(record.src, image.alt, record));
         model.textContent = record.model || "image";
         route.textContent = formatHistoryRoute(record);
         time.textContent = new Date(record.createdAt).toLocaleString();
@@ -4045,18 +4266,6 @@
       await renderHistory();
     }
 
-    function setBusy(isBusy) {
-      generationBusy = isBusy;
-      refreshGenerationAvailability();
-      submitButton.textContent = isBusy ? "生成中..." : "生成图片";
-      statusEl.textContent = isBusy ? "生成中" : statusEl.textContent;
-      modelPicker.classList.toggle("is-busy", isBusy);
-      modelCheckboxes.forEach((checkbox) => {
-        checkbox.disabled = isBusy;
-      });
-      if (isBusy) modelPicker.open = false;
-    }
-
     function showMessage(message) {
       messageEl.textContent = message;
       messageEl.classList.add("show");
@@ -4139,17 +4348,34 @@
       if (showHistory) renderHistory();
     }
 
-    function openLightbox(src, alt) {
+    function openLightbox(src, alt, record = null) {
       lightboxImage.src = src;
       lightboxImage.alt = alt || "大图预览";
+      lightboxParameters.innerHTML = "";
+      lightboxDetails.hidden = !record;
+      lightboxDialog.classList.toggle("has-details", Boolean(record));
+      if (record) {
+        HistoryDetails.buildHistoryDetails(record).forEach((detail) => {
+          const term = document.createElement("dt");
+          const description = document.createElement("dd");
+          term.textContent = detail.label;
+          description.textContent = detail.value;
+          description.classList.toggle("multiline", Boolean(detail.multiline));
+          lightboxParameters.append(term, description);
+        });
+      }
       lightbox.classList.add("show");
       lightbox.setAttribute("aria-hidden", "false");
+      lightboxClose.focus();
     }
 
     function closeLightbox() {
       lightbox.classList.remove("show");
       lightbox.setAttribute("aria-hidden", "true");
       lightboxImage.removeAttribute("src");
+      lightboxParameters.innerHTML = "";
+      lightboxDetails.hidden = true;
+      lightboxDialog.classList.remove("has-details");
     }
   </script>
 </body>

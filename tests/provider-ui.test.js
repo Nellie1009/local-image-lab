@@ -45,3 +45,15 @@ test("price viewer distinguishes request, image, and token billing", () => {
   assert.match(html, /per_token/);
   assert.match(html, /pricing\.json/);
 });
+
+test("the page wires additive image input, queued submissions, and history details", () => {
+  assert.match(html, /id="reference-dropzone"/);
+  assert.match(html, /id="generation-queue-status"/);
+  assert.match(html, /id="lightbox-details"/);
+  assert.match(html, /reference-images\.js/);
+  assert.match(html, /generation-queue\.js/);
+  assert.match(html, /history-details\.js/);
+  assert.match(html, /ReferenceImages\.extractImageFiles/);
+  assert.match(html, /GenerationQueue\.createGenerationQueue/);
+  assert.match(html, /HistoryDetails\.buildHistoryDetails/);
+});
