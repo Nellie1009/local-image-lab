@@ -4,7 +4,7 @@
 
 Local Image Lab 是一个无需后端、由浏览器直接请求图片模型的本地生图台。它不绑定某一家 API 平台：你可以保存自己的多个 API Key，统一选择模型、提交任务、比较结果，并在某个 Key 额度不足时继续尝试其他可用来源。
 
-在线体验：[local-image-lab-dpbpftgxl8na.edgeone.cool](https://local-image-lab-dpbpftgxl8na.edgeone.cool)
+在线体验：[local-image-lab-zeu4qa2m.edgeone.cool](https://local-image-lab-zeu4qa2m.edgeone.cool?eo_token=5b6f978568328f37d7eea2ae2787309f&eo_time=1790018139)
 
 ## 为什么做这个项目
 
