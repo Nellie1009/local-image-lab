@@ -53,6 +53,8 @@ test("the page wires additive image input, queued submissions, and history detai
   assert.match(html, /<kbd>⌘V<\/kbd>/);
   assert.match(html, /referenceDropTarget\.addEventListener\("click"/);
   assert.match(html, /referenceDropTarget\.addEventListener\("keydown"/);
+  assert.doesNotMatch(html, /拖到这里/);
+  assert.match(html, /\.upload-actions \.ghost-button,[\s\S]*?width: 112px;[\s\S]*?height: 38px;/);
   assert.match(html, /id="generation-queue-status"/);
   assert.match(html, /id="lightbox-details"/);
   assert.match(html, /reference-images\.js/);

@@ -470,18 +470,17 @@
     }
 
     .upload-box {
-      border: 2px dashed rgba(17, 105, 92, 0.42);
+      border: 1px dashed var(--line);
       border-radius: 8px;
-      background: #f8fbf9;
+      background: rgba(255, 255, 255, 0.54);
       padding: 10px 12px 12px;
       transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
     }
 
     .upload-box.is-dragover {
       border-color: var(--accent);
-      border-style: solid;
-      background: #e7f0ed;
-      box-shadow: 0 0 0 4px rgba(17, 105, 92, 0.14);
+      background: #eef7f3;
+      box-shadow: 0 0 0 3px rgba(17, 105, 92, 0.12);
     }
 
     .upload-drop-copy {
@@ -508,7 +507,7 @@
       height: 54px;
       display: grid;
       place-items: center;
-      border: 2px solid rgba(17, 105, 92, 0.42);
+      border: 1px solid var(--line);
       border-radius: 8px;
       background: #fff;
       color: var(--accent);
@@ -562,7 +561,11 @@
 
     .upload-actions .ghost-button,
     .upload-actions .upload-button {
-      min-height: 36px;
+      width: 112px;
+      height: 38px;
+      min-height: 38px;
+      margin: 0;
+      padding: 0 12px;
       font-size: 13px;
     }
 
@@ -1585,7 +1588,7 @@
               <div class="upload-drop-copy" id="reference-drop-target" role="button" tabindex="0" aria-label="选择、拖入或粘贴参考图片">
                 <span class="upload-symbol" aria-hidden="true">↑</span>
                 <strong>拖入或粘贴图片</strong>
-                <span class="upload-instruction">拖到这里、点击选择，或按 <kbd>⌘V</kbd> / <kbd>Ctrl+V</kbd></span>
+                <span class="upload-instruction">点击选择，或按 <kbd>⌘V</kbd> / <kbd>Ctrl+V</kbd></span>
               </div>
               <div class="upload-actions">
                 <label class="upload-button" for="source-images">选择图片</label>
