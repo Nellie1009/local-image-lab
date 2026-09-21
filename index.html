@@ -2472,7 +2472,10 @@
               successfulCandidate,
               ...orderedCandidates.filter((candidate) => candidate.credential.id !== successfulCandidate.credential.id)
             ];
-            images.push(...outcome.value.images);
+            images.push(...outcome.value.images.map((image) => ({
+              ...image,
+              route: createRouteMetadata(successfulCandidate, routingAttempts)
+            })));
           } catch (error) {
             requestErrors.push(`第 ${index + 1} 次：${getErrorText(error)}`);
             const action = MultiModel.getBatchErrorAction(error?.status, images.length, geminiCount);
@@ -3003,6 +3006,7 @@
           await response.text().catch(() => "");
         } catch (error) {
           lastError = error;
+          if (error?.name === "TimeoutError") throw error;
           if (attempt === REQUEST_MAX_ATTEMPTS) {
             throw error;
           }
@@ -3280,31 +3284,34 @@
     }
 
     function prepareGeneratedImages(images, metadata) {
-      return images.map((image, index) => ({
-        ...image,
-        resultId: image.resultId || createLocalRecordId("result"),
-        comparisonId: metadata.comparisonId || "",
-        model: metadata.model,
-        prompt: metadata.prompt,
-        provider: metadata.provider,
-        providerId: metadata.route?.providerId || metadata.providerId || "",
-        providerName: metadata.route?.providerName || metadata.provider || "",
-        endpointId: metadata.route?.endpointId || "",
-        endpointName: metadata.route?.endpointName || "",
-        credentialLabel: metadata.route?.credentialLabel || "",
-        priceGroupId: metadata.route?.priceGroupId || "",
-        billingType: metadata.route?.billingType || "",
-        estimatedPrice: Number.isFinite(metadata.route?.estimatedPrice) ? metadata.route.estimatedPrice : null,
-        routingAttempts: (metadata.route?.routingAttempts || []).map((attempt) => ({
-          providerId: attempt.providerId,
-          credentialLabel: attempt.credentialLabel,
-          status: attempt.status,
-          reason: attempt.reason
-        })),
-        saved_prompt: metadata.saved_prompt || null,
-        batchIndex: index,
-        createdAt: metadata.createdAt || Date.now()
-      }));
+      return images.map((image, index) => {
+        const imageRoute = image.route || metadata.route;
+        return {
+          ...image,
+          resultId: image.resultId || createLocalRecordId("result"),
+          comparisonId: metadata.comparisonId || "",
+          model: metadata.model,
+          prompt: metadata.prompt,
+          provider: imageRoute?.providerName || metadata.provider,
+          providerId: imageRoute?.providerId || metadata.providerId || "",
+          providerName: imageRoute?.providerName || metadata.provider || "",
+          endpointId: imageRoute?.endpointId || "",
+          endpointName: imageRoute?.endpointName || "",
+          credentialLabel: imageRoute?.credentialLabel || "",
+          priceGroupId: imageRoute?.priceGroupId || "",
+          billingType: imageRoute?.billingType || "",
+          estimatedPrice: Number.isFinite(imageRoute?.estimatedPrice) ? imageRoute.estimatedPrice : null,
+          routingAttempts: (imageRoute?.routingAttempts || []).map((attempt) => ({
+            providerId: attempt.providerId,
+            credentialLabel: attempt.credentialLabel,
+            status: attempt.status,
+            reason: attempt.reason
+          })),
+          saved_prompt: metadata.saved_prompt || null,
+          batchIndex: index,
+          createdAt: metadata.createdAt || Date.now()
+        };
+      });
     }
 
     function renderModelImages(model, images, metadata) {

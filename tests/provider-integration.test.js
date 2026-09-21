@@ -38,3 +38,9 @@ test("quota fallback does not replace the existing two-model queue", () => {
   assert.match(html, /MODEL_REQUEST_CONCURRENCY/);
   assert.match(html, /正在切换 API Key/);
 });
+
+test("unknown timeouts are not replayed and Gemini images keep their winning route", () => {
+  assert.match(html, /if \(error\?\.name === "TimeoutError"\) throw error/);
+  assert.match(html, /route: createRouteMetadata\(successfulCandidate, routingAttempts\)/);
+  assert.match(html, /const imageRoute = image\.route \|\| metadata\.route/);
+});
