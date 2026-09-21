@@ -36,7 +36,7 @@
 
 ### `providers.json`
 
-保存请求层信息，不含价格、模型能力或 API Key。
+保存请求层信息和平台模型映射，不含价格、模型能力或 API Key。模型映射将全局模型 ID 关联到该平台实际使用的模型名与协议，因此同一个模型可以同时由多个平台提供。
 
 ```json
 {
@@ -70,7 +70,18 @@
           "note": "直连无超时优化线路"
         }
       ],
-      "adapters": ["openai-images", "gemini-native"],
+      "modelMappings": [
+        {
+          "modelId": "gpt-image-2.5-flare",
+          "requestModel": "gpt-image-2.5-flare",
+          "adapter": "openai-images"
+        },
+        {
+          "modelId": "gemini-3.1-flash-image-preview",
+          "requestModel": "gemini-3.1-flash-image-preview",
+          "adapter": "gemini-native"
+        }
+      ],
       "quotaErrors": {
         "statusCodes": [402],
         "messagePatterns": ["余额不足", "额度不足", "insufficient quota", "insufficient balance"]
@@ -84,15 +95,12 @@
 
 ### `models.json`
 
-保存模型身份、请求协议、参数能力和限制，不保存价格。
+保存全局模型身份、参数能力和限制，不保存平台、请求协议或价格。
 
 每个模型至少包含：
 
 - `id`：页面和历史记录使用的稳定标识。
-- `requestModel`：发送给 12API 的模型名。
-- `providerId`：第一期均为 `12api`。
 - `vendor`：OpenAI 或 Google。
-- `adapter`：`openai-images` 或 `gemini-native`。
 - `capabilities`：文生图、图生图、多参考图、透明背景等。
 - `options`：质量、尺寸或宽高比、分辨率、数量。
 - `limits`：参考图数量、类型和请求大小。
@@ -112,7 +120,7 @@
 | `gemini-3.1-flash-image` | Gemini Native | 是 | 是 | 未提供 |
 | `gemini-3.1-flash-image-preview` | Gemini Native | 是 | 是 | 未提供 |
 
-稳定版与 Preview 版是不同模型，不自动合并，也不在目录中互相改写。请求使用与模型 ID 相同的 `requestModel`，除非后续接口规范明确要求别名。
+稳定版与 Preview 版是不同模型，不自动合并，也不在目录中互相改写。12API 的 `modelMappings` 第一版使用与模型 ID 相同的 `requestModel`，除非后续接口规范明确要求别名。
 
 GPT Image 2.5 两个模型支持 `auto`、`low`、`medium`、`high`、`xhigh`、`max`。`gpt-image-2` 支持 `auto`、`low`、`medium`、`high`。三个 GPT Image 模型支持自定义尺寸、每次 1 至 8 张结果和最多 16 张参考图。
 
@@ -277,7 +285,7 @@ API Key 不进入任何项目文件。浏览器本地保存的数据形状为：
 每个被选中的模型独立路由；多模型比较仍按现有并发上限执行。
 
 1. 根据 `models.json` 找到精确模型，不做跨模型替换。
-2. 根据是否上传参考图筛选支持文生图或图生图的平台模型。
+2. 从每个平台的 `modelMappings` 找到该模型的请求名和适配器，再根据是否上传参考图筛选支持文生图或图生图的平台模型。
 3. 找出该平台所有 `active` Key。
 4. 读取 Key 的 `priceGroupId`；第一期为 `default`。
 5. 计算可比较的按次价格。质量倍率只用于明确提供倍率的模型。
