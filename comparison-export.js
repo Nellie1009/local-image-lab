@@ -19,6 +19,40 @@
     return Number.isInteger(index) && index >= 0 ? index : 0;
   }
 
+  function sanitizeRecord(record) {
+    const {
+      secret: _secret,
+      apiKey: _apiKey,
+      credentialSecret: _credentialSecret,
+      routingAttempts: _routingAttempts,
+      ...safe
+    } = record;
+    return safe;
+  }
+
+  function joinUnique(values) {
+    return [...new Set(values.filter(Boolean).map(String))].join(" / ");
+  }
+
+  function formatEstimatedPrice(record) {
+    if (Number.isFinite(record.estimatedPrice)) {
+      return `¥${Number(record.estimatedPrice).toFixed(3)}`;
+    }
+    if (record.billingType === "per_token") return "按 token 计费";
+    return "";
+  }
+
+  function summarizeImages(images) {
+    const records = Object.values(images || {});
+    return {
+      platforms: joinUnique(records.map((record) =>
+        record.providerName || record.provider || record.providerId
+      )),
+      priceGroups: joinUnique(records.map((record) => record.priceGroupId)),
+      estimatedPrices: joinUnique(records.map(formatEstimatedPrice))
+    };
+  }
+
   function buildComparisonExportTable(records) {
     const models = [];
     const seenModels = new Set();
@@ -42,7 +76,7 @@
       let index = getSafeIndex(record.batchIndex);
       while (group.rowsByIndex.get(index)?.[record.model]) index += 1;
       if (!group.rowsByIndex.has(index)) group.rowsByIndex.set(index, {});
-      group.rowsByIndex.get(index)[record.model] = record;
+      group.rowsByIndex.get(index)[record.model] = sanitizeRecord(record);
     });
 
     const rows = [];
@@ -50,10 +84,12 @@
       [...group.rowsByIndex.keys()]
         .sort((a, b) => a - b)
         .forEach((index) => {
+          const images = group.rowsByIndex.get(index);
           rows.push({
             prompt: group.prompt,
             index: index + 1,
-            images: group.rowsByIndex.get(index)
+            images,
+            ...summarizeImages(images)
           });
         });
     });

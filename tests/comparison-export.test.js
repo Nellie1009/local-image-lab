@@ -81,6 +81,70 @@ test("keeps legacy history records with the same prompt in one export group", ()
   assert.equal(table.rows[0].images["gemini-2.5-flash-image"].id, 2);
 });
 
+test("comparison rows retain provider metadata but strip credential secrets", () => {
+  const table = buildComparisonExportTable([{
+    resultId: "r1",
+    comparisonId: "c1",
+    prompt: "poster",
+    model: "gpt-image-2.5-flare",
+    providerName: "12API",
+    endpointName: "CDN 线路",
+    priceGroupId: "default",
+    billingType: "per_request",
+    estimatedPrice: 0.225,
+    credentialLabel: "默认 Key",
+    secret: "must-not-export",
+    batchIndex: 0
+  }]);
+  const record = table.rows[0].images["gpt-image-2.5-flare"];
+  assert.equal(record.providerName, "12API");
+  assert.equal(record.estimatedPrice, 0.225);
+  assert.equal(record.credentialLabel, "默认 Key");
+  assert.equal("secret" in record, false);
+});
+
+test("summarizes mixed provider routes for leading Excel metadata columns", () => {
+  const table = buildComparisonExportTable([
+    {
+      resultId: "r1",
+      comparisonId: "c1",
+      prompt: "poster",
+      model: "gpt-image-2.5-flare",
+      providerName: "12API",
+      priceGroupId: "default",
+      billingType: "per_request",
+      estimatedPrice: 0.15,
+      batchIndex: 0
+    },
+    {
+      resultId: "r2",
+      comparisonId: "c1",
+      prompt: "poster",
+      model: "doubao-seedream-5-0-pro-260628",
+      providerName: "火山方舟 Ark",
+      priceGroupId: "default",
+      billingType: "per_image",
+      estimatedPrice: 0.3,
+      batchIndex: 0
+    }
+  ]);
+
+  assert.equal(table.rows[0].platforms, "12API / 火山方舟 Ark");
+  assert.equal(table.rows[0].priceGroups, "default");
+  assert.equal(table.rows[0].estimatedPrices, "¥0.150 / ¥0.300");
+});
+
+test("the history serializer persists route labels without a credential secret", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const serializer = html.match(/async function saveHistoryRecords[\s\S]*?async function getHistoryRecords/)?.[0] || "";
+
+  assert.match(serializer, /providerId:/);
+  assert.match(serializer, /providerName:/);
+  assert.match(serializer, /credentialLabel:/);
+  assert.match(serializer, /estimatedPrice:/);
+  assert.doesNotMatch(serializer, /secret:/);
+});
+
 test("the page preserves selection data in history and wires the Excel exporter", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 
@@ -91,5 +155,6 @@ test("the page preserves selection data in history and wires the Excel exporter"
   assert.match(html, /exportSelectedImagesToExcel/);
   assert.match(html, /createExportSelectionToggle/);
   assert.match(html, /id="export-selection-history"/);
+  assert.match(html, /"平台", "价格分组", "预计价格"/);
   assert.doesNotMatch(html, /id="export-selection-home"/);
 });

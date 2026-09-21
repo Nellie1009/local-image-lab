@@ -3272,6 +3272,20 @@
         model: metadata.model,
         prompt: metadata.prompt,
         provider: metadata.provider,
+        providerId: metadata.route?.providerId || metadata.providerId || "",
+        providerName: metadata.route?.providerName || metadata.provider || "",
+        endpointId: metadata.route?.endpointId || "",
+        endpointName: metadata.route?.endpointName || "",
+        credentialLabel: metadata.route?.credentialLabel || "",
+        priceGroupId: metadata.route?.priceGroupId || "",
+        billingType: metadata.route?.billingType || "",
+        estimatedPrice: Number.isFinite(metadata.route?.estimatedPrice) ? metadata.route.estimatedPrice : null,
+        routingAttempts: (metadata.route?.routingAttempts || []).map((attempt) => ({
+          providerId: attempt.providerId,
+          credentialLabel: attempt.credentialLabel,
+          status: attempt.status,
+          reason: attempt.reason
+        })),
         saved_prompt: metadata.saved_prompt || null,
         batchIndex: index,
         createdAt: metadata.createdAt || Date.now()
@@ -3663,6 +3677,24 @@
             resultId: image.resultId || createLocalRecordId("result"),
             comparisonId: image.comparisonId || metadata.comparisonId || "",
             provider: image.provider || metadata.provider,
+            providerId: image.providerId || metadata.route?.providerId || "",
+            providerName: image.providerName || metadata.route?.providerName || metadata.provider || "",
+            endpointId: image.endpointId || metadata.route?.endpointId || "",
+            endpointName: image.endpointName || metadata.route?.endpointName || "",
+            credentialLabel: image.credentialLabel || metadata.route?.credentialLabel || "",
+            priceGroupId: image.priceGroupId || metadata.route?.priceGroupId || "",
+            billingType: image.billingType || metadata.route?.billingType || "",
+            estimatedPrice: Number.isFinite(image.estimatedPrice)
+              ? image.estimatedPrice
+              : Number.isFinite(metadata.route?.estimatedPrice)
+                ? metadata.route.estimatedPrice
+                : null,
+            routingAttempts: (image.routingAttempts || metadata.route?.routingAttempts || []).map((attempt) => ({
+              providerId: attempt.providerId,
+              credentialLabel: attempt.credentialLabel,
+              status: attempt.status || null,
+              reason: attempt.reason
+            })),
             model: image.model || metadata.model,
             prompt: image.prompt || metadata.prompt,
             saved_prompt: image.saved_prompt || metadata.saved_prompt || metadata.skill || null,
@@ -3712,6 +3744,7 @@
         const image = document.createElement("img");
         const meta = document.createElement("div");
         const model = document.createElement("strong");
+        const route = document.createElement("span");
         const time = document.createElement("span");
         const link = document.createElement("a");
         card.className = "history-card";
@@ -3720,16 +3753,26 @@
         image.alt = record.prompt || record.model || "历史图片";
         image.addEventListener("click", () => openLightbox(record.src, image.alt));
         model.textContent = record.model || "image";
+        route.textContent = formatHistoryRoute(record);
         time.textContent = new Date(record.createdAt).toLocaleString();
         link.className = "download-button";
         link.href = record.src;
         link.download = createImageFilename(record, record.batchIndex || 0, record.extension);
         link.textContent = "下载";
         card.append(createExportSelectionToggle(record), image);
-        meta.append(model, time, link);
+        meta.append(model, route, time, link);
         card.append(meta);
         container.appendChild(card);
       });
+    }
+
+    function formatHistoryRoute(record) {
+      const provider = record.providerName || record.provider || record.providerId || "未知平台";
+      if (Number.isFinite(record.estimatedPrice)) {
+        return `${provider} · 预计 ¥${Number(record.estimatedPrice).toFixed(3)}`;
+      }
+      if (record.billingType === "per_token") return `${provider} · 按 token 计费`;
+      return provider;
     }
 
     function createExportSelectionToggle(record) {
@@ -3801,7 +3844,7 @@
         const sheet = workbook.addWorksheet("模型对比", {
           views: [{ state: "frozen", ySplit: 1 }]
         });
-        const headers = ["Prompt", ...table.models];
+        const headers = ["Prompt", "平台", "价格分组", "预计价格", ...table.models];
         sheet.addRow(headers);
         sheet.getRow(1).height = 28;
         sheet.getRow(1).eachCell((cell) => {
@@ -3810,13 +3853,19 @@
           cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
         });
         sheet.getColumn(1).width = 46;
+        sheet.getColumn(2).width = 20;
+        sheet.getColumn(3).width = 16;
+        sheet.getColumn(4).width = 18;
         table.models.forEach((_model, index) => {
-          sheet.getColumn(index + 2).width = 30;
+          sheet.getColumn(index + 5).width = 30;
         });
 
         for (const row of table.rows) {
           const excelRow = sheet.addRow([
             row.index === 1 ? row.prompt : `${row.prompt}\n结果 ${row.index}`,
+            row.platforms,
+            row.priceGroups,
+            row.estimatedPrices,
             ...table.models.map(() => "")
           ]);
           excelRow.height = 156;
@@ -3833,12 +3882,12 @@
           for (const [index, model] of table.models.entries()) {
             const record = row.images[model];
             if (!record) continue;
-            const cell = sheet.getCell(excelRow.number, index + 2);
+            const cell = sheet.getCell(excelRow.number, index + 5);
             try {
               const image = await getExcelImageData(record.src);
               const imageId = workbook.addImage({ base64: image.dataUrl, extension: image.extension });
               sheet.addImage(imageId, {
-                tl: { col: index + 1, row: excelRow.number - 1 },
+                tl: { col: index + 4, row: excelRow.number - 1 },
                 ext: image.size
               });
             } catch (error) {
