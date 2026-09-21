@@ -89,7 +89,6 @@
       prompt: payload.prompt,
       image: images.length ? images : undefined,
       size: payload.size,
-      output_format: payload.output_format,
       response_format: "b64_json",
       watermark: false,
       sequential_image_generation: count > 1 ? "auto" : "disabled",

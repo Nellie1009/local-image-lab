@@ -67,6 +67,7 @@ test("builds Ark JSON requests with references and sequential output controls", 
   assert.equal(body.sequential_image_generation_options.max_images, 3);
   assert.equal(body.response_format, "b64_json");
   assert.equal(body.watermark, false);
+  assert.equal("output_format" in body, false);
 });
 
 test("redacts API keys and inline image contents from diagnostics", () => {
