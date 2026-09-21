@@ -470,10 +470,11 @@
     }
 
     .upload-box {
-      border: 1px dashed var(--line);
+      position: relative;
+      border: 2px dashed var(--line);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.54);
-      padding: 10px 12px 12px;
+      padding: 12px;
       transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
     }
 
@@ -484,13 +485,13 @@
     }
 
     .upload-drop-copy {
-      min-height: 178px;
+      min-height: 210px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 22px 12px 18px;
+      gap: 12px;
+      padding: 34px 18px 24px;
       color: var(--muted);
       text-align: center;
       cursor: pointer;
@@ -503,21 +504,18 @@
     }
 
     .upload-symbol {
-      width: 54px;
-      height: 54px;
+      width: 58px;
+      height: 48px;
       display: grid;
       place-items: center;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-      color: var(--accent);
-      font-size: 36px;
-      font-weight: 500;
+      color: var(--muted);
+      font-size: 42px;
+      font-weight: 700;
       line-height: 1;
     }
 
     .upload-drop-copy strong {
-      font-size: 18px;
+      font-size: 17px;
       color: var(--ink);
     }
 
@@ -527,28 +525,25 @@
       line-height: 1.45;
     }
 
-    .upload-instruction kbd {
-      display: inline-block;
-      min-width: 32px;
-      margin: 0 2px;
-      padding: 2px 6px;
-      border: 1px solid var(--line);
-      border-bottom-width: 2px;
-      border-radius: 5px;
-      background: #fff;
-      color: var(--ink);
-      font: inherit;
-      font-weight: 800;
+    .upload-clear-button {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 1;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 4px 2px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
     }
 
-    .upload-actions {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 0;
-      padding-top: 12px;
-      border-top: 1px solid rgba(17, 105, 92, 0.16);
+    .upload-clear-button:hover,
+    .upload-clear-button:focus-visible {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     .file-input-hidden {
@@ -557,31 +552,6 @@
       height: 1px;
       opacity: 0;
       pointer-events: none;
-    }
-
-    .upload-actions .ghost-button,
-    .upload-actions .upload-button {
-      width: 112px;
-      height: 38px;
-      min-height: 38px;
-      margin: 0;
-      padding: 0 12px;
-      font-size: 13px;
-    }
-
-    .upload-button {
-      cursor: pointer;
-      border-radius: 7px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-weight: 800;
-      padding: 0 13px;
-      border: 1px solid var(--line);
-      background: #fbf7ef;
-      color: var(--ink);
-      white-space: nowrap;
     }
 
     .hint {
@@ -1585,14 +1555,11 @@
           <div class="field">
             <label for="source-images">参考图</label>
             <div class="upload-box" id="reference-dropzone">
+              <button class="upload-clear-button" type="button" id="clear-source-images">清空上传图</button>
               <div class="upload-drop-copy" id="reference-drop-target" role="button" tabindex="0" aria-label="选择、拖入或粘贴参考图片">
                 <span class="upload-symbol" aria-hidden="true">↑</span>
-                <strong>拖入或粘贴图片</strong>
-                <span class="upload-instruction">点击选择，或按 <kbd>⌘V</kbd> / <kbd>Ctrl+V</kbd></span>
-              </div>
-              <div class="upload-actions">
-                <label class="upload-button" for="source-images">选择图片</label>
-                <button class="ghost-button" type="button" id="clear-source-images">清空上传图</button>
+                <strong>点击上传参考图片</strong>
+                <span class="upload-instruction">支持 JPG、PNG、WebP，可拖拽或粘贴添加</span>
               </div>
               <input class="file-input-hidden" id="source-images" name="sourceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple>
               <p class="hint" id="upload-hint">不上传图就是文生图；上传图后自动走图生图。GPT Image 编辑接口一次最多 16 张参考图。</p>

@@ -50,11 +50,13 @@ test("the page wires additive image input, queued submissions, and history detai
   assert.match(html, /id="reference-dropzone"/);
   assert.match(html, /id="reference-drop-target"/);
   assert.match(html, /class="upload-symbol"/);
-  assert.match(html, /<kbd>⌘V<\/kbd>/);
+  assert.match(html, /点击上传参考图片/);
+  assert.match(html, /支持 JPG、PNG、WebP，可拖拽或粘贴添加/);
+  assert.match(html, /class="upload-clear-button"/);
   assert.match(html, /referenceDropTarget\.addEventListener\("click"/);
   assert.match(html, /referenceDropTarget\.addEventListener\("keydown"/);
   assert.doesNotMatch(html, /拖到这里/);
-  assert.match(html, /\.upload-actions \.ghost-button,[\s\S]*?width: 112px;[\s\S]*?height: 38px;/);
+  assert.doesNotMatch(html, /class="upload-actions"/);
   assert.match(html, /id="generation-queue-status"/);
   assert.match(html, /id="lightbox-details"/);
   assert.match(html, /reference-images\.js/);
