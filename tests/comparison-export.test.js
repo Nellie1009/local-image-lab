@@ -155,6 +155,7 @@ test("the page preserves selection data in history and wires the Excel exporter"
   assert.match(html, /exportSelectedImagesToExcel/);
   assert.match(html, /createExportSelectionToggle/);
   assert.match(html, /id="export-selection-history"/);
+  assert.match(html, /id="export-selection-home"/);
+  assert.match(html, /id="clear-export-selection-home"/);
   assert.match(html, /"平台", "价格分组", "预计价格"/);
-  assert.doesNotMatch(html, /id="export-selection-home"/);
 });

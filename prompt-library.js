@@ -90,11 +90,14 @@
     }
   };
 
-  function composeSavedPrompt(savedPrompt, userPrompt) {
-    const saved = String(savedPrompt || "").trim();
-    const user = String(userPrompt || "").trim();
-    if (saved && user) return `${saved}\n\n用户补充要求：\n${user}`;
-    return saved || user;
+  function resolveSavedPromptSelection(currentPromptId, clickedPromptId, currentPrompt, savedPromptContent) {
+    if (currentPromptId === clickedPromptId) {
+      return { selectedPromptId: "", prompt: String(currentPrompt || "") };
+    }
+    return {
+      selectedPromptId: clickedPromptId,
+      prompt: String(savedPromptContent || "")
+    };
   }
 
   function createSavedPromptRecord(name, content, id, addedAt) {
@@ -133,8 +136,8 @@
 
   return {
     BUILT_IN_SAVED_PROMPTS,
-    composeSavedPrompt,
     createSavedPromptRecord,
-    migrateLegacyPromptEntries
+    migrateLegacyPromptEntries,
+    resolveSavedPromptSelection
   };
 });

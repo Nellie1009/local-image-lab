@@ -34,7 +34,41 @@ test("builds OpenAI generation and edit requests with the 12API contract", () =>
     ]
   });
   assert.equal(edit.url, "https://cdn.12ai.org/v1/images/edits");
-  assert.equal(edit.options.body.getAll("image").length, 2);
+  assert.equal(edit.options.body.getAll("image[]").length, 2);
+});
+
+test("explains 12API browser fetch failures as a preflight Authorization CORS issue", () => {
+  const message = Adapters.formatFetchFailure(
+    new TypeError("Failed to fetch"),
+    "https://cdn.12ai.org/v1/images/edits"
+  );
+  assert.match(message, /CORS/);
+  assert.match(message, /Authorization/);
+  assert.match(message, /减少图片张数不会修复/);
+});
+
+test("routes 12API OpenAI image requests through the local proxy without changing the payload", () => {
+  const request = Adapters.buildOpenAiRequest({
+    origin: "https://cdn.12ai.org",
+    apiKey: "sk-secret",
+    modelId: "gpt-image-2",
+    payload: { prompt: "edit this" },
+    files: [new File(["image"], "reference.png", { type: "image/png" })]
+  });
+
+  const proxied = Adapters.buildLocalProxyRequest(request, "http://127.0.0.1:8766/__proxy");
+  assert.equal(proxied.url, "http://127.0.0.1:8766/__proxy");
+  assert.equal(proxied.options.headers.Authorization, "Bearer sk-secret");
+  assert.equal(proxied.options.headers["X-Local-Proxy-Target"], request.url);
+  assert.equal(proxied.options.body, request.options.body);
+
+  const generation = Adapters.buildOpenAiRequest({
+    origin: "https://other.example",
+    apiKey: "sk-secret",
+    modelId: "gpt-image-2",
+    payload: { prompt: "text only" }
+  });
+  assert.equal(Adapters.buildLocalProxyRequest(generation, "http://127.0.0.1:8766/__proxy"), null);
 });
 
 test("builds Gemini requests from the mapped request model", () => {

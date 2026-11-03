@@ -5,22 +5,32 @@ const path = require("node:path");
 
 const {
   BUILT_IN_SAVED_PROMPTS,
-  composeSavedPrompt,
   createSavedPromptRecord,
-  migrateLegacyPromptEntries
+  migrateLegacyPromptEntries,
+  resolveSavedPromptSelection
 } = require("../prompt-library.js");
 
-test("combines a saved prompt before the user's prompt", () => {
-  assert.equal(
-    composeSavedPrompt("  保存内容  ", "  用户补充  "),
-    "保存内容\n\n用户补充要求：\n用户补充"
+test("choosing a saved prompt fills the editable input and clicking it again deselects without clearing text", () => {
+  const selected = resolveSavedPromptSelection("", "y2k", "用户补充", "保存模板");
+  assert.deepEqual(selected, { selectedPromptId: "y2k", prompt: "保存模板" });
+
+  const deselected = resolveSavedPromptSelection(
+    selected.selectedPromptId,
+    "y2k",
+    "保存模板\n\n用户自行补充并编辑",
+    "保存模板"
   );
+  assert.deepEqual(deselected, {
+    selectedPromptId: "",
+    prompt: "保存模板\n\n用户自行补充并编辑"
+  });
 });
 
-test("uses either prompt by itself and returns empty when neither exists", () => {
-  assert.equal(composeSavedPrompt("保存内容", ""), "保存内容");
-  assert.equal(composeSavedPrompt("", "用户内容"), "用户内容");
-  assert.equal(composeSavedPrompt("", ""), "");
+test("choosing another saved prompt replaces the editable input with its text", () => {
+  assert.deepEqual(
+    resolveSavedPromptSelection("y2k", "travel", "已编辑的文本", "旅行模板"),
+    { selectedPromptId: "travel", prompt: "旅行模板" }
+  );
 });
 
 test("ships four direct image prompts without skill frontmatter", () => {
@@ -83,6 +93,11 @@ test("the page uses saved prompts in the generation request", () => {
   assert.match(html, /<script src="prompt-library\.js"><\/script>/);
   assert.match(html, /保存的 Prompt/);
   assert.match(html, /saved_prompt:/);
+  assert.match(html, /resolveSavedPromptSelection/);
+  assert.match(html, /const prompt = String\(userPrompt \|\| ""\)\.trim\(\)/);
+  assert.match(html, /prompt,\s*metadata: savedPrompt/);
+  assert.match(html, /const selection = PromptLibrary\.resolveSavedPromptSelection/);
+  assert.match(html, /promptInput\.value = selection\.prompt/);
   assert.doesNotMatch(html, /handleAddPromptSkillFromGithub/);
   assert.doesNotMatch(html, /buildPromptWithSkill/);
 });

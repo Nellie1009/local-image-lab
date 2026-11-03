@@ -26,6 +26,26 @@ test("models are rendered from the catalog instead of hard-coded checkboxes", ()
   assert.doesNotMatch(html, /class="model-option"><input type="checkbox" value=/);
 });
 
+test("model and count stay visible while advanced generation settings start collapsed", () => {
+  const advancedIndex = html.indexOf('<details class="advanced-model-settings"');
+  assert.notEqual(advancedIndex, -1);
+
+  const modelControlsStart = html.indexOf('id="model-picker"');
+  const countControl = html.indexOf('id="count"');
+  assert.ok(modelControlsStart >= 0 && modelControlsStart < advancedIndex);
+  assert.ok(countControl >= 0 && countControl < advancedIndex);
+  assert.doesNotMatch(html.slice(advancedIndex, html.indexOf(">", advancedIndex)), /\sopen(?:\s|>)/);
+
+  const advancedEnd = html.indexOf("</details>", advancedIndex);
+  const advancedControls = html.slice(advancedIndex, advancedEnd);
+  assert.match(advancedControls, /id="size"/);
+  assert.match(advancedControls, /id="quality"/);
+  assert.match(advancedControls, /id="output-format"/);
+  assert.match(advancedControls, /id="style"/);
+  assert.match(advancedControls, /id="background"/);
+  assert.match(advancedControls, /id="gemini-resolution"/);
+});
+
 test("credentials can be restored without printing the secret into row markup", () => {
   assert.match(html, /CredentialStore\.maskSecret/);
   assert.match(html, /credentialStore\.restore/);

@@ -21,6 +21,50 @@
     ));
   }
 
+  function formatFetchFailure(error, requestUrl) {
+    const message = String(error?.message || "TypeError");
+    const url = String(requestUrl || "未知");
+    let hostname = "";
+    try {
+      hostname = new URL(url).hostname;
+    } catch (_error) {
+      // Keep the original URL text in the diagnostic when parsing fails.
+    }
+
+    if (["cdn.12ai.org", "new.12ai.org", "api.12ai.org"].includes(hostname)) {
+      return `浏览器请求失败：${message}\n请求地址：${url}\n这不是请求体过大的证据。当前探测到 12API 的 OPTIONS 预检响应只返回 Access-Control-Allow-Headers: *，没有明确允许 Authorization；浏览器可能因此在上传图片前拦截请求。减少图片张数不会修复此类 CORS 问题，需要 12API 在预检响应中明确允许 Authorization。`;
+    }
+
+    return `浏览器请求失败：${message}\n请求地址：${url}\n浏览器没有向页面提供 HTTP 响应。可能是 CORS 预检、网络/代理连接中断，或网关超时；这个错误本身不能证明是请求体过大。`;
+  }
+
+  function buildLocalProxyRequest(descriptor, proxyUrl) {
+    if (descriptor?.adapterId !== "openai-images") return null;
+    let target;
+    try {
+      target = new URL(descriptor.url);
+    } catch (_error) {
+      return null;
+    }
+    const allowedHosts = ["cdn.12ai.org", "new.12ai.org", "api.12ai.org"];
+    const allowedPaths = ["/v1/images/edits", "/v1/images/generations"];
+    if (target.protocol !== "https:" || !allowedHosts.includes(target.hostname)
+      || !allowedPaths.includes(target.pathname) || target.search || target.hash) {
+      return null;
+    }
+
+    return {
+      url: proxyUrl,
+      options: {
+        ...descriptor.options,
+        headers: {
+          ...descriptor.options.headers,
+          "X-Local-Proxy-Target": target.href
+        }
+      }
+    };
+  }
+
   function openAiPayload(modelId, payload) {
     const body = compactObject({ ...payload, model: modelId });
     delete body.gemini_resolution;
@@ -52,7 +96,7 @@
 
     const formData = new FormData();
     Object.entries(body).forEach(([key, value]) => formData.append(key, String(value)));
-    files.forEach((file) => formData.append("image", file, file.name));
+    files.forEach((file) => formData.append("image[]", file, file.name));
     return {
       adapterId: "openai-images",
       url: `${origin}/v1/images/edits`,
@@ -173,7 +217,9 @@
   return {
     buildArkRequest,
     buildGeminiRequest,
+    buildLocalProxyRequest,
     buildOpenAiRequest,
+    formatFetchFailure,
     redactRequestDescriptor,
     resolveEndpoint
   };

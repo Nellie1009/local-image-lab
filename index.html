@@ -582,6 +582,51 @@
       color: var(--ink);
     }
 
+    .advanced-model-settings {
+      margin: 0 0 14px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+    }
+
+    .advanced-model-settings > summary {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 9px 36px 9px 12px;
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .advanced-model-settings > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .advanced-model-settings > summary::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: translateY(-2px) rotate(45deg);
+    }
+
+    .advanced-model-settings[open] > summary {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .advanced-model-settings[open] > summary::after {
+      transform: translateY(2px) rotate(225deg);
+    }
+
+    .advanced-model-settings-body {
+      padding: 12px 12px 0;
+    }
+
     .model-picker > summary {
       width: 100%;
       min-height: 44px;
@@ -674,141 +719,87 @@
       cursor: wait;
     }
 
-    .skill-field-header {
-      min-height: 32px;
+    .prompt-field-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
       margin-bottom: 7px;
     }
 
-    .skill-field-header label {
+    .prompt-field-header > label {
       margin: 0;
     }
 
-    .skill-header-actions {
+    .prompt-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       min-width: 0;
-      display: flex;
-      align-items: center;
-      justify-content: end;
       gap: 8px;
     }
 
-    .skill-collapsed-selection {
-      display: none;
-      max-width: 240px;
-      overflow: hidden;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .prompt-actions > .ghost-button,
+    .saved-prompt-dropdown > summary {
+      min-height: 38px;
+      font-size: 13px;
     }
 
-    .skill-collapsed-selection.show {
-      display: block;
-    }
-
-    .skill-panel-toggle {
-      width: 32px;
-      height: 32px;
-      flex: 0 0 32px;
-      display: grid;
-      place-items: center;
+    .saved-prompt-dropdown {
+      position: relative;
+      min-width: 0;
+      margin: 0;
       padding: 0;
+      border: 0;
+    }
+
+    .saved-prompt-dropdown > summary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      list-style: none;
+      padding: 0 13px;
       border: 1px solid var(--line);
       border-radius: 7px;
       background: #fbf7ef;
       color: var(--ink);
       cursor: pointer;
-      transition: border-color 150ms ease, background 150ms ease;
+      font-weight: 800;
     }
 
-    .skill-panel-toggle:hover {
+    .saved-prompt-dropdown > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .saved-prompt-dropdown[open] > summary {
       border-color: rgba(17, 105, 92, 0.5);
       background: #eef7f3;
     }
 
-    .skill-panel-toggle:focus-visible {
-      outline: 0;
-      border-color: rgba(17, 105, 92, 0.72);
-      box-shadow: 0 0 0 3px rgba(17, 105, 92, 0.14);
-    }
-
-    .skill-chevron {
-      width: 8px;
-      height: 8px;
-      border-right: 2px solid currentColor;
-      border-bottom: 2px solid currentColor;
-      transform: rotate(225deg);
-      transition: transform 160ms ease;
-    }
-
-    .skill-panel-toggle[aria-expanded="false"] .skill-chevron {
-      transform: rotate(45deg);
-    }
-
-    .sr-only {
+    .saved-prompt-menu {
       position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .skill-panel {
+      z-index: 10;
+      top: calc(100% + 6px);
+      right: 0;
+      width: min(380px, calc(100vw - 56px));
+      max-height: min(54vh, 420px);
+      overflow: auto;
+      padding: 6px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.5);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .saved-prompt-empty {
+      margin: 0;
       padding: 12px;
-    }
-
-    .skill-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: 8px;
-    }
-
-    .skill-actions .ghost-button {
-      min-height: 34px;
-      font-size: 13px;
-    }
-
-    .skill-add-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .skill-add-row input {
-      min-height: 38px;
-      padding: 8px 10px;
-      font-size: 13px;
-    }
-
-    .skill-add-row .ghost-button {
-      min-height: 38px;
-      font-size: 13px;
-    }
-
-    .skill-summary {
-      margin: 8px 0 0;
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
+      font-size: 13px;
     }
 
     .skill-add-status {
-      min-height: 18px;
-      margin: 6px 0 0;
+      margin: 4px 0 0;
       color: var(--muted);
       font-size: 12px;
       line-height: 1.4;
@@ -816,8 +807,7 @@
 
     .skill-cards {
       display: grid;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 4px;
     }
 
     .saved-prompt-card {
@@ -829,7 +819,7 @@
       width: 100%;
       padding: 10px 12px;
       border: 1px solid rgba(216, 208, 196, 0.86);
-      border-radius: 8px;
+      border-radius: 6px;
       background: #fffdf8;
       cursor: pointer;
       color: var(--ink);
@@ -878,30 +868,55 @@
       line-height: 1.45;
     }
 
-    .skill-viewer {
-      display: none;
-      margin-top: 10px;
-      border-top: 1px solid var(--line);
-      padding-top: 10px;
-    }
-
-    .skill-viewer.show {
-      display: block;
-    }
-
-    .skill-content {
-      max-height: 320px;
-      overflow: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-      margin: 0;
-      padding: 10px;
-      border-radius: 7px;
+    .save-prompt-dialog {
+      width: min(420px, calc(100% - 28px));
+      padding: 18px;
       border: 1px solid var(--line);
-      background: #fffdf8;
+      border-radius: 8px;
+      background: var(--panel);
       color: var(--ink);
-      font-size: 12px;
-      line-height: 1.5;
+      box-shadow: var(--shadow);
+    }
+
+    .save-prompt-dialog form {
+      padding: 0;
+    }
+
+    .save-prompt-dialog::backdrop {
+      background: rgba(29, 35, 32, 0.48);
+    }
+
+    .save-prompt-dialog h2 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .save-prompt-dialog label {
+      margin-bottom: 6px;
+    }
+
+    .save-prompt-dialog input {
+      min-height: 40px;
+    }
+
+    .save-prompt-dialog-actions {
+      display: flex;
+      justify-content: end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .save-prompt-dialog-actions .ghost-button {
+      min-height: 38px;
+      font-size: 13px;
+    }
+
+    .save-prompt-dialog-actions .primary-button {
+      width: auto;
+      min-height: 38px;
+      margin: 0;
+      padding: 0 14px;
+      font-size: 13px;
     }
 
     .thumb-grid {
@@ -1310,13 +1325,6 @@
       margin-top: 2px;
     }
 
-    .history-meta .download-button {
-      min-height: 34px;
-      width: 100%;
-      margin-top: 8px;
-      font-size: 12px;
-    }
-
     .history-empty {
       color: var(--muted);
       font-size: 13px;
@@ -1577,66 +1585,6 @@
               </details>
             </div>
             <div class="field">
-              <label for="size">尺寸</label>
-              <select id="size" name="size">
-                <option value="auto" selected>auto</option>
-                <option value="1024x1024">1024x1024</option>
-                <option value="1536x1024">1536x1024</option>
-                <option value="1024x1536">1024x1536</option>
-                <option value="1792x1024">1792x1024</option>
-                <option value="1024x1792">1024x1792</option>
-                <option value="512x512">512x512</option>
-                <option value="256x256">256x256</option>
-                <option value="1:1">1:1</option>
-                <option value="3:2">3:2</option>
-                <option value="2:3">2:3</option>
-                <option value="4:3">4:3</option>
-                <option value="3:4">3:4</option>
-                <option value="4:5">4:5</option>
-                <option value="5:4">5:4</option>
-                <option value="9:16">9:16</option>
-                <option value="16:9">16:9</option>
-                <option value="21:9">21:9</option>
-                <option value="1:4">1:4</option>
-                <option value="4:1">4:1</option>
-                <option value="1:8">1:8</option>
-                <option value="8:1">8:1</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field-row">
-            <div class="field">
-              <label for="quality">质量</label>
-              <select id="quality" name="quality">
-                <option value="auto" selected>auto</option>
-                <option value="low">low</option>
-                <option value="medium">medium</option>
-                <option value="high">high</option>
-                <option value="standard">standard</option>
-                <option value="hd">hd</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="output-format">格式</label>
-              <select id="output-format" name="outputFormat">
-                <option value="png" selected>png</option>
-                <option value="jpeg">jpeg</option>
-                <option value="webp">webp</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field-row">
-            <div class="field">
-              <label for="style">风格</label>
-              <select id="style" name="style">
-                <option value="auto" selected>auto</option>
-                <option value="vivid">vivid</option>
-                <option value="natural">natural</option>
-              </select>
-            </div>
-            <div class="field">
               <label for="count">数量</label>
               <select id="count" name="count">
                 <option value="1" selected>1</option>
@@ -1651,67 +1599,115 @@
             </div>
           </div>
 
-          <div class="field-row">
-            <div class="field">
-              <label for="background">背景</label>
-              <select id="background" name="background">
-                <option value="auto" selected>auto</option>
-                <option value="opaque">opaque</option>
-                <option value="transparent">transparent</option>
-              </select>
+          <details class="advanced-model-settings">
+            <summary>其他设置</summary>
+            <div class="advanced-model-settings-body">
+              <div class="field-row">
+                <div class="field">
+                  <label for="size">尺寸</label>
+                  <select id="size" name="size">
+                    <option value="auto" selected>auto</option>
+                    <option value="1024x1024">1024x1024</option>
+                    <option value="1536x1024">1536x1024</option>
+                    <option value="1024x1536">1024x1536</option>
+                    <option value="1792x1024">1792x1024</option>
+                    <option value="1024x1792">1024x1792</option>
+                    <option value="512x512">512x512</option>
+                    <option value="256x256">256x256</option>
+                    <option value="1:1">1:1</option>
+                    <option value="3:2">3:2</option>
+                    <option value="2:3">2:3</option>
+                    <option value="4:3">4:3</option>
+                    <option value="3:4">3:4</option>
+                    <option value="4:5">4:5</option>
+                    <option value="5:4">5:4</option>
+                    <option value="9:16">9:16</option>
+                    <option value="16:9">16:9</option>
+                    <option value="21:9">21:9</option>
+                    <option value="1:4">1:4</option>
+                    <option value="4:1">4:1</option>
+                    <option value="1:8">1:8</option>
+                    <option value="8:1">8:1</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="quality">质量</label>
+                  <select id="quality" name="quality">
+                    <option value="auto" selected>auto</option>
+                    <option value="low">low</option>
+                    <option value="medium">medium</option>
+                    <option value="high">high</option>
+                    <option value="standard">standard</option>
+                    <option value="hd">hd</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="output-format">格式</label>
+                  <select id="output-format" name="outputFormat">
+                    <option value="png" selected>png</option>
+                    <option value="jpeg">jpeg</option>
+                    <option value="webp">webp</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="style">风格</label>
+                  <select id="style" name="style">
+                    <option value="auto" selected>auto</option>
+                    <option value="vivid">vivid</option>
+                    <option value="natural">natural</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="background">背景</label>
+                  <select id="background" name="background">
+                    <option value="auto" selected>auto</option>
+                    <option value="opaque">opaque</option>
+                    <option value="transparent">transparent</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="gemini-resolution">Gemini 分辨率</label>
+                  <select id="gemini-resolution" name="geminiResolution">
+                    <option value="auto" selected>auto</option>
+                    <option value="512px">512px</option>
+                    <option value="1K">1K</option>
+                    <option value="2K">2K</option>
+                    <option value="4K">4K</option>
+                    <option value="1024px">1024px</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div class="field">
-              <label for="gemini-resolution">Gemini 分辨率</label>
-              <select id="gemini-resolution" name="geminiResolution">
-                <option value="auto" selected>auto</option>
-                <option value="512px">512px</option>
-                <option value="1K">1K</option>
-                <option value="2K">2K</option>
-                <option value="4K">4K</option>
-                <option value="1024px">1024px</option>
-              </select>
-            </div>
-          </div>
+          </details>
 
           <div class="field">
-            <label for="prompt">Prompt</label>
+            <div class="prompt-field-header">
+              <label for="prompt">Prompt</label>
+              <div class="prompt-actions">
+                <select id="prompt-skill" name="promptSkill" aria-label="当前选中的保存 Prompt" hidden>
+                  <option value="" selected>不使用保存的 Prompt</option>
+                  <option value="photo-abstract-editorial">photo-abstract-editorial · 抽象编辑画</option>
+                  <option value="tait-crt-interface-skill">tait-crt-interface-skill · CRT像素界面</option>
+                  <option value="travel-memory-sticker-card">travel-memory-sticker-card · 旅行贴纸卡</option>
+                  <option value="y2k-poster-design">y2k-poster-design · Y2K海报</option>
+                </select>
+                <button class="ghost-button" id="add-skill-button" type="button">保存当前 Prompt</button>
+                <details class="saved-prompt-dropdown" id="saved-prompt-dropdown">
+                  <summary>已保存的 Prompt</summary>
+                  <div class="saved-prompt-menu">
+                    <div class="skill-cards" id="skill-cards"></div>
+                  </div>
+                </details>
+              </div>
+            </div>
             <textarea id="prompt" name="prompt" placeholder="例：一张干净的产品海报，桌面上的透明玻璃香水瓶，柔和自然光，细腻真实摄影风格"></textarea>
-          </div>
-
-          <div class="field" id="skill-field">
-            <div class="skill-field-header">
-              <label for="prompt-skill">保存的 Prompt</label>
-              <div class="skill-header-actions">
-                <span class="skill-collapsed-selection" id="skill-collapsed-selection">未选择</span>
-                <button class="skill-panel-toggle" id="toggle-skill-panel" type="button" aria-expanded="true" aria-controls="skill-panel-body" title="收起保存的 Prompt">
-                  <span class="skill-chevron" aria-hidden="true"></span>
-                  <span class="sr-only" id="skill-panel-toggle-label">收起保存的 Prompt</span>
-                </button>
-              </div>
-            </div>
-            <div class="skill-panel" id="skill-panel-body">
-              <select id="prompt-skill" name="promptSkill">
-                <option value="" selected>不使用保存的 Prompt</option>
-                <option value="photo-abstract-editorial">photo-abstract-editorial · 抽象编辑画</option>
-                <option value="tait-crt-interface-skill">tait-crt-interface-skill · CRT像素界面</option>
-                <option value="travel-memory-sticker-card">travel-memory-sticker-card · 旅行贴纸卡</option>
-                <option value="y2k-poster-design">y2k-poster-design · Y2K海报</option>
-              </select>
-              <div class="skill-add-row">
-                <input id="skill-github-input" type="text" placeholder="给当前主 Prompt 起个名字">
-                <button class="ghost-button" id="add-skill-button" type="button">保存当前</button>
-              </div>
-              <p class="skill-add-status" id="skill-add-status"></p>
-              <div class="skill-cards" id="skill-cards"></div>
-              <p class="skill-summary" id="skill-summary">选择保存项后，生成时会把它放在主 Prompt 前面；主 Prompt 仍可单独输入。</p>
-              <div class="skill-actions">
-                <button class="ghost-button" type="button" id="toggle-skill-content">查看 Prompt 内容</button>
-                <a class="ghost-button" id="skill-source-link" href="#" target="_blank" rel="noreferrer" hidden>来源</a>
-              </div>
-              <div class="skill-viewer" id="skill-viewer">
-                <pre class="skill-content" id="skill-content">选择一个保存的 Prompt 后可以查看内容。</pre>
-              </div>
-            </div>
+            <p class="skill-add-status" id="skill-add-status"></p>
           </div>
 
           <button class="primary-button" id="submit" type="submit">生成图片</button>
@@ -1741,6 +1737,9 @@
           <div class="history-top">
             <div class="history-title">最近 12 张</div>
             <div class="history-actions">
+              <button class="ghost-button" type="button" id="export-selection-home" disabled>导出 Excel</button>
+              <button class="ghost-button" type="button" id="download-selected-home" disabled>下载所选</button>
+              <button class="ghost-button" type="button" id="clear-export-selection-home" disabled>清空所选</button>
               <a class="ghost-button" href="#history">查看全部</a>
             </div>
           </div>
@@ -1755,12 +1754,11 @@
       <div class="history-page-head">
         <h2>生图历史</h2>
         <div class="history-actions">
-          <a class="ghost-button" href="#home">返回生成</a>
           <span class="export-selection-summary" id="history-export-selection-status">已选 0 张</span>
           <button class="ghost-button" type="button" id="export-selection-history" disabled>导出 Excel</button>
-          <button class="ghost-button" type="button" id="clear-export-selection-history" disabled>清空选择</button>
-          <button class="ghost-button" type="button" id="download-history">下载全部</button>
-          <button class="ghost-button" type="button" id="clear-history">清空</button>
+          <button class="ghost-button" type="button" id="download-selected-history" disabled>下载所选</button>
+          <button class="ghost-button" type="button" id="clear-export-selection-history" disabled>清空所选</button>
+          <a class="ghost-button" href="#home">返回生成</a>
         </div>
       </div>
       <div class="history-list" id="full-history-list">
@@ -1768,6 +1766,18 @@
       </div>
     </section>
   </div>
+
+  <dialog class="save-prompt-dialog" id="save-prompt-dialog" aria-labelledby="save-prompt-title">
+    <form id="save-prompt-form">
+      <h2 id="save-prompt-title">保存当前 Prompt</h2>
+      <label for="saved-prompt-name">名称</label>
+      <input id="saved-prompt-name" type="text" maxlength="80" placeholder="例如：产品海报风格" required>
+      <div class="save-prompt-dialog-actions">
+        <button class="ghost-button" type="button" id="cancel-save-prompt">取消</button>
+        <button class="primary-button" type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog class="price-viewer" id="price-viewer" aria-labelledby="price-viewer-title">
     <div class="price-viewer-head">
@@ -1845,12 +1855,14 @@
     const requestJsonEl = document.querySelector("#request-json");
     const actionsEl = document.querySelector("#actions");
     const historyExportSelectionStatus = document.querySelector("#history-export-selection-status");
+    const exportSelectionHomeButton = document.querySelector("#export-selection-home");
     const exportSelectionHistoryButton = document.querySelector("#export-selection-history");
+    const clearExportSelectionHomeButton = document.querySelector("#clear-export-selection-home");
     const clearExportSelectionHistoryButton = document.querySelector("#clear-export-selection-history");
     const historyList = document.querySelector("#history-list");
     const fullHistoryList = document.querySelector("#full-history-list");
-    const downloadHistoryButton = document.querySelector("#download-history");
-    const clearHistoryButton = document.querySelector("#clear-history");
+    const downloadSelectedHomeButton = document.querySelector("#download-selected-home");
+    const downloadSelectedHistoryButton = document.querySelector("#download-selected-history");
     const homePage = document.querySelector("#home-page");
     const historyPage = document.querySelector("#history-page");
     const lightbox = document.querySelector("#lightbox");
@@ -1879,17 +1891,12 @@
     const geminiResolutionSelect = document.querySelector("#gemini-resolution");
     const promptInput = document.querySelector("#prompt");
     const promptSkillSelect = document.querySelector("#prompt-skill");
-    const skillPanelBody = document.querySelector("#skill-panel-body");
-    const toggleSkillPanelButton = document.querySelector("#toggle-skill-panel");
-    const skillPanelToggleLabel = document.querySelector("#skill-panel-toggle-label");
-    const skillCollapsedSelection = document.querySelector("#skill-collapsed-selection");
-    const skillSummary = document.querySelector("#skill-summary");
-    const skillViewer = document.querySelector("#skill-viewer");
-    const skillContent = document.querySelector("#skill-content");
-    const toggleSkillContentButton = document.querySelector("#toggle-skill-content");
-    const skillSourceLink = document.querySelector("#skill-source-link");
     const skillCards = document.querySelector("#skill-cards");
-    const skillGithubInput = document.querySelector("#skill-github-input");
+    const savedPromptDropdown = document.querySelector("#saved-prompt-dropdown");
+    const savePromptDialog = document.querySelector("#save-prompt-dialog");
+    const savePromptForm = document.querySelector("#save-prompt-form");
+    const savedPromptNameInput = document.querySelector("#saved-prompt-name");
+    const cancelSavePromptButton = document.querySelector("#cancel-save-prompt");
     const addSkillButton = document.querySelector("#add-skill-button");
     const skillAddStatus = document.querySelector("#skill-add-status");
 
@@ -1898,10 +1905,10 @@
     const REMEMBER_SETTINGS_KEY = "image_generator_remember_settings_v2";
     const SAVED_PROMPTS_KEY = "image_generator_saved_prompts_v1";
     const LEGACY_CUSTOM_SKILLS_KEY = "image_generator_custom_skills_v1";
-    const SKILL_PANEL_COLLAPSED_KEY = "image_generator_skill_panel_collapsed_v1";
     const LEGACY_API_KEY = "openai_image_api_key";
     const REQUEST_MAX_ATTEMPTS = 3;
     const REQUEST_TIMEOUT_MS = 180000;
+    const LOCAL_IMAGE_PROXY_URL = "http://127.0.0.1:8766/__proxy";
     const MODEL_REQUEST_CONCURRENCY = 2;
     const GEMINI_INLINE_REQUEST_MAX_BYTES = 20 * 1024 * 1024;
     const GEMINI_JSON_OVERHEAD_BYTES = 256 * 1024;
@@ -2158,22 +2165,17 @@
     modelOptions.addEventListener("change", handleModelSelectionChange);
     document.addEventListener("click", (event) => {
       if (!modelPicker.contains(event.target)) modelPicker.open = false;
+      if (!savedPromptDropdown.contains(event.target)) savedPromptDropdown.open = false;
     });
-    promptSkillSelect.addEventListener("change", () => {
-      syncPromptSkillControls();
-      updateReadyPreviewState();
-    });
-    toggleSkillPanelButton.addEventListener("click", () => {
-      setSkillPanelCollapsed(toggleSkillPanelButton.getAttribute("aria-expanded") === "true");
-    });
-    toggleSkillContentButton.addEventListener("click", togglePromptSkillContent);
     skillCards.addEventListener("click", handlePromptSkillCardClick);
-    addSkillButton.addEventListener("click", saveCurrentPrompt);
-    skillGithubInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        saveCurrentPrompt();
-      }
+    addSkillButton.addEventListener("click", openSavePromptDialog);
+    cancelSavePromptButton.addEventListener("click", () => savePromptDialog.close());
+    savePromptDialog.addEventListener("click", (event) => {
+      if (event.target === savePromptDialog) savePromptDialog.close();
+    });
+    savePromptForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      saveCurrentPrompt();
     });
     sourceImagesInput.addEventListener("change", () => appendReferenceFiles(sourceImagesInput.files));
     clearSourceImagesButton.addEventListener("click", clearReferenceImages);
@@ -2194,12 +2196,12 @@
     thumbGrid.addEventListener("dragleave", handleThumbDragLeave);
     thumbGrid.addEventListener("drop", handleThumbDrop);
     thumbGrid.addEventListener("dragend", handleThumbDragEnd);
-    downloadHistoryButton.addEventListener("click", downloadAllHistory);
-    clearHistoryButton.addEventListener("click", clearHistory);
-    [exportSelectionHistoryButton].forEach((button) => {
+    [downloadSelectedHomeButton, downloadSelectedHistoryButton]
+      .forEach((button) => button.addEventListener("click", downloadSelectedHistory));
+    [exportSelectionHomeButton, exportSelectionHistoryButton].forEach((button) => {
       button.addEventListener("click", exportSelectedImagesToExcel);
     });
-    [clearExportSelectionHistoryButton].forEach((button) => {
+    [clearExportSelectionHomeButton, clearExportSelectionHistoryButton].forEach((button) => {
       button.addEventListener("click", clearExportSelection);
     });
     lightboxClose.addEventListener("click", closeLightbox);
@@ -2212,8 +2214,6 @@
     window.addEventListener("hashchange", syncRoute);
     renderPromptSkillOptions();
     renderPromptSkillCards();
-    setSkillPanelCollapsed(localStorage.getItem(SKILL_PANEL_COLLAPSED_KEY) === "true", false);
-    syncPromptSkillControls();
     syncRoute();
     renderHistory();
     refreshExportSelectionUi();
@@ -2514,9 +2514,9 @@
         setPreviewState("缺少 API Key", "在 API 来源中添加至少一个可用 Key。");
         return showMessage("没有可用的 API Key。");
       }
-      if (!userPrompt && !selectedSavedPromptId) {
-        setPreviewState("缺少 Prompt", "写一句主 Prompt，或选择一个保存的 Prompt，再点击生成。");
-        return showMessage("先写主 Prompt，或选择一个保存的 Prompt。");
+      if (!userPrompt) {
+        setPreviewState("缺少 Prompt", "在主 Prompt 输入框填写内容，或选择保存项填入后再生成。");
+        return showMessage("主 Prompt 为空，请输入内容或选择一个保存的 Prompt。");
       }
       if (!selectedModels.length) {
         setPreviewState("没有选择模型", "至少选择一个模型后再生成。");
@@ -2526,7 +2526,7 @@
       const savedPromptBundle = buildPromptWithSavedPrompt(selectedSavedPromptId, userPrompt);
       const prompt = savedPromptBundle.prompt;
       if (prompt.length > PROMPT_MAX_LENGTH) {
-        setPreviewState("Prompt 太长", `当前 ${prompt.length} 字符，接口最多 ${PROMPT_MAX_LENGTH} 字符。请缩短主 Prompt 或保存的 Prompt。`);
+        setPreviewState("Prompt 太长", `当前 ${prompt.length} 字符，接口最多 ${PROMPT_MAX_LENGTH} 字符。请缩短主 Prompt。`);
         return showMessage(`Prompt 太长：当前 ${prompt.length} 字符，接口最多 ${PROMPT_MAX_LENGTH} 字符。`);
       }
 
@@ -2772,14 +2772,18 @@
       };
 
       const descriptor = createDescriptor();
+      const transportDescriptor = createRequestTransport(descriptor);
       recordRoutedRequest(candidate.model.id, candidate, descriptor, payload, context, requestContext);
+      updateModelRequestRecord(candidate.model.id, { transportUrl: transportDescriptor.url });
       setModelResultState(
         candidate.model.id,
         context.sourceImages.length ? "正在编辑图片" : "正在生成图片",
         `${candidate.provider.name} · ${candidate.credential.label}`,
         "active"
       );
-      const response = await fetchWithRetry(descriptor.url, () => createDescriptor().options, {
+      const response = await fetchWithRetry(transportDescriptor.url, () => {
+        return createRequestTransport(createDescriptor()).options;
+      }, {
         label: `${candidate.provider.name} ${candidate.model.id}`,
         onRetry: (detail) => setModelResultState(candidate.model.id, "正在重试", detail, "warning")
       });
@@ -2790,6 +2794,13 @@
         : normalizeOpenAiImages(json.data || [], payload.output_format || "png");
       if (!images.length) throw new Error("接口成功响应了，但返回里没有可显示的图片数据。");
       return { images };
+    }
+
+    function createRequestTransport(descriptor) {
+      const localPage = window.location.protocol === "file:"
+        || ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname);
+      if (!localPage) return descriptor;
+      return ProviderAdapters.buildLocalProxyRequest(descriptor, LOCAL_IMAGE_PROXY_URL) || descriptor;
     }
 
     function recordRoutedRequest(model, candidate, descriptor, payload, context, requestContext) {
@@ -3043,14 +3054,15 @@
     }
 
     function saveCurrentPrompt() {
-      const name = skillGithubInput.value.trim();
+      const name = savedPromptNameInput.value.trim();
       const content = promptInput.value.trim();
       if (!name) {
-        skillAddStatus.textContent = "先给当前主 Prompt 起个名字。";
+        savedPromptNameInput.focus();
         return;
       }
       if (!content) {
         skillAddStatus.textContent = "主 Prompt 还是空的，先写好内容再保存。";
+        savePromptDialog.close();
         return;
       }
 
@@ -3064,8 +3076,21 @@
       saveCustomSavedPrompts();
       renderPromptSkillOptions();
       renderPromptSkillCards();
-      skillGithubInput.value = "";
+      savedPromptNameInput.value = "";
+      savePromptDialog.close();
       skillAddStatus.textContent = `已保存：${PROMPT_SKILLS[promptId].name}`;
+    }
+
+    function openSavePromptDialog() {
+      if (!promptInput.value.trim()) {
+        skillAddStatus.textContent = "主 Prompt 还是空的，先写好内容再保存。";
+        promptInput.focus();
+        return;
+      }
+      skillAddStatus.textContent = "";
+      savedPromptNameInput.value = "";
+      savePromptDialog.showModal();
+      savedPromptNameInput.focus();
     }
 
     function deleteSavedPrompt(promptId) {
@@ -3077,7 +3102,6 @@
       saveCustomSavedPrompts();
       renderPromptSkillOptions();
       renderPromptSkillCards();
-      syncPromptSkillControls();
       updateReadyPreviewState();
       skillAddStatus.textContent = `已删除：${savedPrompt.name}`;
     }
@@ -3089,61 +3113,29 @@
     function buildPromptWithSavedPrompt(promptId, userPrompt) {
       const savedPrompt = getPromptSkill(promptId);
       const content = savedPrompt?.content || "";
+      const prompt = String(userPrompt || "").trim();
       return {
-        prompt: PromptLibrary.composeSavedPrompt(content, userPrompt),
+        prompt,
         metadata: savedPrompt ? {
           id: promptId,
           name: savedPrompt.name,
           source: savedPrompt.sourceUrl || null,
           content,
           content_length: content.length,
-          user_prompt_length: userPrompt.length
+          user_prompt_length: prompt.length
         } : null
       };
     }
 
-    async function syncPromptSkillControls() {
-      const savedPrompt = getPromptSkill();
-      updateCollapsedSkillSelection(savedPrompt);
-      if (!savedPrompt) {
-        skillSummary.textContent = "选择保存项后，生成时会把它放在主 Prompt 前面；主 Prompt 仍可单独输入。";
-        skillSourceLink.hidden = true;
-        syncPromptSkillCardSelection();
-        skillContent.textContent = "选择一个保存的 Prompt 后可以查看内容。";
-        return;
-      }
-      skillSummary.textContent = savedPrompt.description;
-      skillSourceLink.hidden = !/^https?:\/\//.test(savedPrompt.sourceUrl || "");
-      skillSourceLink.href = savedPrompt.sourceUrl || "#";
-      skillSourceLink.textContent = "来源";
-      syncPromptSkillCardSelection();
-      if (skillViewer.classList.contains("show")) {
-        await renderPromptSkillContent();
-      } else {
-        skillContent.textContent = "点击“查看 Prompt 内容”后展开完整文字。";
-      }
-    }
-
-    function updateCollapsedSkillSelection(skill = getPromptSkill()) {
-      skillCollapsedSelection.textContent = skill
-        ? `${skill.name} · ${skill.label || "自定义"}`
-        : "未选择";
-    }
-
-    function setSkillPanelCollapsed(collapsed, persist = true) {
-      skillPanelBody.hidden = collapsed;
-      toggleSkillPanelButton.setAttribute("aria-expanded", String(!collapsed));
-      toggleSkillPanelButton.title = collapsed ? "展开保存的 Prompt" : "收起保存的 Prompt";
-      skillPanelToggleLabel.textContent = collapsed ? "展开保存的 Prompt" : "收起保存的 Prompt";
-      skillCollapsedSelection.classList.toggle("show", collapsed);
-      updateCollapsedSkillSelection();
-      if (persist) {
-        localStorage.setItem(SKILL_PANEL_COLLAPSED_KEY, String(collapsed));
-      }
-    }
-
     function renderPromptSkillCards() {
       skillCards.innerHTML = "";
+      if (!Object.keys(PROMPT_SKILLS).length) {
+        const empty = document.createElement("p");
+        empty.className = "saved-prompt-empty";
+        empty.textContent = "还没有保存的 Prompt。";
+        skillCards.appendChild(empty);
+        return;
+      }
       Object.entries(PROMPT_SKILLS).forEach(([promptId, savedPrompt]) => {
         const wrapper = document.createElement("div");
         const card = document.createElement("button");
@@ -3182,8 +3174,16 @@
       }
       const card = event.target.closest(".skill-preview");
       if (!card) return;
-      promptSkillSelect.value = card.dataset.skillId || "";
-      syncPromptSkillControls();
+      const clickedPromptId = card.dataset.skillId || "";
+      const selection = PromptLibrary.resolveSavedPromptSelection(
+        promptSkillSelect.value,
+        clickedPromptId,
+        promptInput.value,
+        getPromptSkill(clickedPromptId)?.content
+      );
+      promptSkillSelect.value = selection.selectedPromptId;
+      promptInput.value = selection.prompt;
+      savedPromptDropdown.open = false;
       updateReadyPreviewState();
     }
 
@@ -3191,23 +3191,6 @@
       skillCards.querySelectorAll(".skill-preview").forEach((card) => {
         card.classList.toggle("selected", card.dataset.skillId === promptSkillSelect.value);
       });
-    }
-
-    async function togglePromptSkillContent() {
-      skillViewer.classList.toggle("show");
-      toggleSkillContentButton.textContent = skillViewer.classList.contains("show") ? "收起 Prompt 内容" : "查看 Prompt 内容";
-      if (skillViewer.classList.contains("show")) {
-        await renderPromptSkillContent();
-      }
-    }
-
-    async function renderPromptSkillContent() {
-      const savedPrompt = getPromptSkill();
-      if (!savedPrompt) {
-        skillContent.textContent = "当前没有选择保存的 Prompt。";
-        return;
-      }
-      skillContent.textContent = savedPrompt.content;
     }
 
     async function fetchWithRetry(url, createOptions, context = {}) {
@@ -3601,8 +3584,12 @@
 
     function formatModelGenerationError(model, error) {
       if (!(error instanceof TypeError)) return getErrorText(error);
-      const requestUrl = modelRequestRecords.get(model)?.request?.url || "未知";
-      return `浏览器请求失败：${error.message || "TypeError"}\n请求地址：${requestUrl}\n常见原因是网络、代理、CORS、网关超时，或上传图片导致请求体过大。\n\n排查建议：先把数量设为 1；如果用了参考图，先减少图片张数或压缩图片。`;
+      const requestRecord = modelRequestRecords.get(model) || {};
+      if (requestRecord.transportUrl === LOCAL_IMAGE_PROXY_URL) {
+        return `本机代理没有连接。请在项目目录打开终端运行：node local-proxy.js，然后重新生成。`;
+      }
+      const requestUrl = requestRecord.request?.url || "未知";
+      return ProviderAdapters.formatFetchFailure(error, requestUrl);
     }
 
     function stripTrailingSlash(value) {
@@ -4012,7 +3999,6 @@
         const model = document.createElement("strong");
         const route = document.createElement("span");
         const time = document.createElement("span");
-        const link = document.createElement("a");
         card.className = "history-card";
         meta.className = "history-meta";
         image.src = record.src;
@@ -4021,12 +4007,8 @@
         model.textContent = record.model || "image";
         route.textContent = formatHistoryRoute(record);
         time.textContent = new Date(record.createdAt).toLocaleString();
-        link.className = "download-button";
-        link.href = record.src;
-        link.download = createImageFilename(record, record.batchIndex || 0, record.extension);
-        link.textContent = "下载";
-        card.append(createExportSelectionToggle(record), image);
-        meta.append(model, route, time, link);
+        card.append(createExportSelectionToggle(record, true), image);
+        meta.append(model, route, time);
         card.append(meta);
         container.appendChild(card);
       });
@@ -4041,7 +4023,7 @@
       return provider;
     }
 
-    function createExportSelectionToggle(record) {
+    function createExportSelectionToggle(record, isHistoryRecord = false) {
       const key = ComparisonExport.getExportRecordKey(record);
       const label = document.createElement("label");
       const input = document.createElement("input");
@@ -4049,8 +4031,9 @@
       label.className = "export-select-toggle";
       input.type = "checkbox";
       input.dataset.exportKey = key;
+      if (isHistoryRecord) input.dataset.historyExportKey = key;
       input.checked = exportSelection.has(key);
-      input.setAttribute("aria-label", "选择用于导出 Excel");
+      input.setAttribute("aria-label", isHistoryRecord ? "选择历史图片" : "选择用于导出 Excel");
       text.textContent = "选择";
       label.append(input, text);
       input.addEventListener("change", () => {
@@ -4082,9 +4065,23 @@
       const count = exportSelection.size;
       const label = `已选 ${count} 张`;
       historyExportSelectionStatus.textContent = label;
-      [exportSelectionHistoryButton, clearExportSelectionHistoryButton]
+      [
+        exportSelectionHomeButton,
+        exportSelectionHistoryButton,
+        clearExportSelectionHomeButton,
+        clearExportSelectionHistoryButton
+      ]
         .forEach((button) => {
           button.disabled = count === 0;
+        });
+
+      const selectedHistoryRecords = getSelectedHistoryRecords();
+      [downloadSelectedHomeButton, downloadSelectedHistoryButton]
+        .forEach((button) => {
+          button.disabled = selectedHistoryRecords.length === 0;
+          button.textContent = selectedHistoryRecords.length
+            ? `下载所选 (${selectedHistoryRecords.length})`
+            : "下载所选";
         });
 
       document.querySelectorAll("input[data-export-key]").forEach((input) => {
@@ -4187,11 +4184,11 @@
 
     function setExportButtonsBusy(isBusy) {
       const hasSelection = exportSelection.size > 0;
-      [exportSelectionHistoryButton].forEach((button) => {
+      [exportSelectionHomeButton, exportSelectionHistoryButton].forEach((button) => {
         button.disabled = isBusy || !hasSelection;
         button.textContent = isBusy ? "正在导出..." : "导出 Excel";
       });
-      [clearExportSelectionHistoryButton].forEach((button) => {
+      [clearExportSelectionHomeButton, clearExportSelectionHistoryButton].forEach((button) => {
         button.disabled = isBusy || !hasSelection;
       });
     }
@@ -4255,38 +4252,33 @@
       };
     }
 
-    async function downloadAllHistory() {
-      const records = await getHistoryRecords();
+    function getSelectedHistoryRecords() {
+      const selectedKeys = new Set(
+        [...document.querySelectorAll("input[data-history-export-key]")]
+          .filter((input) => input.checked)
+          .map((input) => input.dataset.historyExportKey)
+      );
+      return [...selectedKeys]
+        .map((key) => exportSelection.get(key))
+        .filter(Boolean);
+    }
+
+    function downloadSelectedHistory() {
+      const records = getSelectedHistoryRecords();
       if (!records.length) {
-        showMessage("还没有历史图片可以下载。");
+        showMessage("先勾选要下载的历史图片。");
         return;
       }
 
-      records.slice().reverse().forEach((record, index) => {
-        window.setTimeout(() => {
-          const link = document.createElement("a");
-          link.href = record.src;
-          link.download = createImageFilename(record, record.batchIndex || index, record.extension);
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-        }, index * 180);
+      records.forEach((record, index) => {
+        const link = document.createElement("a");
+        link.href = record.src;
+        link.download = createImageFilename(record, record.batchIndex || index, record.extension);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
       });
-    }
-
-    async function clearHistory() {
-      if (!confirm("确定清空所有本地生图历史吗？")) return;
-      const db = await openHistoryDb();
-      await new Promise((resolve, reject) => {
-        const request = db.transaction(HISTORY_STORE_NAME, "readwrite")
-          .objectStore(HISTORY_STORE_NAME)
-          .clear();
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error || new Error("清空历史失败。"));
-      });
-      db.close();
-      clearExportSelection();
-      await renderHistory();
+      showMessage(`已开始下载 ${records.length} 张历史图片。`);
     }
 
     function showMessage(message) {
