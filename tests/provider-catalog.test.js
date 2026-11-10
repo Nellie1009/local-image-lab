@@ -17,15 +17,18 @@ function readCatalogs() {
   };
 }
 
-test("the catalogs contain exactly the approved twelve image models", () => {
+test("the catalogs contain the configured 12API and Ark image models", () => {
   const raw = readCatalogs();
   assert.deepEqual(Catalog.validateCatalogs(raw), []);
   assert.deepEqual(
     raw.models.models.map((model) => model.id),
     [
+      "gpt-image-2.6-flare",
+      "gpt-image-2.6-sunburst",
       "gpt-image-2.5-flare",
       "gpt-image-2.5-sunburst",
       "gpt-image-2",
+      "gemini-nano-banana-2.1",
       "gemini-3.1-flash-lite-image",
       "gemini-2.5-flash-image",
       "gemini-3-pro-image",
@@ -56,6 +59,30 @@ test("per-token pricing has no per-image estimate", () => {
     .find((item) => item.providerId === "12api" && item.groupId === "default");
   assert.equal(row.billingType, "per_token");
   assert.equal(row.estimatedPerRequest, null);
+});
+
+test("latest 12API image models have the supplied default prices and adapters", () => {
+  const raw = readCatalogs();
+  const index = Catalog.createCatalogIndex(raw);
+  const mappings = new Map(raw.providers.providers
+    .find((provider) => provider.id === "12api")
+    .modelMappings.map((mapping) => [mapping.modelId, mapping]));
+
+  for (const modelId of ["gpt-image-2.6-flare", "gpt-image-2.6-sunburst", "gpt-image-2.5-flare", "gpt-image-2.5-sunburst", "gpt-image-2"]) {
+    const price = index.pricesByProviderModel.get(`12api:${modelId}`).groupsById.get("default");
+    assert.equal(price.billingType, "per_token");
+    assert.equal(price.inputPerMillion, 3);
+    assert.equal(price.outputPerMillion, 18);
+  }
+
+  for (const modelId of ["gemini-nano-banana-2.1", "gemini-3.1-flash-lite-image"]) {
+    const price = index.pricesByProviderModel.get(`12api:${modelId}`).groupsById.get("default");
+    assert.equal(price.billingType, "per_request");
+    assert.equal(price.basePrice, modelId === "gemini-nano-banana-2.1" ? 0.13 : 0.03);
+  }
+
+  assert.equal(mappings.get("gpt-image-2.6-flare").adapter, "openai-images");
+  assert.equal(mappings.get("gemini-nano-banana-2.1").adapter, "gemini-native");
 });
 
 test("catalog validation names the file and broken reference", () => {
@@ -94,6 +121,18 @@ test("loads all three catalogs over HTTP and reports the filename on failure", a
 test("converts catalog options to the existing multi-model config shape", () => {
   const configs = Catalog.createModelConfigMap(Catalog.createCatalogIndex(readCatalogs()));
   assert.deepEqual(configs["gpt-image-2.5-flare"].qualities, ["auto", "low", "medium", "high", "xhigh", "max"]);
+  assert.deepEqual(configs["gpt-image-2.6-flare"].formats, ["png", "jpeg", "webp", "svg", "gif"]);
+  assert.deepEqual(configs["gpt-image-2.6-flare"].formatPriceGroups, { svg: ["default"], gif: ["default"] });
+  assert.deepEqual(configs["gpt-image-2.6-flare"].editUnsupportedFormats, ["svg"]);
+  assert.deepEqual(configs["gpt-image-2.6-flare"].complexities, ["low", "medium", "high"]);
+  assert.equal(configs["gpt-image-2.6-flare"].supportsMarkup, true);
+  assert.equal(configs["gpt-image-2.6-flare"].supportsMask, true);
+  assert.equal(configs["gpt-image-2.6-flare"].supportsCustomSize, true);
+  assert.equal(configs["gpt-image-2"].supportsCustomSize, true);
+  assert.deepEqual(configs["gpt-image-2.6-flare"].frameCounts, ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"]);
+  assert.equal(configs["gpt-image-2.5-flare"].supportsMarkup, true);
+  assert.equal(configs["gpt-image-2.5-flare"].supportsMask, true);
+  assert.deepEqual(configs["gpt-image-2.5-flare"].complexities, []);
   assert.equal(configs["doubao-seedream-5-0-pro-260628"].supportsEdit, true);
   assert.deepEqual(configs["doubao-seedream-5-0-pro-260628"].sizes, ["auto", "2K", "4K"]);
 });

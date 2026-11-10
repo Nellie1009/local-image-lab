@@ -45,6 +45,7 @@
         const endpoint = provider.endpointsById.get(endpointId);
         const priceEntry = catalog.pricesByProviderModel.get(`${provider.id}:${model.id}`);
         const groupId = credential.priceGroupId || provider.defaultPriceGroupId || "default";
+        if (input.requiredPriceGroupId && groupId !== input.requiredPriceGroupId) return;
         const priceGroup = priceEntry?.groupsById.get(groupId);
         if (!endpoint || !priceGroup) return;
         candidates.push({

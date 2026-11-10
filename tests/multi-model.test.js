@@ -11,6 +11,7 @@ const {
   mergeSupportedOptions,
   normalizeSelectedModels,
   resolveCompatiblePayload,
+  validateGptImageSize,
   runModelQueue
 } = require("../multi-model.js");
 
@@ -82,6 +83,63 @@ test("uses shared values when supported and compatible defaults when they are no
       n: 4
     }
   );
+});
+
+test("resolves GPT complexity and GIF controls only for supported 2.6 output", () => {
+  const profile = {
+    sizes: ["auto", "512x512"],
+    qualities: ["auto", "low", "medium", "high", "xhigh", "max"],
+    formats: ["png", "gif", "svg"],
+    complexities: ["low", "medium", "high"],
+    frameCounts: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+    frameDurationMs: { min: 20, max: 2000, step: 10, default: 200 },
+    styles: ["auto"],
+    backgrounds: ["auto", "opaque", "transparent"],
+    geminiResolutions: [],
+    counts: ["1", "2", "3", "4", "5", "6", "7", "8"]
+  };
+  const gif = resolveCompatiblePayload({
+    prompt: "loop",
+    output_format: "gif",
+    complexity: "medium",
+    frame_count: 8,
+    frame_duration_ms: 120,
+    n: 2
+  }, "gpt-image-2.6-flare", profile);
+  assert.equal(gif.complexity, "medium");
+  assert.equal(gif.frame_count, 8);
+  assert.equal(gif.frame_duration_ms, 120);
+  assert.equal(gif.n, 2);
+
+  const svg = resolveCompatiblePayload({ prompt: "icon", output_format: "svg", n: 8 }, "gpt-image-2.6-flare", profile);
+  assert.equal(svg.n, 1);
+  assert.equal("frame_count" in svg, false);
+  assert.equal("frame_duration_ms" in svg, false);
+});
+
+test("resolves and validates custom GPT Image dimensions including GIF frame sizes", () => {
+  const payload = resolveCompatiblePayload({
+    prompt: "custom",
+    size: "custom",
+    custom_size: "1248x1248",
+    output_format: "png",
+    n: 1
+  }, "gpt-image-2.6-flare", {
+    sizes: ["auto", "custom"],
+    supportsCustomSize: true,
+    qualities: ["auto"],
+    formats: ["png", "gif"],
+    styles: ["auto"],
+    backgrounds: ["auto", "opaque"],
+    geminiResolutions: [],
+    counts: ["1"]
+  });
+  assert.equal(payload.size, "1248x1248");
+  assert.equal(validateGptImageSize("1248x1248", "png"), true);
+  assert.equal(validateGptImageSize("512x512", "gif"), true);
+  assert.equal(validateGptImageSize("512x512", "png"), false);
+  assert.equal(validateGptImageSize("1000x1000", "gif"), false);
+  assert.equal(validateGptImageSize("4096x1024", "gif"), false);
 });
 
 test("keeps transparent output in a format that supports alpha", () => {
@@ -158,6 +216,16 @@ test("detects the real base64 image type instead of trusting the requested forma
     format: "webp",
     mime: "image/webp",
     extension: "webp"
+  });
+  assert.deepEqual(detectBase64ImageType("data:image/svg+xml;base64,PHN2Zy8+", "png"), {
+    format: "svg",
+    mime: "image/svg+xml",
+    extension: "svg"
+  });
+  assert.deepEqual(detectBase64ImageType("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", "png"), {
+    format: "gif",
+    mime: "image/gif",
+    extension: "gif"
   });
 });
 

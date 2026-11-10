@@ -36,6 +36,12 @@
       { label: "质量", value: valueOrMissing(parameters.quality) },
       { label: "输出格式", value: valueOrMissing(parameters.output_format) }
     );
+    if (parameters.svg_model) details.push({ label: "SVG 模型", value: String(parameters.svg_model) });
+    if (parameters.complexity) details.push({ label: "Complexity", value: String(parameters.complexity) });
+    if (parameters.frame_count) details.push({ label: "GIF 帧数", value: String(parameters.frame_count) });
+    if (parameters.frame_duration_ms) details.push({ label: "单帧时长", value: `${parameters.frame_duration_ms} ms` });
+    if (parameters.markup) details.push({ label: "markup 标注图", value: String(parameters.markup) });
+    if (parameters.mask) details.push({ label: "mask 遮罩图", value: String(parameters.mask) });
     if (parameters.style) details.push({ label: "风格", value: String(parameters.style) });
     details.push(
       { label: "背景", value: valueOrMissing(parameters.background) },

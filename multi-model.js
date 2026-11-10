@@ -53,15 +53,42 @@
       ["size", "sizes"],
       ["quality", "qualities"],
       ["output_format", "formats"],
+      ["complexity", "complexities"],
       ["style", "styles"],
       ["background", "backgrounds"],
       ["gemini_resolution", "geminiResolutions"]
     ];
 
     fields.forEach(([payloadKey, configKey]) => {
+      if (payloadKey === "size" && String(shared.size) === "custom" && profile.supportsCustomSize) {
+        const customSize = String(shared.custom_size || "").trim();
+        if (validateGptImageSize(customSize, shared.output_format)) next.size = customSize;
+        return;
+      }
       const value = pickCompatibleValue(shared[payloadKey], profile[configKey]);
       if (value !== undefined) next[payloadKey] = value;
     });
+
+    if (next.output_format === "gif" && profile.frameCounts?.length) {
+      const frameCount = Number(shared.frame_count);
+      const allowedFrameCounts = profile.frameCounts.map(Number);
+      next.frame_count = allowedFrameCounts.includes(frameCount)
+        ? frameCount
+        : Number(profile.frameCountDefault || allowedFrameCounts[0]);
+      const timing = profile.frameDurationMs || {};
+      const duration = Number(shared.frame_duration_ms);
+      const step = Math.max(1, Number(timing.step) || 10);
+      const normalizedDuration = Math.round(duration / step) * step;
+      next.frame_duration_ms = Number.isFinite(duration)
+        && normalizedDuration >= Number(timing.min || 20)
+        && normalizedDuration <= Number(timing.max || 2000)
+        ? normalizedDuration
+        : Number(timing.default || 200);
+    }
+
+    if ((profile.formats || []).includes("svg")) {
+      next.svg_model = String(shared.svg_model || "gpt-5.5").trim() || "gpt-5.5";
+    }
 
     if (next.background === "transparent" && next.output_format === "jpeg") {
       const alphaFormat = ["png", "webp"].find((format) =>
@@ -75,25 +102,45 @@
     }
 
     const count = pickCompatibleValue(shared.n, profile.counts);
-    if (count !== undefined) next.n = Number(count);
+    if (count !== undefined) next.n = next.output_format === "svg" ? 1 : Number(count);
+    if (next.output_format === "svg" || next.output_format === "gif") {
+      if (next.background === "transparent") delete next.background;
+    }
     return next;
+  }
+
+  function validateGptImageSize(value, outputFormat) {
+    const match = String(value || "").trim().match(/^(\d{2,4})x(\d{2,4})$/);
+    if (!match) return false;
+    const width = Number(match[1]);
+    const height = Number(match[2]);
+    const pixels = width * height;
+    const ratio = Math.max(width, height) / Math.min(width, height);
+    return width <= 3840 && height <= 3840
+      && width % 16 === 0 && height % 16 === 0
+      && ratio <= 3
+      && pixels <= 8294400
+      && (String(outputFormat).toLowerCase() === "gif" || pixels >= 655360);
   }
 
   function detectBase64ImageType(value, fallbackFormat = "png") {
     const raw = String(value || "").trim();
-    const dataUrlType = raw.match(/^data:image\/(png|jpe?g|webp);base64,/i)?.[1];
+    const dataUrlType = raw.match(/^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,/i)?.[1];
     let format = String(dataUrlType || fallbackFormat || "png").toLowerCase();
     const base64 = raw.replace(/^data:[^,]+,/, "");
 
     if (base64.startsWith("iVBORw0KGgo")) format = "png";
     else if (base64.startsWith("/9j/")) format = "jpeg";
     else if (base64.startsWith("UklGR")) format = "webp";
+    else if (base64.startsWith("R0lGOD")) format = "gif";
+    else if (base64.startsWith("PHN2Zy")) format = "svg";
 
     if (format === "jpg") format = "jpeg";
-    if (!["png", "jpeg", "webp"].includes(format)) format = "png";
+    if (format === "svg+xml") format = "svg";
+    if (!["png", "jpeg", "webp", "svg", "gif"].includes(format)) format = "png";
     return {
       format,
-      mime: format === "jpeg" ? "image/jpeg" : `image/${format}`,
+      mime: format === "svg" ? "image/svg+xml" : format === "jpeg" ? "image/jpeg" : `image/${format}`,
       extension: format === "jpeg" ? "jpg" : format
     };
   }
@@ -177,6 +224,7 @@
     mergeSupportedOptions,
     normalizeSelectedModels,
     resolveCompatiblePayload,
+    validateGptImageSize,
     runModelQueue
   };
 });

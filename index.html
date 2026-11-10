@@ -68,22 +68,16 @@
       font-size: 15px;
     }
 
-    .status-pill {
-      min-width: 132px;
-      text-align: center;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 9px 14px;
-      color: var(--muted);
-      background: rgba(255, 253, 248, 0.72);
-    }
-
     .top-actions {
       display: flex;
       gap: 10px;
       align-items: center;
       flex-wrap: wrap;
       justify-content: end;
+    }
+
+    .top-actions [hidden] {
+      display: none;
     }
 
     main {
@@ -162,6 +156,10 @@
       min-width: 0;
     }
 
+    .provider-add-grid > input[hidden] {
+      display: none;
+    }
+
     .provider-source-panel {
       margin-bottom: 14px;
       border: 1px solid var(--line);
@@ -169,21 +167,16 @@
       background: rgba(255, 255, 255, 0.5);
     }
 
-    .provider-source-panel > summary {
+    .provider-source-heading {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       min-height: 44px;
       padding: 9px 12px;
-      list-style: none;
-      cursor: pointer;
       font-size: 13px;
       font-weight: 800;
-    }
-
-    .provider-source-panel > summary::-webkit-details-marker {
-      display: none;
+      border-bottom: 1px solid var(--line);
     }
 
     .provider-summary-count {
@@ -194,7 +187,6 @@
 
     .provider-source-body {
       padding: 0 12px 12px;
-      border-top: 1px solid var(--line);
     }
 
     .provider-add-grid {
@@ -206,6 +198,17 @@
 
     .provider-add-grid .key-line {
       grid-column: 1 / -1;
+    }
+
+    .custom-provider-fields {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    .custom-provider-fields[hidden] {
+      display: none;
     }
 
     .provider-toolbar,
@@ -233,6 +236,19 @@
       display: grid;
       gap: 7px;
       margin-top: 10px;
+    }
+
+    .saved-credentials {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .saved-credentials > summary {
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
     }
 
     .credential-row {
@@ -271,6 +287,25 @@
     .credential-meta {
       margin-top: 2px;
       color: var(--muted);
+      font-size: 11px;
+    }
+
+    .credential-url-line {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .credential-value {
+      min-width: 0;
+      min-height: 40px;
+      padding: 11px 12px;
+      font-size: 12px;
+    }
+
+    .credential-url-line .ghost-button {
+      min-height: 40px;
+      padding: 0 9px;
       font-size: 11px;
     }
 
@@ -1347,14 +1382,28 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
       gap: 16px;
       margin-bottom: 14px;
+    }
+
+    .history-heading {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .history-page-head h2 {
       margin: 0;
       font-size: 24px;
       letter-spacing: 0;
+    }
+
+    .history-time-filter {
+      width: auto;
+      min-width: 132px;
+      padding: 8px 10px;
     }
 
     .lightbox {
@@ -1508,6 +1557,10 @@
         grid-template-columns: 1fr;
       }
 
+      .custom-provider-fields {
+        grid-template-columns: 1fr;
+      }
+
       .provider-toolbar {
         align-items: stretch;
         flex-direction: column;
@@ -1527,24 +1580,26 @@
         <p class="tagline">浏览器本地保存 API 来源，直接对比多个图片模型。</p>
       </div>
       <div class="top-actions">
-        <a class="ghost-button" href="#home" id="home-link">生成</a>
-        <a class="ghost-button" href="#history" id="history-link">生图历史</a>
-        <div class="status-pill" id="status">待生成</div>
+        <a class="ghost-button" href="#history" id="history-link">查看生图历史</a>
+        <a class="ghost-button" href="#home" id="history-return-link" hidden>返回生图台</a>
       </div>
     </header>
 
     <main class="page" id="home-page">
       <section class="panel">
         <form id="image-form">
-          <details class="provider-source-panel" id="provider-source-panel" open>
-            <summary>
+          <section class="provider-source-panel" id="provider-source-panel">
+            <div class="provider-source-heading">
               <span>API 来源</span>
               <span class="provider-summary-count" id="provider-summary-count">正在加载目录</span>
-            </summary>
+            </div>
             <div class="provider-source-body">
               <div class="provider-add-grid">
                 <select id="provider-select" aria-label="API 平台"></select>
-                <input id="provider-key-label" type="text" maxlength="40" placeholder="备注，例如：12API 主 Key">
+                <input id="provider-key-label" type="text" maxlength="40" placeholder="备注（可选），例如：主 Key">
+                <div class="custom-provider-fields" id="custom-provider-fields" hidden>
+                  <input id="custom-provider-url" type="url" placeholder="API URL，例如：https://api.example.com/v1">
+                </div>
                 <div class="key-line">
                   <input id="provider-key-secret" type="password" autocomplete="off" placeholder="输入 API Key">
                   <button class="ghost-button" type="button" id="add-provider-key">添加 Key</button>
@@ -1554,11 +1609,14 @@
                 <p class="provider-status" id="provider-status">Key 只保存在这个浏览器。</p>
                 <button class="ghost-button" type="button" id="view-pricing">查看价格</button>
               </div>
-              <div class="credential-rows" id="credential-rows">
-                <p class="credential-empty">还没有保存 API Key。</p>
-              </div>
+              <details class="saved-credentials" id="saved-credentials">
+                <summary>已保存的 API</summary>
+                <div class="credential-rows" id="credential-rows">
+                  <p class="credential-empty">还没有保存 API Key。</p>
+                </div>
+              </details>
             </div>
-          </details>
+          </section>
 
           <div class="field">
             <label for="source-images">参考图</label>
@@ -1573,6 +1631,24 @@
               <p class="hint" id="upload-hint">不上传图就是文生图；上传图后自动走图生图。GPT Image 编辑接口一次最多 16 张参考图。</p>
               <div class="thumb-grid" id="thumb-grid"></div>
             </div>
+          </div>
+
+          <div class="field" id="markup-field" hidden>
+            <label for="markup-image">标注图（PNG）</label>
+            <div class="key-line">
+              <input id="markup-image" type="file" accept="image/png">
+              <button class="ghost-button" id="clear-markup-image" type="button">移除标注图</button>
+            </div>
+            <p class="hint" id="markup-status">上传与第一张参考图同尺寸的透明 PNG，仅保留标注笔迹。</p>
+          </div>
+
+          <div class="field" id="mask-field" hidden>
+            <label for="mask-image">遮罩图（PNG）</label>
+            <div class="key-line">
+              <input id="mask-image" type="file" accept="image/png">
+              <button class="ghost-button" id="clear-mask-image" type="button">移除遮罩图</button>
+            </div>
+            <p class="hint" id="mask-status">上传与第一张参考图同尺寸、带 alpha 通道的 PNG；不能与 markup 同时使用。</p>
           </div>
 
           <div class="field-row">
@@ -1607,6 +1683,7 @@
                   <label for="size">尺寸</label>
                   <select id="size" name="size">
                     <option value="auto" selected>auto</option>
+                    <option value="custom">custom</option>
                     <option value="1024x1024">1024x1024</option>
                     <option value="1536x1024">1536x1024</option>
                     <option value="1024x1536">1024x1536</option>
@@ -1630,6 +1707,11 @@
                     <option value="8:1">8:1</option>
                   </select>
                 </div>
+                <div class="field" id="custom-size-field" hidden>
+                  <label for="custom-size">自定义尺寸</label>
+                  <input id="custom-size" name="customSize" type="text" inputmode="numeric" placeholder="1248x1248" autocomplete="off">
+                  <p class="hint">宽×高；边长不超过 3840、均为 16 的倍数，比例不超过 3:1。</p>
+                </div>
                 <div class="field">
                   <label for="quality">质量</label>
                   <select id="quality" name="quality">
@@ -1643,6 +1725,16 @@
                 </div>
               </div>
 
+              <div class="field" id="complexity-field" hidden>
+                <label for="complexity">Complexity</label>
+                <select id="complexity" name="complexity">
+                  <option value="low">low</option>
+                  <option value="medium">medium</option>
+                  <option value="high" selected>high</option>
+                </select>
+                <p class="hint">仅 GPT Image 2.6 支持；控制构图规划程度。</p>
+              </div>
+
               <div class="field-row">
                 <div class="field">
                   <label for="output-format">格式</label>
@@ -1651,6 +1743,7 @@
                     <option value="jpeg">jpeg</option>
                     <option value="webp">webp</option>
                   </select>
+                  <p class="hint" id="output-format-hint" hidden></p>
                 </div>
                 <div class="field">
                   <label for="style">风格</label>
@@ -1661,6 +1754,29 @@
                   </select>
                 </div>
               </div>
+
+              <div class="field" id="svg-model-field" hidden>
+                <label for="svg-model">SVG 模型</label>
+                <input id="svg-model" name="svgModel" type="text" value="gpt-5.5" maxlength="100">
+              </div>
+
+              <div class="field-row" id="gif-fields" hidden>
+                <div class="field">
+                  <label for="frame-count">GIF 帧数</label>
+                  <select id="frame-count" name="frameCount">
+                    <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    <option value="5">5</option><option value="6">6</option><option value="7">7</option>
+                    <option value="8">8</option><option value="9" selected>9</option><option value="10">10</option>
+                    <option value="11">11</option><option value="12">12</option><option value="13">13</option>
+                    <option value="14">14</option><option value="15">15</option><option value="16">16</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="frame-duration-ms">单帧时长（毫秒）</label>
+                  <input id="frame-duration-ms" name="frameDurationMs" type="number" min="20" max="2000" step="10" value="200">
+                </div>
+              </div>
+              <p class="hint" id="gif-hint" hidden>帧数、单帧尺寸和数量共用像素预算；建议从 512×512 左右开始。GIF 不支持透明背景。</p>
 
               <div class="field-row">
                 <div class="field">
@@ -1752,13 +1868,20 @@
 
     <section class="panel page hidden history-page" id="history-page">
       <div class="history-page-head">
-        <h2>生图历史</h2>
+        <div class="history-heading">
+          <h2>生图历史</h2>
+          <select class="history-time-filter" id="history-time-filter" aria-label="筛选历史图片时间范围">
+            <option value="today">今天</option>
+            <option value="7days">7天</option>
+            <option value="1month">1个月</option>
+            <option value="all" selected>全部</option>
+          </select>
+        </div>
         <div class="history-actions">
           <span class="export-selection-summary" id="history-export-selection-status">已选 0 张</span>
           <button class="ghost-button" type="button" id="export-selection-history" disabled>导出 Excel</button>
           <button class="ghost-button" type="button" id="download-selected-history" disabled>下载所选</button>
           <button class="ghost-button" type="button" id="clear-export-selection-history" disabled>清空所选</button>
-          <a class="ghost-button" href="#home">返回生成</a>
         </div>
       </div>
       <div class="history-list" id="full-history-list">
@@ -1822,6 +1945,7 @@
   <script src="reference-images.js"></script>
   <script src="generation-queue.js"></script>
   <script src="history-details.js"></script>
+  <script src="history-filter.js"></script>
   <script src="comparison-export.js"></script>
   <script src="provider-catalog.js"></script>
   <script src="credential-store.js"></script>
@@ -1830,11 +1954,12 @@
   <script src="vendor/exceljs.min.js"></script>
   <script>
     const form = document.querySelector("#image-form");
-    const providerSourcePanel = document.querySelector("#provider-source-panel");
     const providerSummaryCount = document.querySelector("#provider-summary-count");
     const providerSelect = document.querySelector("#provider-select");
     const providerKeyLabel = document.querySelector("#provider-key-label");
     const providerKeySecret = document.querySelector("#provider-key-secret");
+    const customProviderFields = document.querySelector("#custom-provider-fields");
+    const customProviderUrl = document.querySelector("#custom-provider-url");
     const addProviderKeyButton = document.querySelector("#add-provider-key");
     const providerStatus = document.querySelector("#provider-status");
     const credentialRows = document.querySelector("#credential-rows");
@@ -1846,7 +1971,6 @@
     const priceTableBody = document.querySelector("#price-table-body");
     const togglePriceJsonButton = document.querySelector("#toggle-price-json");
     const priceJson = document.querySelector("#price-json");
-    const statusEl = document.querySelector("#status");
     const submitButton = document.querySelector("#submit");
     const generationQueueStatus = document.querySelector("#generation-queue-status");
     const canvasWrap = document.querySelector("#canvas-wrap");
@@ -1861,6 +1985,9 @@
     const clearExportSelectionHistoryButton = document.querySelector("#clear-export-selection-history");
     const historyList = document.querySelector("#history-list");
     const fullHistoryList = document.querySelector("#full-history-list");
+    const historyTimeFilter = document.querySelector("#history-time-filter");
+    const historyLink = document.querySelector("#history-link");
+    const historyReturnLink = document.querySelector("#history-return-link");
     const downloadSelectedHomeButton = document.querySelector("#download-selected-home");
     const downloadSelectedHistoryButton = document.querySelector("#download-selected-history");
     const homePage = document.querySelector("#home-page");
@@ -1880,11 +2007,30 @@
     const referenceDropzone = document.querySelector("#reference-dropzone");
     const referenceDropTarget = document.querySelector("#reference-drop-target");
     const clearSourceImagesButton = document.querySelector("#clear-source-images");
+    const markupField = document.querySelector("#markup-field");
+    const markupImageInput = document.querySelector("#markup-image");
+    const clearMarkupImageButton = document.querySelector("#clear-markup-image");
+    const markupStatus = document.querySelector("#markup-status");
+    const maskField = document.querySelector("#mask-field");
+    const maskImageInput = document.querySelector("#mask-image");
+    const clearMaskImageButton = document.querySelector("#clear-mask-image");
+    const maskStatus = document.querySelector("#mask-status");
     const uploadHint = document.querySelector("#upload-hint");
     const thumbGrid = document.querySelector("#thumb-grid");
     const sizeSelect = document.querySelector("#size");
+    const customSizeField = document.querySelector("#custom-size-field");
+    const customSizeInput = document.querySelector("#custom-size");
     const qualitySelect = document.querySelector("#quality");
     const outputFormatSelect = document.querySelector("#output-format");
+    const outputFormatHint = document.querySelector("#output-format-hint");
+    const svgModelField = document.querySelector("#svg-model-field");
+    const svgModelInput = document.querySelector("#svg-model");
+    const complexityField = document.querySelector("#complexity-field");
+    const complexitySelect = document.querySelector("#complexity");
+    const gifFields = document.querySelector("#gif-fields");
+    const gifHint = document.querySelector("#gif-hint");
+    const frameCountSelect = document.querySelector("#frame-count");
+    const frameDurationInput = document.querySelector("#frame-duration-ms");
     const styleSelect = document.querySelector("#style");
     const countSelect = document.querySelector("#count");
     const backgroundSelect = document.querySelector("#background");
@@ -1902,6 +2048,7 @@
 
     const HISTORY_DB_NAME = "local-image-generator-history";
     const HISTORY_STORE_NAME = "images";
+    const HISTORY_REFERENCE_STORE_NAME = "generation-references";
     const REMEMBER_SETTINGS_KEY = "image_generator_remember_settings_v2";
     const SAVED_PROMPTS_KEY = "image_generator_saved_prompts_v1";
     const LEGACY_CUSTOM_SKILLS_KEY = "image_generator_custom_skills_v1";
@@ -1915,6 +2062,10 @@
     const PROMPT_MAX_LENGTH = 32000;
     const RETRYABLE_STATUS_CODES = new Set([408, 409, 425, 429, 500, 502, 503, 504]);
     let selectedSourceImages = [];
+    let selectedMarkupFile = null;
+    let selectedMaskFile = null;
+    let countBeforeSvg = "";
+    let outputFormatWasSvg = false;
     let modelResultPanels = new Map();
     let modelRequestRecords = new Map();
     let activeComparisonModels = [];
@@ -1924,6 +2075,7 @@
     let generationBusy = false;
     let catalogReady = false;
     let activePriceFilter = "all";
+    let fullHistoryRecords = [];
     const exportSelection = new Map();
     const generationQueue = GenerationQueue.createGenerationQueue({
       worker: runGenerationBatch,
@@ -2148,6 +2300,7 @@
     loadCustomSavedPrompts();
     promptInput.addEventListener("input", updateReadyPreviewState);
     addProviderKeyButton.addEventListener("click", addProviderCredential);
+    providerSelect.addEventListener("change", updateCustomProviderFields);
     providerKeySecret.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
@@ -2163,6 +2316,21 @@
     priceFilterTabs.addEventListener("click", handlePriceFilter);
     togglePriceJsonButton.addEventListener("click", togglePriceJson);
     modelOptions.addEventListener("change", handleModelSelectionChange);
+    sizeSelect.addEventListener("change", () => {
+      syncCustomSizeDetails();
+      updateReadyPreviewState();
+    });
+    customSizeInput.addEventListener("input", updateReadyPreviewState);
+    outputFormatSelect.addEventListener("change", () => {
+      syncOutputFormatDetails();
+      updateReadyPreviewState();
+    });
+    svgModelInput.addEventListener("input", updateReadyPreviewState);
+    [complexitySelect, frameCountSelect, backgroundSelect].forEach((control) => {
+      control.addEventListener("change", updateReadyPreviewState);
+    });
+    frameDurationInput.addEventListener("input", updateReadyPreviewState);
+    frameDurationInput.addEventListener("change", updateReadyPreviewState);
     document.addEventListener("click", (event) => {
       if (!modelPicker.contains(event.target)) modelPicker.open = false;
       if (!savedPromptDropdown.contains(event.target)) savedPromptDropdown.open = false;
@@ -2179,6 +2347,14 @@
     });
     sourceImagesInput.addEventListener("change", () => appendReferenceFiles(sourceImagesInput.files));
     clearSourceImagesButton.addEventListener("click", clearReferenceImages);
+    markupImageInput.addEventListener("change", handleMarkupImageChange);
+    clearMarkupImageButton.addEventListener("click", clearMarkupImage);
+    maskImageInput.addEventListener("change", handleMaskImageChange);
+    clearMaskImageButton.addEventListener("click", clearMaskImage);
+    historyTimeFilter.addEventListener("change", () => {
+      renderFilteredHistory();
+      refreshExportSelectionUi();
+    });
     referenceDropTarget.addEventListener("click", () => sourceImagesInput.click());
     referenceDropTarget.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
@@ -2251,10 +2427,38 @@
         option.textContent = provider.name;
         providerSelect.appendChild(option);
       });
+      const customOption = document.createElement("option");
+      customOption.value = "custom";
+      customOption.textContent = "其他平台";
+      providerSelect.appendChild(customOption);
+      updateCustomProviderFields();
+    }
+
+    function updateCustomProviderFields() {
+      const isCustom = providerSelect.value === "custom";
+      customProviderFields.hidden = !isCustom;
+      customProviderUrl.required = isCustom;
     }
 
     function addProviderCredential() {
       try {
+        if (providerSelect.value === "custom") {
+          const customBaseUrl = customProviderUrl.value.trim();
+          const sourceName = new URL(customBaseUrl).hostname;
+          credentialStore.add({
+            providerId: "custom",
+            baseUrl: customBaseUrl,
+            label: providerKeyLabel.value.trim() || `${sourceName} Key`,
+            secret: providerKeySecret.value
+          });
+          providerKeySecret.value = "";
+          providerKeyLabel.value = "";
+          customProviderUrl.value = "";
+          providerStatus.textContent = `已保存 ${sourceName} API；接口规范接入前不会参与模型生成。`;
+          providerStatus.classList.remove("error");
+          renderCredentialRows();
+          return;
+        }
         const provider = providerCatalog?.providersById.get(providerSelect.value);
         if (!provider) throw new Error("请选择 API 平台。");
         credentialStore.add({
@@ -2278,8 +2482,11 @@
     function renderCredentialRows() {
       const credentials = credentialStore?.list() || [];
       credentialRows.innerHTML = "";
+      const routableActiveCount = credentials.filter((item) =>
+        item.status === "active" && providerCatalog?.providersById.has(item.providerId)
+      ).length;
       providerSummaryCount.textContent = credentials.length
-        ? `${credentials.filter((item) => item.status === "active").length} 个可用 / ${credentials.length} 个已保存`
+        ? `${routableActiveCount} 个可用 / ${credentials.length} 个已保存`
         : "未添加 Key";
       if (!credentials.length) {
         credentialRows.innerHTML = '<p class="credential-empty">还没有保存 API Key。</p>';
@@ -2289,6 +2496,11 @@
 
       credentials.forEach((credential) => {
         const provider = providerCatalog?.providersById.get(credential.providerId);
+        const endpoint = provider?.endpointsById.get(credential.endpointId || provider.defaultEndpointId);
+        const baseUrl = credential.baseUrl || endpoint?.origin || "";
+        const providerName = credential.providerId === "custom"
+          ? (baseUrl ? new URL(baseUrl).hostname : credential.providerId)
+          : credential.providerName || provider?.name || credential.providerId;
         const row = document.createElement("div");
         row.className = credential.status === "exhausted"
           ? "credential-row exhausted"
@@ -2302,8 +2514,25 @@
         const name = document.createElement("div");
         name.className = "credential-name";
         name.textContent = credential.label;
+        main.append(name);
+
+        if (baseUrl) {
+          const urlLine = document.createElement("div");
+          urlLine.className = "credential-url-line";
+          const urlInput = document.createElement("input");
+          urlInput.className = "credential-value";
+          urlInput.type = "url";
+          urlInput.readOnly = true;
+          urlInput.value = baseUrl;
+          urlInput.setAttribute("aria-label", `${providerName} API URL`);
+          const copyUrl = createCredentialButton("复制 URL", "copy-url", credential.id);
+          copyUrl.title = "复制 API URL";
+          urlLine.append(urlInput, copyUrl);
+          main.appendChild(urlLine);
+        }
+
         const secret = document.createElement("input");
-        secret.className = "credential-secret-display";
+        secret.className = "credential-value credential-secret-display";
         secret.type = "password";
         secret.readOnly = true;
         secret.tabIndex = -1;
@@ -2312,8 +2541,10 @@
         const failure = credential.lastFailure?.message ? ` · ${credential.lastFailure.message}` : "";
         const meta = document.createElement("div");
         meta.className = "credential-meta";
-        meta.textContent = `${provider?.name || credential.providerId} · ${CredentialStore.maskSecret(credential.secret)} · ${credential.status}${failure}`;
-        main.append(name, secret, meta);
+        const statusLabel = credential.providerId === "custom" ? "接口待接入" : credential.status;
+        const sourceLabel = providerName === credential.label ? "" : `${providerName} · `;
+        meta.textContent = `${sourceLabel}${CredentialStore.maskSecret(credential.secret)} · ${statusLabel}${failure}`;
+        main.append(secret, meta);
 
         const actions = document.createElement("div");
         actions.className = "credential-actions";
@@ -2346,6 +2577,11 @@
       if (!button) return;
       const id = button.dataset.credentialId;
       const row = button.closest(".credential-row");
+      if (button.dataset.action === "copy-url") {
+        const urlInput = row.querySelector('.credential-url-line input[type="url"]');
+        copyCredentialUrl(urlInput);
+        return;
+      }
       if (button.dataset.action === "reveal") {
         const input = row.querySelector(".credential-secret-display");
         const reveal = input.type === "password";
@@ -2365,6 +2601,26 @@
       }
       renderCredentialRows();
       updateReadyPreviewState(true);
+    }
+
+    async function copyCredentialUrl(input) {
+      if (!input) return;
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(input.value);
+        } else {
+          input.focus();
+          input.select();
+          if (!document.execCommand("copy")) throw new Error("copy failed");
+        }
+        providerStatus.textContent = "API URL 已复制。";
+        providerStatus.classList.remove("error");
+      } catch (_error) {
+        input.focus();
+        input.select();
+        providerStatus.textContent = "无法自动复制，URL 已选中，可按 Ctrl/Cmd+C。";
+        providerStatus.classList.add("error");
+      }
     }
 
     function renderModelOptions() {
@@ -2472,7 +2728,6 @@
       catalogReady = false;
       submitButton.disabled = true;
       const message = `模型目录加载失败：${getErrorText(error)}`;
-      statusEl.textContent = "目录加载失败";
       providerSummaryCount.textContent = "加载失败";
       providerStatus.textContent = message;
       providerStatus.classList.add("error");
@@ -2481,7 +2736,9 @@
     }
 
     function refreshGenerationAvailability() {
-      const hasActiveCredential = Boolean(credentialStore?.list().some((credential) => credential.status === "active"));
+      const hasActiveCredential = Boolean(credentialStore?.list().some((credential) =>
+        credential.status === "active" && providerCatalog?.providersById.has(credential.providerId)
+      ));
       submitButton.disabled = !catalogReady || !hasActiveCredential;
     }
 
@@ -2531,11 +2788,23 @@
       }
 
       const sourceImages = getSelectedImages();
+      const customSize = String(data.get("customSize") || "").trim();
+      const customSizeModels = selectedModels.filter((model) => modelConfigs[model]?.supportsCustomSize);
+      if (data.get("size") === "custom" && customSizeModels.length
+        && customSizeModels.some(() => !MultiModel.validateGptImageSize(customSize, data.get("outputFormat")))) {
+        setPreviewState("尺寸无效", "请检查自定义宽高是否符合所选格式的限制。");
+        return showMessage("自定义尺寸无效。普通格式需 655,360 至 8,294,400 像素；GIF 可低于最小像素数。宽高都须为 16 的倍数，最大边不超过 3840，比例不超过 3:1。格式示例：1248x1248。");
+      }
       const sharedPayload = {
         prompt,
         size: data.get("size"),
+        custom_size: customSize,
         quality: data.get("quality"),
         output_format: data.get("outputFormat"),
+        svg_model: data.get("svgModel"),
+        complexity: data.get("complexity"),
+        frame_count: Number(data.get("frameCount") || 9),
+        frame_duration_ms: Number(data.get("frameDurationMs") || 200),
         style: data.get("style"),
         background: data.get("background"),
         gemini_resolution: data.get("geminiResolution"),
@@ -2549,6 +2818,8 @@
         selectedModels,
         sharedPayload,
         sourceImages,
+        markupFile: selectedMarkupFile,
+        maskFile: selectedMaskFile,
         savedPromptMetadata: savedPromptBundle.metadata
       });
     });
@@ -2560,12 +2831,13 @@
         selectedModels,
         sharedPayload,
         sourceImages,
+        markupFile,
+        maskFile,
         savedPromptMetadata
       } = task;
 
       createModelComparison(selectedModels);
       resetModelRequestRecords(selectedModels);
-      let completedModels = 0;
 
       const outcomes = await MultiModel.runModelQueue(
         selectedModels,
@@ -2577,6 +2849,8 @@
               comparisonId,
               sharedPayload,
               sourceImages,
+              markupFile,
+              maskFile,
               savedPromptMetadata
             });
             updateModelRequestRecord(model, { status: result.warnings.length ? "部分完成" : "已完成" });
@@ -2586,9 +2860,6 @@
             setModelResultState(model, "生成失败", message, "error");
             updateModelRequestRecord(model, { status: "失败", error: message });
             throw new Error(message);
-          } finally {
-            completedModels += 1;
-            statusEl.textContent = `生成中 ${completedModels}/${selectedModels.length}`;
           }
         }
       );
@@ -2603,8 +2874,6 @@
           : []);
       const notices = [...failures, ...warnings];
       if (notices.length) showMessage(notices.join("\n\n"));
-      const successCount = outcomes.length - failures.length;
-      statusEl.textContent = failures.length ? `完成 ${successCount}/${outcomes.length}` : "已完成";
     }
 
     async function generateForModel(model, context) {
@@ -2614,14 +2883,41 @@
         MultiModel.resolveCompatiblePayload(context.sharedPayload, model, config)
       );
       const isEdit = context.sourceImages.length > 0;
+      if (isEdit && config.editUnsupportedFormats?.includes(payload.output_format)) {
+        throw new Error(`${model} 的 ${payload.output_format.toUpperCase()} 格式只支持文生图，不能上传参考图编辑。`);
+      }
+      if (context.markupFile && !config.supportsMarkup) {
+        throw new Error(`${model} 不支持 markup 标注编辑；此能力仅支持 GPT Image 2.5 和 2.6。`);
+      }
+      if (context.maskFile && !config.supportsMask) {
+        throw new Error(`${model} 不支持 mask 遮罩编辑；请改用支持遮罩的 GPT Image 模型。`);
+      }
+      if (context.markupFile && context.maskFile) {
+        throw new Error("markup 标注图和 mask 遮罩图不能同时使用，请移除其中一个。");
+      }
+      if (context.markupFile && !isEdit) {
+        throw new Error("markup 标注图需要与参考图一起用于图片编辑。");
+      }
+      if (context.maskFile && !isEdit) {
+        throw new Error("mask 遮罩图需要与参考图一起用于图片编辑。");
+      }
       if (isEdit) {
         const validationError = validateEditFiles(model, context.sourceImages);
         if (validationError) throw new Error(validationError);
+      }
+      if (context.markupFile) {
+        const markupError = await validateMarkupFile(context.markupFile, context.sourceImages[0]);
+        if (markupError) throw new Error(markupError);
+      }
+      if (context.maskFile) {
+        const maskError = await validateMaskFile(context.maskFile, context.sourceImages[0]);
+        if (maskError) throw new Error(maskError);
       }
 
       const candidates = ProviderRouter.buildCandidates({
         modelId: model,
         isEdit,
+        requiredPriceGroupId: config.formatPriceGroups?.[payload.output_format]?.[0],
         quality: payload.quality || context.sharedPayload.quality,
         count: payload.n,
         referenceImageCount: context.sourceImages.length,
@@ -2629,6 +2925,9 @@
         credentials: credentialStore.list()
       });
       if (!candidates.length) {
+        if (config.formatPriceGroups?.[payload.output_format]?.length) {
+          throw new Error(`${model} 的 ${payload.output_format.toUpperCase()} 格式只支持 default 分组，请添加或启用对应分组的 API Key。`);
+        }
         throw new Error(`没有支持 ${model} 的可用 API Key。请在 API 来源中添加对应平台的 Key，或恢复已停用的 Key。`);
       }
 
@@ -2724,6 +3023,14 @@
           size: payload.size || "接口默认",
           quality: payload.quality || "接口默认",
           output_format: payload.output_format || "接口默认",
+          svg_model: payload.output_format === "svg" ? (payload.svg_model || "gpt-5.5") : "",
+          ...(payload.complexity ? { complexity: payload.complexity } : {}),
+          ...(payload.output_format === "gif" ? {
+            frame_count: Number(payload.frame_count || 9),
+            frame_duration_ms: Number(payload.frame_duration_ms || 200)
+          } : {}),
+          ...(context.markupFile ? { markup: context.markupFile.name } : {}),
+          ...(context.maskFile ? { mask: context.maskFile.name } : {}),
           style: payload.style || "接口默认",
           background: payload.background || "接口默认",
           gemini_resolution: payload.gemini_resolution || "接口默认",
@@ -2736,7 +3043,7 @@
       const generatedImages = prepareGeneratedImages(images, metadata);
       renderModelImages(model, generatedImages, metadata);
       setModelResultStatus(model, `${route.providerName} · ${warnings.length ? "部分完成" : "已完成"}`, warnings.length ? "warning" : "success");
-      await saveModelHistory(generatedImages, metadata, warnings);
+      await saveModelHistory(generatedImages, metadata, warnings, context.sourceImages);
       return { images: generatedImages, warnings, route };
     }
 
@@ -2748,7 +3055,9 @@
             apiKey: candidate.credential.secret,
             modelId: candidate.mapping.requestModel,
             payload,
-            files: context.sourceImages
+            files: context.sourceImages,
+            markupFile: context.markupFile,
+            maskFile: context.maskFile
           });
         }
         if (candidate.mapping.adapter === "gemini-native") {
@@ -2868,9 +3177,13 @@
       return json;
     }
 
-    async function saveModelHistory(images, metadata, warnings) {
+    async function saveModelHistory(images, metadata, warnings, referenceImages) {
       try {
-        await saveHistoryRecords(images, metadata);
+        const referenceSaveError = await saveHistoryRecords(images, metadata, referenceImages);
+        if (referenceSaveError) {
+          warnings.push(`历史图片已保存，但参考图未能保存：${getErrorText(referenceSaveError)}`);
+          setModelResultStatus(metadata.model, "图片完成，参考图未保存", "warning");
+        }
       } catch (error) {
         warnings.push(`图片已生成，但历史保存失败：${getErrorText(error)}`);
         setModelResultStatus(metadata.model, "图片完成，历史失败", "warning");
@@ -2887,6 +3200,11 @@
       if (!config.formats.includes(next.output_format)) {
         delete next.output_format;
       }
+      if (next.output_format === "svg" && config.formats.includes("svg")) {
+        next.svg_model = String(next.svg_model || "gpt-5.5").trim() || "gpt-5.5";
+      } else {
+        delete next.svg_model;
+      }
       if (!config.backgrounds.includes(next.background)) {
         delete next.background;
       }
@@ -2896,7 +3214,28 @@
       if (!config.qualities.includes(next.quality)) {
         delete next.quality;
       }
-      if (!config.sizes.includes(next.size)) {
+      if (!config.complexities.includes(next.complexity)) {
+        delete next.complexity;
+      }
+      if (next.output_format === "gif" && config.frameCounts.length) {
+        const timing = config.frameDurationMs;
+        const frameCount = Number(next.frame_count);
+        next.frame_count = config.frameCounts.includes(String(frameCount))
+          ? frameCount
+          : Number(config.frameCountDefault || 9);
+        const step = Math.max(1, Number(timing.step) || 10);
+        const duration = Math.round(Number(next.frame_duration_ms) / step) * step;
+        next.frame_duration_ms = Number.isFinite(duration)
+          && duration >= Number(timing.min || 20)
+          && duration <= Number(timing.max || 2000)
+          ? duration
+          : Number(timing.default || 200);
+      } else {
+        delete next.frame_count;
+        delete next.frame_duration_ms;
+      }
+      if (!config.sizes.includes(next.size)
+        && !(config.supportsCustomSize && MultiModel.validateGptImageSize(next.size, next.output_format))) {
         delete next.size;
       }
       if (!config.geminiResolutions.includes(next.gemini_resolution)) {
@@ -2905,6 +3244,10 @@
       if (!Number.isFinite(next.n) || next.n < 1) next.n = 1;
       if (!config.counts.includes(String(next.n))) {
         next.n = Number(config.counts[0] || 1);
+      }
+      if (next.output_format === "svg") next.n = 1;
+      if (["svg", "gif"].includes(next.output_format) && next.background === "transparent") {
+        delete next.background;
       }
       return next;
     }
@@ -3373,6 +3716,74 @@
       return "";
     }
 
+    async function validateMarkupFile(markupFile, firstReferenceFile) {
+      if (markupFile.type !== "image/png") return "markup 必须是 PNG 文件。";
+      if (markupFile.size > 50 * 1024 * 1024) return "markup 文件不能超过 50MB。";
+      if (!firstReferenceFile) return "markup 标注图需要至少一张参考图。";
+      try {
+        if (!await hasPngAlphaChannel(markupFile)) return "markup 必须是带 alpha 通道的透明 PNG。";
+        const [markupSize, referenceSize] = await Promise.all([
+          readOrientedImageSize(markupFile),
+          readOrientedImageSize(firstReferenceFile)
+        ]);
+        if (markupSize.width * markupSize.height > 16777216) {
+          return "markup 图像素不能超过 16,777,216。";
+        }
+        if (markupSize.width !== referenceSize.width || markupSize.height !== referenceSize.height) {
+          return `markup 尺寸需与第一张参考图一致（当前 ${markupSize.width}×${markupSize.height}，参考图 ${referenceSize.width}×${referenceSize.height}）。`;
+        }
+      } catch (_error) {
+        return "无法读取 markup 或第一张参考图的尺寸，请确认图片文件有效。";
+      }
+      return "";
+    }
+
+    async function validateMaskFile(maskFile, firstReferenceFile) {
+      if (maskFile.type !== "image/png") return "mask 必须是 PNG 文件。";
+      if (!firstReferenceFile) return "mask 遮罩图需要至少一张参考图。";
+      try {
+        if (!await hasPngAlphaChannel(maskFile)) return "mask 必须是包含 alpha 通道的 PNG。";
+        const [maskSize, referenceSize] = await Promise.all([
+          readOrientedImageSize(maskFile),
+          readOrientedImageSize(firstReferenceFile)
+        ]);
+        if (maskSize.width !== referenceSize.width || maskSize.height !== referenceSize.height) {
+          return `mask 尺寸需与第一张参考图一致（当前 ${maskSize.width}×${maskSize.height}，参考图 ${referenceSize.width}×${referenceSize.height}）。`;
+        }
+      } catch (_error) {
+        return "无法读取 mask 或第一张参考图的尺寸，请确认图片文件有效。";
+      }
+      return "";
+    }
+
+    async function hasPngAlphaChannel(file) {
+      const bytes = new Uint8Array(await file.slice(0, 26).arrayBuffer());
+      const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+      if (bytes.length < 26 || !signature.every((byte, index) => bytes[index] === byte)) return false;
+      if (String.fromCharCode(...bytes.slice(12, 16)) !== "IHDR") return false;
+      return bytes[25] === 4 || bytes[25] === 6;
+    }
+
+    async function readOrientedImageSize(file) {
+      if (typeof createImageBitmap === "function") {
+        const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+        const size = { width: bitmap.width, height: bitmap.height };
+        bitmap.close?.();
+        return size;
+      }
+      const objectUrl = URL.createObjectURL(file);
+      try {
+        return await new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+          image.onerror = () => reject(new Error("图片无法解码"));
+          image.src = objectUrl;
+        });
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    }
+
     function normalizeOpenAiImages(items, format) {
       return items
         .map((item) => {
@@ -3652,17 +4063,18 @@
     }
 
     function getSelectedModels() {
+      const selected = modelCheckboxes
+        .filter((checkbox) => checkbox.checked)
+        .map((checkbox) => checkbox.value);
+      if (!selected.length) return [];
       return MultiModel.normalizeSelectedModels(
-        modelCheckboxes.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value),
+        selected,
         modelCheckboxes.map((checkbox) => checkbox.value),
         modelSelect.value || "gpt-image-2"
       );
     }
 
-    function handleModelSelectionChange(event) {
-      if (!modelCheckboxes.some((checkbox) => checkbox.checked)) {
-        event.target.checked = true;
-      }
+    function handleModelSelectionChange() {
       syncModelSelection(true);
     }
 
@@ -3671,10 +4083,12 @@
       modelCheckboxes.forEach((checkbox) => {
         checkbox.checked = selectedModels.includes(checkbox.value);
       });
-      modelSelect.value = selectedModels[0] || "gpt-image-2";
-      modelSummary.textContent = selectedModels.length === 1
-        ? selectedModels[0]
-        : `${selectedModels.length} 个模型`;
+      modelSelect.value = selectedModels[0] || "";
+      modelSummary.textContent = selectedModels.length === 0
+        ? "未选择模型"
+        : selectedModels.length === 1
+          ? selectedModels[0]
+          : `${selectedModels.length} 个模型`;
       modelSummary.title = selectedModels.join("\n");
       syncModelControls();
       if (forceResultReset) {
@@ -3690,14 +4104,84 @@
       const primaryModel = selectedModels[0] || "gpt-image-2";
       const config = modelConfigs[primaryModel] || modelConfigs["gpt-image-2"];
       syncSelect(sizeSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "sizes"), "auto");
+      syncCustomSizeDetails();
       syncSelect(qualitySelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "qualities"), "auto");
       syncSelect(outputFormatSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "formats"), "png");
+      syncSelect(complexitySelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "complexities"), "high");
+      syncSelect(frameCountSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "frameCounts"), "9");
       syncSelect(styleSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "styles"), "auto");
       syncSelect(backgroundSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "backgrounds"), "auto");
       syncSelect(geminiResolutionSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "geminiResolutions"), "1K");
       syncSelect(countSelect, MultiModel.mergeSupportedOptions(selectedModels, modelConfigs, "counts"), "1");
+      syncOutputFormatDetails();
       updateUploadHint();
       updateReadyPreviewState();
+    }
+
+    function syncOutputFormatDetails() {
+      const selectedModels = getSelectedModels();
+      const configs = selectedModels.map((model) => modelConfigs[model] || {});
+      const supportsSvgGif = configs.some((config) => (config.formats || []).some((format) => ["svg", "gif"].includes(format)));
+      const supportsComplexity = configs.some((config) => config.complexities?.length);
+      const supportsGif = configs.some((config) => config.frameCounts?.length);
+      const supportsMarkup = configs.length > 0 && configs.every((config) => config.supportsMarkup);
+      const format = outputFormatSelect.value;
+      const showSvgModel = supportsSvgGif && format === "svg";
+      svgModelField.hidden = !showSvgModel;
+      outputFormatHint.hidden = !supportsSvgGif || !["svg", "gif"].includes(format);
+      if (!outputFormatHint.hidden) {
+        outputFormatHint.textContent = format === "svg"
+          ? "SVG 仅 GPT Image 2.6 与 12API default 分组支持（mini 不支持）；仅文生图，数量固定为 1。"
+          : "GIF 仅 GPT Image 2.6 与 12API default 分组支持（mini 不支持）；支持文生图和图生图，不支持透明背景。";
+      }
+      complexityField.hidden = !supportsComplexity;
+      gifFields.hidden = !supportsGif || format !== "gif";
+      gifHint.hidden = gifFields.hidden;
+      const hasReferences = selectedSourceImages.length > 0;
+      if (!hasReferences && selectedMarkupFile) {
+        selectedMarkupFile = null;
+        markupImageInput.value = "";
+      }
+      if (!hasReferences && selectedMaskFile) {
+        selectedMaskFile = null;
+        maskImageInput.value = "";
+      }
+      markupField.hidden = !hasReferences || (!supportsMarkup && !selectedMarkupFile);
+      const supportsMask = configs.length > 0 && configs.every((config) => config.supportsMask);
+      maskField.hidden = !hasReferences || (!supportsMask && !selectedMaskFile);
+      if (selectedMarkupFile && !supportsMarkup) {
+        markupStatus.textContent = "当前所选模型未全部支持 markup；请选择 GPT Image 2.5/2.6，或移除标注图。";
+      } else if (selectedMarkupFile) {
+        markupStatus.textContent = `${selectedMarkupFile.name} · 仅作用于第一张参考图。`;
+      } else {
+        markupStatus.textContent = "上传与第一张参考图同尺寸的透明 PNG，仅保留标注笔迹。";
+      }
+      if (selectedMaskFile && !supportsMask) {
+        maskStatus.textContent = "当前所选模型未全部支持 mask；请选择支持遮罩的 GPT Image 模型，或移除遮罩图。";
+      } else if (selectedMaskFile) {
+        maskStatus.textContent = `${selectedMaskFile.name} · 仅作用于第一张参考图。`;
+      } else {
+        maskStatus.textContent = "上传与第一张参考图同尺寸、带 alpha 通道的 PNG；不能与 markup 同时使用。";
+      }
+
+      const isSvg = format === "svg";
+      if (isSvg && !outputFormatWasSvg) {
+        countBeforeSvg = countSelect.value;
+      } else if (!isSvg && outputFormatWasSvg && countBeforeSvg
+        && [...countSelect.options].some((option) => option.value === countBeforeSvg)) {
+        countSelect.value = countBeforeSvg;
+      }
+      if (isSvg) countSelect.value = "1";
+      countSelect.disabled = isSvg || countSelect.options.length === 0
+        || (countSelect.options.length === 1 && countSelect.value === "auto");
+      outputFormatWasSvg = isSvg;
+    }
+
+    function syncCustomSizeDetails() {
+      const selectedModels = getSelectedModels();
+      const supportsCustomSize = selectedModels.some((model) => modelConfigs[model]?.supportsCustomSize);
+      customSizeField.hidden = !supportsCustomSize || sizeSelect.value !== "custom";
+      customSizeInput.required = !customSizeField.hidden;
     }
 
     function syncSelect(select, allowedValues, preferredValue) {
@@ -3707,7 +4191,7 @@
       allowedValues.forEach((value) => {
         const option = document.createElement("option");
         option.value = value;
-        option.textContent = value;
+        option.textContent = ({ svg: "SVG 矢量图", gif: "GIF 动图", custom: "自定义" })[value] || value;
         select.appendChild(option);
       });
 
@@ -3736,6 +4220,67 @@
       selectedSourceImages = ReferenceImages.appendUniqueImages(selectedSourceImages, [...(files || [])]);
       sourceImagesInput.value = "";
       renderReferenceThumbs();
+      updateReadyPreviewState();
+    }
+
+    function handleMarkupImageChange() {
+      const file = markupImageInput.files?.[0] || null;
+      if (!file) return;
+      if (selectedMaskFile) {
+        markupImageInput.value = "";
+        markupStatus.textContent = "markup 和 mask 不能同时使用；请先移除当前遮罩图。";
+        return;
+      }
+      if (file.type !== "image/png") {
+        markupImageInput.value = "";
+        selectedMarkupFile = null;
+        markupStatus.textContent = "markup 必须是 PNG 文件。";
+        updateReadyPreviewState();
+        return;
+      }
+      if (file.size > 50 * 1024 * 1024) {
+        markupImageInput.value = "";
+        selectedMarkupFile = null;
+        markupStatus.textContent = "markup 文件不能超过 50MB。";
+        updateReadyPreviewState();
+        return;
+      }
+      selectedMarkupFile = file;
+      syncOutputFormatDetails();
+      updateReadyPreviewState();
+    }
+
+    function clearMarkupImage() {
+      selectedMarkupFile = null;
+      markupImageInput.value = "";
+      markupStatus.textContent = "上传与第一张参考图同尺寸的透明 PNG，仅保留标注笔迹。";
+      updateReadyPreviewState();
+    }
+
+    function handleMaskImageChange() {
+      const file = maskImageInput.files?.[0] || null;
+      if (!file) return;
+      if (selectedMarkupFile) {
+        maskImageInput.value = "";
+        maskStatus.textContent = "mask 和 markup 不能同时使用；请先移除当前标注图。";
+        return;
+      }
+      if (file.type !== "image/png") {
+        maskImageInput.value = "";
+        selectedMaskFile = null;
+        maskStatus.textContent = "mask 必须是 PNG 文件。";
+        updateReadyPreviewState();
+        return;
+      }
+      selectedMaskFile = file;
+      syncOutputFormatDetails();
+      updateReadyPreviewState();
+    }
+
+    function clearMaskImage() {
+      selectedMaskFile = null;
+      maskImageInput.value = "";
+      maskStatus.textContent = "上传与第一张参考图同尺寸、带 alpha 通道的 PNG；不能与 markup 同时使用。";
       updateReadyPreviewState();
     }
 
@@ -3795,6 +4340,7 @@
         item.append(image, number, tools);
         thumbGrid.appendChild(item);
       });
+      syncOutputFormatDetails();
       updateUploadHint();
     }
 
@@ -3895,7 +4441,7 @@
 
     function openHistoryDb() {
       return new Promise((resolve, reject) => {
-        const request = indexedDB.open(HISTORY_DB_NAME, 1);
+        const request = indexedDB.open(HISTORY_DB_NAME, 2);
         request.onupgradeneeded = () => {
           const db = request.result;
           if (!db.objectStoreNames.contains(HISTORY_STORE_NAME)) {
@@ -3905,14 +4451,22 @@
             });
             store.createIndex("createdAt", "createdAt");
           }
+          if (!db.objectStoreNames.contains(HISTORY_REFERENCE_STORE_NAME)) {
+            db.createObjectStore(HISTORY_REFERENCE_STORE_NAME, { keyPath: "comparisonId" });
+          }
         };
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error || new Error("打开历史库失败。"));
       });
     }
 
-    async function saveHistoryRecords(images, metadata) {
+    async function saveHistoryRecords(images, metadata, referenceFiles = []) {
       if (!images.length) return;
+      const storedReferences = referenceFiles.map((file) => ({
+        name: file.name || "粘贴的图片",
+        mime: file.type || "image/png",
+        blob: file
+      }));
       const db = await openHistoryDb();
       await new Promise((resolve, reject) => {
         const transaction = db.transaction(HISTORY_STORE_NAME, "readwrite");
@@ -3958,7 +4512,44 @@
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error || new Error("保存历史失败。"));
       });
+      let referenceSaveError = null;
+      if (metadata.comparisonId && storedReferences.length) {
+        try {
+          await new Promise((resolve, reject) => {
+            const transaction = db.transaction(HISTORY_REFERENCE_STORE_NAME, "readwrite");
+            transaction.objectStore(HISTORY_REFERENCE_STORE_NAME).put({
+              comparisonId: metadata.comparisonId,
+              images: storedReferences
+            });
+            transaction.oncomplete = resolve;
+            transaction.onerror = () => reject(transaction.error || new Error("保存参考图失败。"));
+            transaction.onabort = () => reject(transaction.error || new Error("保存参考图失败。"));
+          });
+        } catch (error) {
+          referenceSaveError = error;
+        }
+      }
       db.close();
+      return referenceSaveError;
+    }
+
+    async function getReferenceImagesForComparisons(records) {
+      const comparisonIds = [...new Set(records.map((record) => record.comparisonId).filter(Boolean))];
+      if (!comparisonIds.length) return new Map();
+      const db = await openHistoryDb();
+      const storedReferences = await new Promise((resolve, reject) => {
+        const transaction = db.transaction(HISTORY_REFERENCE_STORE_NAME, "readonly");
+        const store = transaction.objectStore(HISTORY_REFERENCE_STORE_NAME);
+        const requests = comparisonIds.map((comparisonId) => new Promise((resolveRequest, rejectRequest) => {
+          const request = store.get(comparisonId);
+          request.onsuccess = () => resolveRequest(request.result || null);
+          request.onerror = () => rejectRequest(request.error || new Error("读取参考图失败。"));
+        }));
+        transaction.onerror = () => reject(transaction.error || new Error("读取参考图失败。"));
+        Promise.all(requests).then(resolve, reject);
+      });
+      db.close();
+      return new Map(storedReferences.filter(Boolean).map((entry) => [entry.comparisonId, entry.images || []]));
     }
 
     async function getHistoryRecords() {
@@ -3977,17 +4568,31 @@
     async function renderHistory() {
       try {
         const records = await getHistoryRecords();
+        fullHistoryRecords = records;
         renderHistoryInto(historyList, records.slice(0, 12));
-        renderHistoryInto(fullHistoryList, records);
+        renderFilteredHistory();
         if (!records.length) {
           historyList.innerHTML = '<div class="history-empty">还没有历史图片。</div>';
-          fullHistoryList.innerHTML = '<div class="history-empty">还没有历史图片。</div>';
         }
       } catch (error) {
         historyList.innerHTML = `<div class="history-empty">${error.message}</div>`;
         fullHistoryList.innerHTML = `<div class="history-empty">${error.message}</div>`;
       }
       refreshExportSelectionUi();
+    }
+
+    function renderFilteredHistory() {
+      const records = HistoryFilter.filterRecords(fullHistoryRecords, historyTimeFilter.value);
+      if (!records.length) {
+        const empty = document.createElement("div");
+        empty.className = "history-empty";
+        empty.textContent = fullHistoryRecords.length
+          ? `所选时间范围（${historyTimeFilter.selectedOptions[0]?.textContent || "全部"}）内没有历史图片。`
+          : "还没有历史图片。";
+        fullHistoryList.replaceChildren(empty);
+        return;
+      }
+      renderHistoryInto(fullHistoryList, records);
     }
 
     function renderHistoryInto(container, records) {
@@ -4100,14 +4705,28 @@
 
       setExportButtonsBusy(true);
       try {
-        const table = ComparisonExport.buildComparisonExportTable(records);
+        const referencesByBatch = await getReferenceImagesForComparisons(records);
+        const exportRecords = await Promise.all(records.map(async (record) => {
+          const storedReferences = referencesByBatch.get(record.comparisonId);
+          const exportReferenceImages = storedReferences
+            ? await Promise.all(storedReferences.map(async (reference) => ({
+              name: reference.name,
+              dataUrl: reference.dataUrl || await blobToDataUrl(reference.blob)
+            })))
+            : (Array.isArray(record.generation_parameters?.reference_images)
+              ? record.generation_parameters.reference_images.map((name) => ({ name }))
+              : []);
+          return { ...record, exportReferenceImages };
+        }));
+        const table = ComparisonExport.buildComparisonExportTable(exportRecords);
         const workbook = new ExcelJS.Workbook();
         workbook.creator = "本地生图台";
         workbook.created = new Date();
         const sheet = workbook.addWorksheet("模型对比", {
           views: [{ state: "frozen", ySplit: 1 }]
         });
-        const headers = ["Prompt", "平台", "价格分组", "预计价格", ...table.models];
+        const modelColumns = ComparisonExport.buildModelColumns(table.models);
+        const headers = ["Prompt", "参考图", "平台", "价格分组", ...modelColumns.map((column) => column.header)];
         sheet.addRow(headers);
         sheet.getRow(1).height = 28;
         sheet.getRow(1).eachCell((cell) => {
@@ -4116,22 +4735,27 @@
           cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
         });
         sheet.getColumn(1).width = 46;
-        sheet.getColumn(2).width = 20;
-        sheet.getColumn(3).width = 16;
-        sheet.getColumn(4).width = 18;
-        table.models.forEach((_model, index) => {
-          sheet.getColumn(index + 5).width = 30;
+        sheet.getColumn(2).width = 40;
+        sheet.getColumn(3).width = 20;
+        sheet.getColumn(4).width = 16;
+        modelColumns.forEach((column, index) => {
+          sheet.getColumn(index + 5).width = column.kind === "price" ? 18 : 30;
         });
 
         for (const row of table.rows) {
           const excelRow = sheet.addRow([
-            row.index === 1 ? row.prompt : `${row.prompt}\n结果 ${row.index}`,
+            row.prompt,
+            row.referenceImages.length
+              ? (row.referenceImages.some((image) => !image.dataUrl) ? "原图未保存" : "")
+              : "无参考图",
             row.platforms,
             row.priceGroups,
-            row.estimatedPrices,
-            ...table.models.map(() => "")
+            ...modelColumns.map((column) => column.kind === "price"
+              ? ComparisonExport.formatEstimatedPrice(row.images[column.model])
+              : "")
           ]);
-          excelRow.height = 156;
+          const referenceSheet = await createExcelReferenceContactSheet(row.referenceImages);
+          excelRow.height = Math.max(156, referenceSheet ? referenceSheet.size.height * 0.75 : 0);
           excelRow.eachCell((cell) => {
             cell.alignment = { vertical: "top", wrapText: true };
             cell.border = {
@@ -4142,15 +4766,23 @@
             };
           });
 
+          if (referenceSheet) {
+            const imageId = workbook.addImage({ base64: referenceSheet.dataUrl, extension: "png" });
+            sheet.addImage(imageId, {
+              tl: { col: 1, row: excelRow.number - 1 },
+              ext: referenceSheet.size
+            });
+          }
+
           for (const [index, model] of table.models.entries()) {
             const record = row.images[model];
             if (!record) continue;
-            const cell = sheet.getCell(excelRow.number, index + 5);
+            const cell = sheet.getCell(excelRow.number, index * 2 + 6);
             try {
               const image = await getExcelImageData(record.src);
               const imageId = workbook.addImage({ base64: image.dataUrl, extension: image.extension });
               sheet.addImage(imageId, {
-                tl: { col: index + 4, row: excelRow.number - 1 },
+                tl: { col: index * 2 + 5, row: excelRow.number - 1 },
                 ext: image.size
               });
             } catch (error) {
@@ -4210,6 +4842,54 @@
         extension: normalizedType.format,
         size: await getExcelImageSize(dataUrl)
       };
+    }
+
+    async function createExcelReferenceContactSheet(references) {
+      const available = (references || []).filter((reference) => reference.dataUrl);
+      if (!available.length) return null;
+      const columns = 4;
+      const tileWidth = 68;
+      const tileHeight = 82;
+      const rows = Math.ceil(available.length / columns);
+      const canvas = document.createElement("canvas");
+      canvas.width = columns * tileWidth;
+      canvas.height = rows * tileHeight;
+      const context = canvas.getContext("2d");
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.font = "10px sans-serif";
+      context.textAlign = "center";
+      context.textBaseline = "top";
+
+      for (const [index, reference] of available.entries()) {
+        const image = await loadExcelImageElement(reference.dataUrl);
+        const x = (index % columns) * tileWidth;
+        const y = Math.floor(index / columns) * tileHeight;
+        const maxWidth = 60;
+        const maxHeight = 60;
+        const scale = Math.min(maxWidth / image.naturalWidth, maxHeight / image.naturalHeight);
+        const width = image.naturalWidth * scale;
+        const height = image.naturalHeight * scale;
+        context.drawImage(image, x + (tileWidth - width) / 2, y + (maxHeight - height) / 2, width, height);
+        const name = String(reference.name || "参考图");
+        const label = name.length > 12 ? `${name.slice(0, 10)}…` : name;
+        context.fillStyle = "#292c2a";
+        context.fillText(label, x + tileWidth / 2, y + 62, tileWidth - 4);
+      }
+
+      return {
+        dataUrl: canvas.toDataURL("image/png"),
+        size: { width: canvas.width, height: canvas.height }
+      };
+    }
+
+    function loadExcelImageElement(source) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("读取参考图失败。"));
+        image.src = source;
+      });
     }
 
     function blobToDataUrl(blob) {
@@ -4310,6 +4990,14 @@
       const imageCount = selectedSourceImages.length;
       const selectedModels = getSelectedModels();
       const modelCount = selectedModels.length;
+      if (!modelCount) {
+        activeComparisonModels = [];
+        modelResultPanels = new Map();
+        canvasWrap.innerHTML = "";
+        canvasWrap.classList.remove("comparison-grid");
+        setPreviewState("未选择模型", "选择一个或多个模型后即可生成。");
+        return;
+      }
       const sameModels = activeComparisonModels.length === selectedModels.length
         && activeComparisonModels.every((model, index) => model === selectedModels[index]);
       if (forceReset || !sameModels || modelResultPanels.size !== selectedModels.length || !canvasWrap.classList.contains("comparison-grid")) {
@@ -4359,7 +5047,8 @@
       const showHistory = location.hash === "#history";
       homePage.classList.toggle("hidden", showHistory);
       historyPage.classList.toggle("hidden", !showHistory);
-      statusEl.textContent = showHistory ? "历史" : statusEl.textContent === "历史" ? "待生成" : statusEl.textContent;
+      historyLink.hidden = showHistory;
+      historyReturnLink.hidden = !showHistory;
       if (showHistory) renderHistory();
     }
 

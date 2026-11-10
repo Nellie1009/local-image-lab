@@ -69,8 +69,23 @@
     const body = compactObject({ ...payload, model: modelId });
     delete body.gemini_resolution;
     body.response_format = "b64_json";
-    delete body.output_format;
-    delete body.background;
+    const supportsSvgGif = /^gpt-image-2\.6-(flare|sunburst)$/.test(modelId);
+    const supportsComplexityAndGifTiming = supportsSvgGif;
+    if (!supportsComplexityAndGifTiming) {
+      delete body.complexity;
+      delete body.frame_count;
+      delete body.frame_duration_ms;
+    }
+    const svgModel = body.svg_model;
+    delete body.svg_model;
+    if (body.output_format === "svg" && supportsSvgGif) {
+      body.svg = { model: svgModel || "gpt-5.5" };
+    } else {
+      delete body.svg;
+      if (body.output_format === "svg" || (body.output_format === "gif" && !supportsSvgGif)) {
+        delete body.output_format;
+      }
+    }
     delete body.style;
     return body;
   }
@@ -97,6 +112,8 @@
     const formData = new FormData();
     Object.entries(body).forEach(([key, value]) => formData.append(key, String(value)));
     files.forEach((file) => formData.append("image[]", file, file.name));
+    if (input.markupFile) formData.append("markup", input.markupFile, input.markupFile.name);
+    if (input.maskFile) formData.append("mask", input.maskFile, input.maskFile.name);
     return {
       adapterId: "openai-images",
       url: `${origin}/v1/images/edits`,

@@ -47,6 +47,20 @@ test("does not fabricate a per-request estimate for token billing", () => {
   assert.equal(candidate.estimatedPrice, null);
 });
 
+test("can restrict a format-specific request to an allowed price group", () => {
+  const defaultCandidate = Router.buildCandidates({
+    modelId: "gpt-image-2.6-flare",
+    isEdit: false,
+    requiredPriceGroupId: "default",
+    catalog,
+    credentials: [
+      activeDefaultCredential,
+      { ...activeDefaultCredential, id: "mini-key", priceGroupId: "mini" }
+    ]
+  });
+  assert.deepEqual(defaultCandidate.map((candidate) => candidate.credential.id), ["cred-1"]);
+});
+
 test("estimates quality multipliers and paid reference images", () => {
   const [gpt] = Router.buildCandidates({
     modelId: "gpt-image-2.5-flare",
@@ -54,7 +68,7 @@ test("estimates quality multipliers and paid reference images", () => {
     quality: "xhigh",
     count: 2,
     catalog,
-    credentials: [activeDefaultCredential]
+    credentials: [{ ...activeDefaultCredential, priceGroupId: "discount" }]
   });
   assert.equal(gpt.estimatedPrice, 0.45);
 

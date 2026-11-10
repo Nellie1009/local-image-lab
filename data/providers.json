@@ -30,9 +30,12 @@
         }
       ],
       "modelMappings": [
+        { "modelId": "gpt-image-2.6-flare", "requestModel": "gpt-image-2.6-flare", "adapter": "openai-images" },
+        { "modelId": "gpt-image-2.6-sunburst", "requestModel": "gpt-image-2.6-sunburst", "adapter": "openai-images" },
         { "modelId": "gpt-image-2.5-flare", "requestModel": "gpt-image-2.5-flare", "adapter": "openai-images" },
         { "modelId": "gpt-image-2.5-sunburst", "requestModel": "gpt-image-2.5-sunburst", "adapter": "openai-images" },
         { "modelId": "gpt-image-2", "requestModel": "gpt-image-2", "adapter": "openai-images" },
+        { "modelId": "gemini-nano-banana-2.1", "requestModel": "gemini-nano-banana-2.1", "adapter": "gemini-native" },
         { "modelId": "gemini-3.1-flash-lite-image", "requestModel": "gemini-3.1-flash-lite-image", "adapter": "gemini-native" },
         { "modelId": "gemini-2.5-flash-image", "requestModel": "gemini-2.5-flash-image", "adapter": "gemini-native" },
         { "modelId": "gemini-3-pro-image", "requestModel": "gemini-3-pro-image", "adapter": "gemini-native" },

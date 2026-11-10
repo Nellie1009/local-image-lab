@@ -34,6 +34,21 @@
     return secret;
   }
 
+  function validateBaseUrl(value) {
+    const input = String(value || "").trim();
+    let url;
+    try {
+      url = new URL(input);
+    } catch (_error) {
+      throw new Error("请填写有效的 API URL。");
+    }
+    if (!["http:", "https:"].includes(url.protocol) || !url.hostname
+      || url.username || url.password || url.search || url.hash) {
+      throw new Error("API URL 需为不含账号、查询参数或片段的 HTTP(S) 地址。");
+    }
+    return url.href.replace(/\/+$/, "");
+  }
+
   function maskSecret(value) {
     const secret = normalizeSecret(value);
     if (!secret) return "";
@@ -56,12 +71,22 @@
       return null;
     }
     if (!providerId || !value.id) return null;
+    let baseUrl = "";
+    try {
+      if (value.baseUrl) baseUrl = validateBaseUrl(value.baseUrl);
+    } catch (_error) {
+      return null;
+    }
+    const providerName = providerId === "custom" ? "" : String(value.providerName || "").trim();
+    if (providerId === "custom" && !baseUrl) return null;
     const status = ["active", "disabled", "exhausted"].includes(value.status)
       ? value.status
       : "active";
     return {
       id: String(value.id),
       providerId,
+      ...(providerName ? { providerName } : {}),
+      ...(baseUrl ? { baseUrl } : {}),
       label: String(value.label || providerId).trim() || providerId,
       secret,
       priceGroupId: String(value.priceGroupId || defaults.priceGroupId || "default"),
@@ -120,9 +145,14 @@
       const providerId = String(input.providerId || "").trim();
       if (!providerId) throw new Error("请选择 API 平台。");
       const defaults = PROVIDER_DEFAULTS[providerId] || {};
+      const providerName = providerId === "custom" ? "" : String(input.providerName || "").trim();
+      const baseUrl = input.baseUrl ? validateBaseUrl(input.baseUrl) : "";
+      if (providerId === "custom" && !baseUrl) throw new Error("请填写有效的 API URL。");
       const credential = {
         id: String(idFactory()),
         providerId,
+        ...(providerName ? { providerName } : {}),
+        ...(baseUrl ? { baseUrl } : {}),
         label: String(input.label || providerId).trim() || providerId,
         secret: validateSecret(input.secret),
         priceGroupId: String(input.priceGroupId || defaults.priceGroupId || "default"),

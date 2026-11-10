@@ -60,3 +60,22 @@ test("legacy history records show known values and mark missing parameters", () 
   assert.equal(details.find((item) => item.label === "尺寸 / 比例").value, "未记录");
 });
 
+test("history details retain GPT Image complexity, GIF timing, and markup filename", () => {
+  const { buildHistoryDetails } = require(modulePath);
+  const details = buildHistoryDetails({
+    model: "gpt-image-2.6-flare",
+    generation_parameters: {
+      complexity: "medium",
+      frame_count: 8,
+      frame_duration_ms: 120,
+      markup: "markup-overlay.png",
+      mask: "mask-overlay.png"
+    }
+  });
+  assert.equal(details.find((item) => item.label === "Complexity").value, "medium");
+  assert.equal(details.find((item) => item.label === "GIF 帧数").value, "8");
+  assert.equal(details.find((item) => item.label === "单帧时长").value, "120 ms");
+  assert.equal(details.find((item) => item.label === "markup 标注图").value, "markup-overlay.png");
+  assert.equal(details.find((item) => item.label === "mask 遮罩图").value, "mask-overlay.png");
+});
+

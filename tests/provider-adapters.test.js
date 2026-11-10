@@ -37,6 +37,92 @@ test("builds OpenAI generation and edit requests with the 12API contract", () =>
   assert.equal(edit.options.body.getAll("image[]").length, 2);
 });
 
+test("keeps GPT Image 2.6 SVG/GIF formats and adds the required customizable SVG model", () => {
+  const svgRequest = Adapters.buildOpenAiRequest({
+    origin: "https://cdn.12ai.org",
+    apiKey: "sk-secret",
+    modelId: "gpt-image-2.6-flare",
+    payload: { prompt: "vector icon", output_format: "svg", svg_model: "gpt-5.6" }
+  });
+  const svgBody = JSON.parse(svgRequest.options.body);
+  assert.equal(svgBody.output_format, "svg");
+  assert.deepEqual(svgBody.svg, { model: "gpt-5.6" });
+  assert.equal("svg_model" in svgBody, false);
+  assert.equal(svgBody.response_format, "b64_json");
+
+  const gifRequest = Adapters.buildOpenAiRequest({
+    origin: "https://cdn.12ai.org",
+    apiKey: "sk-secret",
+    modelId: "gpt-image-2.6-sunburst",
+    payload: { prompt: "animated icon", output_format: "gif", svg_model: "ignored" }
+  });
+  const gifBody = JSON.parse(gifRequest.options.body);
+  assert.equal(gifBody.output_format, "gif");
+  assert.equal("svg" in gifBody, false);
+  assert.equal("svg_model" in gifBody, false);
+});
+
+test("sends GPT Image 2.6 controls, preserves background, and attaches a markup PNG on edits", () => {
+  const markup = new File(["overlay"], "markup.png", { type: "image/png" });
+  const request = Adapters.buildOpenAiRequest({
+    origin: "https://cdn.12ai.org",
+    apiKey: "sk-secret",
+    modelId: "gpt-image-2.6-flare",
+    payload: {
+      prompt: "edit the marked region",
+      output_format: "gif",
+      background: "opaque",
+      complexity: "medium",
+      frame_count: 8,
+      frame_duration_ms: 120
+    },
+    files: [new File(["source"], "source.png", { type: "image/png" })],
+    markupFile: markup
+  });
+
+  const body = request.options.body;
+  assert.equal(body.get("complexity"), "medium");
+  assert.equal(body.get("frame_count"), "8");
+  assert.equal(body.get("frame_duration_ms"), "120");
+  assert.equal(body.get("background"), "opaque");
+  assert.equal(body.get("markup").name, "markup.png");
+  assert.equal(body.getAll("image[]").length, 1);
+});
+
+test("attaches a separate mask PNG in GPT Image edit multipart data", () => {
+  const mask = new File(["mask"], "mask.png", { type: "image/png" });
+  const request = Adapters.buildOpenAiRequest({
+    origin: "https://cdn.12ai.org",
+    apiKey: "sk-secret",
+    modelId: "gpt-image-2",
+    payload: { prompt: "edit masked area" },
+    files: [new File(["source"], "source.png", { type: "image/png" })],
+    maskFile: mask
+  });
+  assert.equal(request.options.body.get("mask").name, "mask.png");
+});
+
+test("drops 2.6-only parameters from older GPT Image model requests", () => {
+  const request = Adapters.buildOpenAiRequest({
+    origin: "https://cdn.12ai.org",
+    apiKey: "sk-secret",
+    modelId: "gpt-image-2.5-flare",
+    payload: {
+      prompt: "poster",
+      output_format: "png",
+      complexity: "low",
+      frame_count: 6,
+      frame_duration_ms: 100
+    }
+  });
+
+  const body = JSON.parse(request.options.body);
+  assert.equal(body.output_format, "png");
+  assert.equal("complexity" in body, false);
+  assert.equal("frame_count" in body, false);
+  assert.equal("frame_duration_ms" in body, false);
+});
+
 test("explains 12API browser fetch failures as a preflight Authorization CORS issue", () => {
   const message = Adapters.formatFetchFailure(
     new TypeError("Failed to fetch"),
